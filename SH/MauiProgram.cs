@@ -32,13 +32,14 @@ namespace SH
             builder.Logging.AddDebug();
 #endif
 
-            //var a = Assembly.GetExecutingAssembly();
-            //using var stream = a.GetManifestResourceStream("appsettings.json");
+            var a = Assembly.GetExecutingAssembly();
+            var appSettings = $"{a.GetName().Name}.appsettings.json";
+            using var stream = a.GetManifestResourceStream(appSettings);
 
-            //var config = new ConfigurationBuilder()
-            //            .AddJsonStream(stream)
-            //            .Build();
-            //builder.Configuration.AddConfiguration(config);
+            var config = new ConfigurationBuilder()
+                        .AddJsonStream(stream)
+                        .Build();
+            builder.Configuration.AddConfiguration(config);
 
             return builder.Build();
         }
