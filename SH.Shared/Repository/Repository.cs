@@ -1,6 +1,7 @@
 ﻿using Common.Dto.Requests;
 using Common.Dto.Responses;
 using Microsoft.Extensions.Configuration;
+using SH.Shared.Services;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
@@ -13,9 +14,13 @@ namespace Common.Repository
     {
 
         readonly IConfiguration _config;
+        readonly IFormFactor _formFactor;
 
-        public Repository(IConfiguration config) =>
+        public Repository(IConfiguration config, IFormFactor formFactor)
+        {
             _config = config;
+            _formFactor = formFactor;
+        }
 
 
         public async Task<ApiResponse<TResponseDto>> HttpPostAsync(TRequestDto request)
@@ -41,8 +46,7 @@ namespace Common.Repository
                     client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", request.Token);
 
                 //var host = _config.GetRequiredSection("WebAPI:Host").Value;
-                //var host = "http://10.0.2.2:7010/api";
-                var host = "http://localhost:7010/api";
+                string host = _formFactor.GetFormFactor() == "Phone" ? "http://10.0.2.2:7010/api" : "http://localhost:7010/api";
 
                 var response = await client.PostAsJsonAsync($"{host}{request.Uri}", request);
 
