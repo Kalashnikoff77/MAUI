@@ -1,0 +1,37 @@
+﻿<img src="@uri" data-avatar="@Account.Id" width="@width" height="@height" title="@Title" class="@Class @online" style="@Style" />
+
+@code {
+    [Parameter, EditorRequired] public AccountsViewDto Account { get; set; } = null!;
+    [Parameter] public EnumImageSize Size { get; set; } = EnumImageSize.s64x64;
+    [Parameter] public string? Title { get; set; }
+    [Parameter] public string? Class { get; set; }
+    [Parameter] public string? Style { get; set; }
+
+    // [Inject] CurrentState CurrentState { get; set; } = null!;
+
+    string uri = null!;
+    string online = null!;
+    int width;
+    int height;
+
+    protected override void OnParametersSet()
+    {
+        if (Account != null) 
+        {
+            width = StaticData.Images[Size].Width;
+            height = StaticData.Images[Size].Height;
+
+            if (Account.Avatar != null)
+                uri = $"/images/AccountsPhotos/{Account.Id}/{Account.Avatar.Guid}/{Size}.jpg";
+            else
+                uri = $"/images/AccountsPhotos/no-avatar/{Size}.jpg";
+
+            // online = CurrentState.ConnectedAccounts.Contains(Account.Id.ToString()) ? "img-online" : "";
+        }
+        else
+        {
+            uri = $"/images/AccountsPhotos/no-avatar/{Size}.jpg";
+            online = "";
+        }
+    }
+}

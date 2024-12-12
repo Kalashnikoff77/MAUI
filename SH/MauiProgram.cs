@@ -1,8 +1,10 @@
 ﻿using Common.Repository;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using MudBlazor.Services;
 using SH.Services;
 using SH.Shared.Services;
+using System.Reflection;
 
 namespace SH
 {
@@ -22,6 +24,7 @@ namespace SH
             builder.Services.AddScoped(typeof(IRepository<,>), typeof(Repository<,>));
 
             builder.Services.AddMudServices();
+
             builder.Services.AddMauiBlazorWebView();
 
 #if DEBUG
@@ -29,7 +32,20 @@ namespace SH
             builder.Logging.AddDebug();
 #endif
 
+            //var a = Assembly.GetExecutingAssembly();
+            //using var stream = a.GetManifestResourceStream("appsettings.json");
+
+            //var config = new ConfigurationBuilder()
+            //            .AddJsonStream(stream)
+            //            .Build();
+            //builder.Configuration.AddConfiguration(config);
+
             return builder.Build();
         }
+    }
+
+    public class Settings
+    {
+        public int WebAPIHost { get; set; }
     }
 }

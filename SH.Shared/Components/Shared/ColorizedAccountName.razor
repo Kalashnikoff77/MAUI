@@ -1,0 +1,20 @@
+﻿<MudText Color="@color" Typo="@Typo" Style="@Style">@Account.Name</MudText>
+
+@code {
+    [Parameter, EditorRequired] public AccountsViewDto Account { get; set; } = null!;
+    [Parameter] public Typo Typo { get; set; } = Typo.inherit;
+    [Parameter] public string? Style { get; set; }
+
+    Color color = Color.Default;
+
+    protected override void OnParametersSet()
+    {
+        if (Account.Users != null && Account.Users.Any())
+        {
+            if (Account.Users?.Count > 1)
+                color = Color.Tertiary;
+            else
+                color = Account.Users!.First().Gender == 0 ? Color.Primary : Color.Error;
+        }
+    }
+}

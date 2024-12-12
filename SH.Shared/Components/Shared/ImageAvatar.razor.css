@@ -1,0 +1,37 @@
+.avatar {
+    border-radius: 50%
+}
+
+.s35 {
+    width: 35px;
+    height: 35px;
+}
+
+.s40 {
+    width: 40px;
+    height: 40px;
+}
+
+.s45 {
+    width: 45px;
+    height: 45px;
+}
+
+.s50 {
+    width: 50px;
+    height: 50px;
+}
+
+.s55 {
+    width: 55px;
+    height: 55px;
+}
+
+.s60 {
+    width: 60px;
+    height: 60px;
+}
+
+.img-online {
+    border: 2px solid #2bad0a;
+}
