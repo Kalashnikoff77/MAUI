@@ -1,0 +1,49 @@
+﻿@page "/"
+@using SH.Shared.Services
+@inject IFormFactor FormFactor
+@using MudBlazor.Utilities
+
+<PageTitle>Home</PageTitle>
+
+@foreach (var schedule in SchedulesList) 
+{
+    <p>@schedule.Event.Name</p>
+}
+
+<MudButton Variant="MudBlazor.Variant.Filled" Color="MudBlazor.Color.Primary" Class="mb-5">Тестовая кнопка</MudButton>
+
+<MudDatePicker Label="Выберите дату" Editable="true" @bind-Date="_date" Placeholder="Select Date" />
+
+<MudStack Class="mb-5 mt-5">
+    <MudDivider />
+
+    <MudColorPicker Label="Basic Color Picker" @bind-Text="_colorValue" Style="@($"color: {_colorValue};")" Placeholder="Select Color" />
+
+    <MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-6">
+        <MudTabPanel Text="Tab One">
+            <MudText>Content One</MudText>
+        </MudTabPanel>
+        <MudTabPanel Text="Tab Two">
+            <MudText>Content Two</MudText>
+        </MudTabPanel>
+        <MudTabPanel Text="Tab Three">
+            <MudText>Content Three</MudText>
+        </MudTabPanel>
+        <MudTabPanel Text="Tab Disabled" Disabled="true">
+            <MudText>Content Disabled</MudText>
+        </MudTabPanel>
+    </MudTabs>
+
+</MudStack>
+
+<h1>Hello, world!</h1>
+
+Welcome to your new app running on <em>@factor</em> using <em>@platform</em>.
+
+@code {
+    private string factor => FormFactor.GetFormFactor();
+    private string platform => FormFactor.GetPlatform();
+    private DateTime? _date = DateTime.Today;
+    
+    private string? _colorValue;
+}
