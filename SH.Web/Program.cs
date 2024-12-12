@@ -15,6 +15,7 @@ builder.Services.AddMudServices();
 
 builder.Services.AddSingleton<IFormFactor, FormFactor>();
 builder.Services.AddScoped(typeof(IRepository<,>), typeof(Repository<,>));
+
 builder.Services.AddMudServices();
 
 var app = builder.Build();

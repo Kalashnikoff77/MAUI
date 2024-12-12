@@ -1,7 +1,40 @@
-﻿namespace Common.Models
+﻿using Common.Enums;
+using PhotoSauce.MagicScaler;
+
+namespace Common.Models
 {
     public static class StaticData
     {
+        // CropScaleMode.Max - размер фото не увеличивать (фото может быть меньше указанных размеров). При необходимости урезать высоту или ширину
+        // CropScaleMode.Crop - размер фото увеличить до указанных размеров. При необходимости урезать высоту или ширину
+
+        /// <summary>
+        /// Настройки размеров изображений
+        /// </summary>
+        public static Dictionary<EnumImageSize, ProcessImageSettings> Images = new()
+        {
+            {
+                EnumImageSize.s64x64,
+                new ProcessImageSettings { Width=64, Height=64, OrientationMode = OrientationMode.Normalize, ResizeMode=CropScaleMode.Crop }
+            },
+            {
+                EnumImageSize.s150x150,
+                new ProcessImageSettings { Width=150, Height=150, OrientationMode = OrientationMode.Normalize, ResizeMode=CropScaleMode.Crop }
+            },
+            {
+                EnumImageSize.s250x250,
+                new ProcessImageSettings { Width=250, Height=250, OrientationMode = OrientationMode.Normalize, ResizeMode=CropScaleMode.Crop }
+            },
+            {
+                EnumImageSize.s450x600,
+                new ProcessImageSettings { Width=450, Height=600, ResizeMode=CropScaleMode.Pad, OrientationMode = OrientationMode.Normalize, MatteColor = System.Drawing.Color.Black }
+            },
+            {
+                EnumImageSize.s768x1024,
+                new ProcessImageSettings { Width=768, Height=1024, ResizeMode=CropScaleMode.Pad, OrientationMode = OrientationMode.Normalize, MatteColor = System.Drawing.Color.Black }
+            }
+        };
+
         /// <summary>
         /// Пол
         /// </summary>
