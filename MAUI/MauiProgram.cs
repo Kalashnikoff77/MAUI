@@ -34,18 +34,11 @@ namespace MAUI
             var a = Assembly.GetExecutingAssembly();
             var appSettings = $"{a.GetName().Name}.appsettings.json";
             using var stream = a.GetManifestResourceStream(appSettings);
-
-            var config = new ConfigurationBuilder()
-                        .AddJsonStream(stream)
-                        .Build();
-            builder.Configuration.AddConfiguration(config);
+            if (stream == null)
+                throw new Exception("Не найден файл конфигурации appsettings.json!");
+            builder.Configuration.AddConfiguration(new ConfigurationBuilder().AddJsonStream(stream).Build());
 
             return builder.Build();
         }
-    }
-
-    public class Settings
-    {
-        public int WebAPIHost { get; set; }
     }
 }

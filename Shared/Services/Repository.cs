@@ -44,9 +44,7 @@ namespace Shared.Services
                 if (!string.IsNullOrWhiteSpace(request.Token))
                     client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", request.Token);
 
-                //var host = _config.GetRequiredSection("WebAPI:Host").Value;
-                string host = _formFactor.GetFormFactor() == "Phone" ? "http://10.0.2.2:7010/api" : "http://localhost:7010/api";
-
+                var host = _config.GetRequiredSection("WebAPI:Host").Value;
                 var response = await client.PostAsJsonAsync($"{host}{request.Uri}", request);
 
                 apiResponse.StatusCode = response.StatusCode;
