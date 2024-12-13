@@ -1,5 +1,4 @@
-﻿using Shared.Repository;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using MudBlazor.Services;
 using MAUI.Services;
@@ -32,14 +31,14 @@ namespace MAUI
             builder.Logging.AddDebug();
 #endif
 
-            //var a = Assembly.GetExecutingAssembly();
-            //var appSettings = $"{a.GetName().Name}.appsettings.json";
-            //using var stream = a.GetManifestResourceStream(appSettings);
+            var a = Assembly.GetExecutingAssembly();
+            var appSettings = $"{a.GetName().Name}.appsettings.json";
+            using var stream = a.GetManifestResourceStream(appSettings);
 
-            //var config = new ConfigurationBuilder()
-            //            .AddJsonStream(stream)
-            //            .Build();
-            //builder.Configuration.AddConfiguration(config);
+            var config = new ConfigurationBuilder()
+                        .AddJsonStream(stream)
+                        .Build();
+            builder.Configuration.AddConfiguration(config);
 
             return builder.Build();
         }

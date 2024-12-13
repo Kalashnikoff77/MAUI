@@ -1,9 +1,9 @@
 ﻿using Common.Dto.Requests;
 using Common.Dto.Responses;
 using Common.Dto.Views;
-using Shared.Repository;
 using Microsoft.AspNetCore.Components;
 using Common.Extensions;
+using Shared.Services;
 
 namespace Shared.Components.Pages
 {

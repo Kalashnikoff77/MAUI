@@ -1,12 +1,11 @@
 ﻿using Common.Dto.Requests;
 using Common.Dto.Responses;
 using Microsoft.Extensions.Configuration;
-using Shared.Services;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 
-namespace Shared.Repository
+namespace Shared.Services
 {
     public class Repository<TRequestDto, TResponseDto> : IRepository<TRequestDto, TResponseDto>
         where TRequestDto : RequestDtoBase
@@ -30,7 +29,7 @@ namespace Shared.Repository
         }
 
 
-        private async Task<ApiResponse<TResponse>> PostAsJsonAsync<TRequest, TResponse>(TRequest request) 
+        private async Task<ApiResponse<TResponse>> PostAsJsonAsync<TRequest, TResponse>(TRequest request)
             where TRequest : RequestDtoBase
             where TResponse : ResponseDtoBase, new()
         {
@@ -55,9 +54,9 @@ namespace Shared.Repository
                 if (apiResponse.StatusCode != HttpStatusCode.Unauthorized)
                     apiResponse.Response = (await response.Content.ReadFromJsonAsync<TResponse>())!;
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
-                apiResponse.StatusCode=HttpStatusCode.InternalServerError;
+                apiResponse.StatusCode = HttpStatusCode.InternalServerError;
                 apiResponse.Response.ErrorMessage = ex.Message;
             }
 

@@ -1,9 +1,9 @@
 ﻿using Common.Dto.Requests;
 using Common.Dto.Responses;
 
-namespace Shared.Repository
+namespace Shared.Services
 {
-    public interface IRepository<TRequestDto, TResponseDto> 
+    public interface IRepository<TRequestDto, TResponseDto>
         where TRequestDto : RequestDtoBase
         where TResponseDto : ResponseDtoBase, new()
     {
