@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:local="clr-namespace:SH"
-             xmlns:shared="clr-namespace:SH.Shared;assembly=SH.Shared"
-             x:Class="SH.MainPage"
+             xmlns:local="clr-namespace:MAUI"
+             xmlns:shared="clr-namespace:Shared;assembly=Shared"
+             x:Class="MAUI.MainPage"
              BackgroundColor="{DynamicResource PageBackgroundColor}">
 
     <BlazorWebView x:Name="blazorWebView" HostPage="wwwroot/index.html">

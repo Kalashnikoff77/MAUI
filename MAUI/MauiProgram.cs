@@ -1,12 +1,12 @@
-﻿using Common.Repository;
+﻿using Shared.Repository;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using MudBlazor.Services;
-using SH.Services;
-using SH.Shared.Services;
+using MAUI.Services;
+using Shared.Services;
 using System.Reflection;
 
-namespace SH
+namespace MAUI
 {
     public static class MauiProgram
     {

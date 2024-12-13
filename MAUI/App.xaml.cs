@@ -1,4 +1,4 @@
-﻿namespace SH
+﻿namespace MAUI
 {
     public partial class App : Application
     {

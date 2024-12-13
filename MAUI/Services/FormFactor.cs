@@ -1,6 +1,6 @@
-using SH.Shared.Services;
+using Shared.Services;
 
-namespace SH.Services
+namespace MAUI.Services
 {
     public class FormFactor : IFormFactor
     {
