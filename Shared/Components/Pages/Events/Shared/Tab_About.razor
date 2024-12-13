@@ -1,0 +1,65 @@
+﻿@if (ScheduleForEventView?.Event != null)
+{
+    <div class="d-flex flex-column">
+        @if (@ScheduleForEventView.Event.Admin != null)
+        {
+            <MudButton OnClick="() => ShowDialogs.AccountInfoCardDialogAsync(ScheduleForEventView.Event.Admin)" FullWidth Class="px-1 mb-3">
+                <div class="d-flex align-center gap-0" style="width:100%">
+                    <ImageAvatar Account="ScheduleForEventView.Event.Admin" Size="EnumImageSize.s64x64" Class="avatar s45 mr-3" Title="Организатор" />
+                    <MudText Typo="Typo.body2" Align="Align.Left"><b>Организатор:</b><br />@ScheduleForEventView.Event.Admin.Name (@ScheduleForEventView.Event.Admin.ToGendersAgesString())</MudText>
+                </div>
+            </MudButton>
+        }
+
+        <div class="d-flex align-center gap-1 mb-1">
+            <MudIcon Icon="@Icons.Material.Outlined.LocationOn" Style="font-size:19px" />
+            <MudText Typo="Typo.body2">@ScheduleForEventView.Event.ToRegionString() (@ScheduleForEventView.Event.Address)</MudText>
+        </div>
+
+        <div class="d-flex align-center gap-1 mb-1">
+            <MudIcon Icon="@Icons.Material.Outlined.CalendarToday" Class="@ScheduleForEventView.ToDateClass()" Style="font-size:18px" />
+            <MudText Typo="Typo.body2"><b>@ScheduleForEventView.ToStartEndString()</b></MudText>
+        </div>
+
+        <div class="d-flex flex-wrap gap-2 mb-1">
+            @foreach (var feature in ScheduleForEventView.Features!.OrderBy(o => o.Name))
+            {
+                <span style="padding: 0 5px 0 5px; font-size:12px; font-weight:500; opacity:0.6; border-width:1px; border-style:dotted">@feature.Name</span>
+            }
+        </div>
+
+        <MudText Typo="Typo.body2" Class="mt-2">
+            <b>Описание мероприятия:</b><br />
+            <LongTextComponent Text="@ScheduleForEventView.Description" />
+        </MudText>
+
+        <MudDivider Class="my-3" />
+
+        <MudGrid Style="text-align:center">
+            <MudItem xs="4" title="Зарегистрировано пар / Свободных мест для пар">
+                <MudIcon Icon="@Icons.Material.Filled.PeopleAlt" Color="Color.Tertiary" /><br />
+                @ScheduleForEventView.Statistic?.NumOfRegPairs/@ScheduleForEventView.Event.MaxPairs
+            </MudItem>
+            <MudItem xs="4" title="Зарегистрировано мужчин / Свободных мест для мужчин">
+                <MudIcon Icon="@Icons.Material.Outlined.Face5" Color="Color.Primary" /><br />
+                @ScheduleForEventView.Statistic?.NumOfRegMen/@ScheduleForEventView.Event.MaxMen
+            </MudItem>
+            <MudItem xs="4" title="Зарегистрировано женщин / Свободных мест для женщин">
+                <MudIcon Icon="@Icons.Material.Outlined.Face3" Color="Color.Error" /><br />
+                @ScheduleForEventView.Statistic?.NumOfRegWomen/@ScheduleForEventView.Event.MaxWomen
+            </MudItem>
+        </MudGrid>
+        <MudGrid Style="text-align:center">
+            <MudItem xs="4">@(ScheduleForEventView.CostPair == 0 ? "Бесплатно" : ScheduleForEventView.CostPair.ToString() + " руб.")</MudItem>
+            <MudItem xs="4">@(ScheduleForEventView.CostMan == 0 ? "Бесплатно" : ScheduleForEventView.CostMan.ToString() + " руб.")</MudItem>
+            <MudItem xs="4">@(ScheduleForEventView.CostWoman == 0 ? "Бесплатно" : ScheduleForEventView.CostWoman.ToString() + " руб.")</MudItem>
+        </MudGrid>
+
+        <MudDivider Class="my-3" />
+
+        <MudText Typo="Typo.body2">
+            <b>Общее описание:</b><br />
+            <LongTextComponent Text="@ScheduleForEventView.Event.Description" />
+        </MudText>
+    </div>
+}

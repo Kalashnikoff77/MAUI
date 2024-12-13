@@ -1,0 +1,30 @@
+﻿<span>@cost</span>
+
+@code {
+    [CascadingParameter] public CurrentState CurrentState { get; set; } = null!;
+    [Parameter, EditorRequired] public SchedulesForEventsViewDto SchedulesForEventsViewDto { get; set; } = null!;
+
+    int price;
+    string cost = null!;
+
+    protected override void OnParametersSet()
+    {
+        if (CurrentState.Account?.Users != null && SchedulesForEventsViewDto != null)
+        {
+            if (CurrentState.Account.Users.Count > 1)
+            {
+                price = SchedulesForEventsViewDto.CostPair;
+            }
+            else
+            {
+                var user = CurrentState.Account.Users.First();
+                if (user.Gender == 0)
+                    price = SchedulesForEventsViewDto.CostMan;
+                else
+                    price = SchedulesForEventsViewDto.CostWoman;
+            }
+
+            cost = price == 0 ? "Бесплатно" : $"{price} руб.";
+        }
+    }
+}

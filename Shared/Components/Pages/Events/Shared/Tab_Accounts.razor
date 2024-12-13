@@ -1,0 +1,34 @@
+﻿@if (Schedules != null)
+{
+    <div class="d-flex flex-column">
+        <MudSimpleTable Hover Striped Elevation="0" Style="overflow:hidden">
+            <tbody>
+                @foreach(var schedule in Schedules) 
+                {
+                    @if (schedule.Account != null) 
+                    {
+                        <tr>
+                            <td class="px-1">
+                                <MudStack @onclick="() => ShowDialogs.AccountInfoCardDialogAsync(schedule.Account)" StretchItems="StretchItems.Start" AlignItems="AlignItems.Center" Spacing="0" Row Style="width:100%; cursor:pointer">
+                                    <div class="d-flex">
+                                        <ImageAvatar Account="schedule.Account" Size="EnumImageSize.s64x64" Class="avatar s55 mr-3" />
+                                        <div class="d-flex flex-column gap-0">
+                                            <p><b>@schedule.Account.Name</b></p>
+                                            <p style="font-size:13px">
+                                                @schedule.Account.ToGendersAgesString()<br />
+                                                @schedule.Account.ToRegionString()
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <AccountGenderIcon Account="@schedule.Account" />
+                                </MudStack>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </MudSimpleTable>
+    </div>
+    
+    <MudDivider />
+}

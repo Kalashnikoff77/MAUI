@@ -1,0 +1,61 @@
+﻿<MudDialog>
+    <TitleContent>@Title</TitleContent>
+
+    <DialogContent>
+        <MudGrid Spacing="3">
+            <MudItem xs="12">
+                <MudTextField @bind-Value="UserCopy.Name"
+                              AdornmentIcon="@Icons.Material.Outlined.Person" AdornmentColor="@NameIconColor" Adornment="Adornment.End"
+                              Validation="@(new Func<string, string?>(NameValidator))"
+                              Label="Имя партнёра" HelperText="Пример: Марина" Typo="Typo.body1" Variant="Variant.Text"
+                              MaxLength="StaticData.DB_USERS_NAME_MAX" />
+            </MudItem>
+
+            <MudItem sm="6" xs="12" Class="pt-0">
+                <MudRadioGroup Class="mt-sm-5 mt-xs-1" @bind-Value="UserCopy.Gender">
+                    <MudRadio Value="0" Color="Color.Primary">Муж.</MudRadio>
+                    <MudRadio Value="1" Color="Color.Secondary">Жен.</MudRadio>
+                </MudRadioGroup>
+            </MudItem>
+
+            <MudItem sm="6" xs="12" Class="pt-0">
+                <MudDatePicker Label="Дата рождения"
+                    DateChanged="BirthDateChanged" Date="BirthDate"
+                    Mask="@(new DateMask("dd.MM.yyyy"))" DateFormat="dd.MM.yyyy"
+                    AdornmentIcon="@Icons.Material.Filled.CalendarMonth" AdornmentColor="@BirthDateIconColor" Adornment="Adornment.End" 
+                    Validation="@(new Func<DateTime?, string?>(BirthDateValidator))" 
+                    OpenTo="OpenTo.Year"
+                    MinDate="DateTime.Now.AddYears(-75)"
+                    MaxDate="DateTime.Now.AddYears(-20)"
+                    HelperText="От 20 до 75 лет" ShowToolbar="false" />
+            </MudItem>
+
+            <MudItem sm="6" xs="12">
+                <MudNumericField @bind-Value="UserCopy.Height"
+                    AdornmentIcon="@Icons.Material.Filled.AccessibilityNew" AdornmentColor="@HeightIconColor" Adornment="Adornment.End" 
+                    Validation="@(new Func<short, string?>(HeightValidator))" 
+                    Label="Рост" HelperText="@($"От {StaticData.DB_USERS_HEIGHT_MIN} до {StaticData.DB_USERS_HEIGHT_MAX} см")" Variant="Variant.Text" />
+            </MudItem>
+
+            <MudItem sm="6" xs="12">
+                <MudNumericField @bind-Value="UserCopy.Weight" 
+                    AdornmentIcon="@Icons.Material.Filled.Accessibility" AdornmentColor="@WeightIconColor" Adornment="Adornment.End"
+                    Validation="@(new Func<short, string?>(WeightValidator))" 
+                    Label="Вес" HelperText="@($"От {StaticData.DB_USERS_WEIGHT_MIN} до {StaticData.DB_USERS_WEIGHT_MAX} кг")" Variant="Variant.Text" />
+            </MudItem>
+
+            <MudItem xs="12">
+                <MudTextField @bind-Value="UserCopy.About"
+                              AdornmentIcon="@Icons.Material.Outlined.ShortText" AdornmentColor="Color.Default" Adornment="Adornment.End"
+                              Label="О партнёре" HelperText="Например: профессия, место рождения, привычки и т.п." Typo="Typo.body1" Variant="Variant.Text"
+                              MaxLength="StaticData.DB_USERS_ABOUT_MAX" />
+            </MudItem>
+
+        </MudGrid>
+    </DialogContent>
+
+    <DialogActions>
+        <MudButton Color="Color.Error" StartIcon="@Icons.Material.Outlined.Close" OnClick="Cancel">Отмена</MudButton>
+        <MudButton Color="Color.Primary" Disabled="!isFormValid" Variant="Variant.Filled" StartIcon="@StartIcon" Size="Size.Small" OnClick="Submit">@ButtonSubmitText</MudButton>
+    </DialogActions>
+</MudDialog>

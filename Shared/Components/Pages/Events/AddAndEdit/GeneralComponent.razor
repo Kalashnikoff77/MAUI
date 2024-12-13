@@ -1,0 +1,76 @@
+﻿<MudExpansionPanel Expanded>
+    <TitleContent>
+        <div class="d-flex">
+            <MudIcon Color="Data.IsPanel1Valid ? Color.Success : Color.Default" Icon="@Icons.Material.Filled.Settings" class="mr-3" />
+            <MudText Color="Data.IsPanel1Valid ? Color.Success : Color.Default"><b>1. ОБЩИЕ ДАННЫЕ</b></MudText>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        <MudGrid>
+            <MudItem sm="12" xs="12">
+                <MudTextField @bind-Value="Data.Event.Name"
+                                Validation="@(new Func<string?, Task<string?>>(Data.NameValidator))"
+                                HelperText="Пример: Тематическая вечеринка FreeLove"
+                                Label="Название мероприятия"
+                                AdornmentIcon="@Icons.Material.Outlined.ShortText" AdornmentColor="@Data.NameIconColor" Adornment="Adornment.End"
+                                Typo="Typo.body1" Margin="Margin.Normal" Variant="Variant.Outlined" MaxLength="StaticData.DB_EVENT_NAME_MAX" />
+                <MudTextField @bind-Value="Data.Event.Description"
+                                Validation="@(new Func<string?, string?>(Data.DescriptionValidator))"
+                                HelperText="Правила, программа и особенности встречи"
+                                Label="Описание мероприятия"
+                                Lines="3" MaxLines="8" AutoGrow
+                                AdornmentIcon="@Icons.Material.Outlined.Info" AdornmentColor="@Data.DescriptionIconColor" Adornment="Adornment.End"
+                                Class="mt-7"
+                                Typo="Typo.body1" Margin="Margin.Normal" Variant="Variant.Outlined" MaxLength="StaticData.DB_EVENT_DESCRIPTION_MAX" />
+            </MudItem>
+
+            <MudItem sm="4" xs="4" Class="pt-2">
+                <MudNumericField @bind-Value="Data.Event.MaxPairs"
+                                    Validation="@(new Func<short?, string?>(Data.MaxPairsValidator))"
+                                    HelperText="Максимальное кол-во пар"
+                                    AdornmentIcon="@Icons.Material.Filled.PeopleAlt" Adornment="Adornment.End" AdornmentColor="@Data.MaxPairsIconColor"
+                                    Typo="Typo.body1" Margin="Margin.Dense" Variant="Variant.Outlined" />
+            </MudItem>
+            <MudItem sm="4" xs="4" Class="pt-2">
+                <MudNumericField @bind-Value="Data.Event.MaxMen"
+                                    Validation="@(new Func<short?, string?>(Data.MaxMenValidator))"
+                                    HelperText="Максимальное кол-во мужчин"
+                                    AdornmentIcon="@Icons.Material.Filled.Face5" Adornment="Adornment.End" AdornmentColor="@Data.MaxMenIconColor"
+                                    Typo="Typo.body1" Margin="Margin.Dense" Variant="Variant.Outlined" />
+            </MudItem>
+            <MudItem sm="4" xs="4" Class="pt-2">
+                <MudNumericField @bind-Value="Data.Event.MaxWomen"
+                                    Validation="@(new Func<short?, string?>(Data.MaxWomenValidator))"
+                                    HelperText="Максимальное кол-во женщин"
+                                    AdornmentIcon="@Icons.Material.Filled.Face3" Adornment="Adornment.End" AdornmentColor="@Data.MaxWomenIconColor"
+                                    Typo="Typo.body1" Margin="Margin.Dense" Variant="Variant.Outlined" />
+            </MudItem>
+
+            <MudItem sm="6" xs="12" Class="pt-3">
+                <MudStack Spacing="0">
+                    <MudAutocomplete AdornmentIcon="@Icons.Material.Outlined.LocationOn" AdornmentColor="@Data.CountryIconColor" Validation="@(new Func<string, string?>(Data.CountryValidator))" T="string" Label="Страна" @bind-Value="Data.CountryText" SearchFunc="@Data.SearchCountry" ResetValueOnEmptyText CoerceText CoerceValue="false" />
+                </MudStack>
+            </MudItem>
+            <MudItem sm="6" xs="12" Class="pt-3">
+                <MudStack Spacing="0">
+                    <MudAutocomplete AdornmentIcon="@Icons.Material.Outlined.LocationOn" AdornmentColor="@Data.RegionIconColor" Validation="@(new Func<string, string?>(Data.RegionValidator))" T="string" Label="Регион" @bind-Value="Data.RegionText" SearchFunc="@Data.SearchRegion" ResetValueOnEmptyText CoerceText CoerceValue="false" Disabled="Data.CountryText == null ? true : false" />
+                </MudStack>
+            </MudItem>
+
+            <MudItem sm="12" Class="pt-5">
+                <MudTextField @bind-Value="Data.Event.Address"
+                                Validation="@(new Func<string?, string?>(Data.AddressValidator))"
+                                HelperText="Пример: МО, пос. Каменка, ул. Центральная, д. 20"
+                                Label="Точный или примерный адрес мероприятия"
+                                AdornmentIcon="@Icons.Material.Outlined.ShortText" AdornmentColor="@Data.AddressIconColor" Adornment="Adornment.End"
+                                Typo="Typo.body1" Margin="Margin.Normal" Variant="Variant.Outlined" MaxLength="StaticData.DB_EVENT_ADDRESS_MAX" />
+            </MudItem>
+
+        </MudGrid>
+    </ChildContent>
+</MudExpansionPanel>
+
+@code {
+    [Parameter, EditorRequired] public EventDtoBase Data { get; set; } = null!;
+}
+

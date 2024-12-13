@@ -1,0 +1,60 @@
+﻿<MudExpansionPanel Disabled="!(Data.IsPanel1Valid && Data.IsPanel2Valid)" Expanded="(Data.IsPanel1Valid && Data.IsPanel2Valid)">
+    <TitleContent>
+        <div class="d-flex">
+            <MudIcon Color="Data.IsPanel3Valid ? Color.Success : Color.Default" Icon="@Icons.Material.Filled.Image" class="mr-3" />
+            <MudText Color="Data.IsPanel3Valid ? Color.Success : Color.Default"><b>3. ФОТОГРАФИИ</b></MudText>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        <MudStack Row Justify="Justify.Center" class="mb-5">
+            @if (Data.Event.Photos?.Count(x => x.IsDeleted == false) >= 20)
+            {
+                <MudButton Disabled Size="Size.Small" Variant="Variant.Outlined" Color="Color.Primary" StartIcon="@Icons.Material.Sharp.Upload">
+                    <MudText>Загружено макс. кол-во фото (20 шт.)</MudText>
+                </MudButton>
+            }
+            else
+            {
+                <MudFileUpload T="IReadOnlyList<IBrowserFile>" MaximumFileCount="255" Accept=".jpg,.jpeg,.png" FilesChanged="Data.UploadPhotos">
+                    <ActivatorContent>
+                        <MudButton Disabled="Data.processingPhoto" Size="Size.Small" Variant="Variant.Outlined" Color="Color.Primary" StartIcon="@Icons.Material.Sharp.Upload">
+                            @if (Data.processingPhoto)
+                            {
+                                <MudProgressCircular Size="Size.Small" Indeterminate />
+                                <MudText Class="ms-2">Обработка фото...</MudText>
+                            }
+                            else
+                            {
+                                <MudText>Добавить фотографии (макс. 20 шт.)</MudText>
+                            }
+                        </MudButton>
+                    </ActivatorContent>
+                </MudFileUpload>
+            }
+        </MudStack>
+
+        @if (Data.Event.Photos?.Count > 0)
+        {
+            <MudStack Row Wrap="Wrap.Wrap" Spacing="0" Justify="Justify.SpaceEvenly">
+                @foreach (var photo in Data.Event.Photos.Where(w => w.IsDeleted == false).OrderByDescending(o => o.IsAvatar).ThenByDescending(o => o.CreateDate))
+                {
+                    <MudPaper Outlined class="pa-3 mb-8" style="@("max-width:274px; " + (photo.IsAvatar ? "background-color:#EDFFEE" : null))">
+                        <MudImage Width="250" Height="250" Src="@($"/images/" + (photo.Id == 0 ? "temp" : $"EventsPhotos/{Data.Event.Id}") + $"/{photo.Guid}/{EnumImageSize.s250x250}.jpg")" Class="mb-2" />
+                        <MudStack Row>
+                            <MudTextField T="string" Value="@photo.Comment" ValueChanged="@((c) => Data.UpdateCommentPhoto(photo, c))" Label="Описание" Variant="Variant.Text" />
+                            <MudMenu Icon="@Icons.Material.Filled.MoreVert" Size="Size.Small" AnchorOrigin="Origin.BottomLeft" TransformOrigin="Origin.TopCenter" Dense>
+                                <MudMenuItem Disabled="@photo.IsAvatar" OnClick="@(() => Data.SetAsAvatarPhoto(photo))" Icon="@Icons.Material.Filled.Portrait">Установить как аватар</MudMenuItem>
+                                <MudMenuItem Disabled="@photo.IsAvatar" OnClick="@(() => photo.IsDeleted = true)" IconColor="Color.Error" Icon="@Icons.Material.Outlined.Delete">Удалить</MudMenuItem>
+                            </MudMenu>
+                        </MudStack>
+                    </MudPaper>
+                }
+            </MudStack>
+        }
+
+    </ChildContent>
+</MudExpansionPanel>
+
+@code {
+    [Parameter, EditorRequired] public EventDtoBase Data { get; set; } = null!;
+}

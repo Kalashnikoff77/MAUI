@@ -1,0 +1,37 @@
+﻿@inherits ScheduleInfoBase
+
+@if (ScheduleForEventView?.Event != null)
+{
+    <MudDialog Style="width:550px; min-width:300px">
+        <DialogContent>
+            <div id="top" class="d-flex flex-column mb-3 align-center" style="overflow-y:visible">
+                
+                @* Фото в карусели *@
+                <Shared.Components.Pages.Events.Shared.CarouselPhotosComponent Photos="ScheduleForEventView.Event.Photos" />
+                @* Расписания и кнопка регистрации *@
+                <Shared.Components.Pages.Events.Shared.SchedulesAndButtonComponent ScheduleForEventView="ScheduleForEventView" ScheduleDates="scheduleDates" ScheduleChangedAsync="ScheduleChangedAsync" SelectedSchedule="selectedSchedule" />
+
+                @* Закладки *@
+                <MudTabs Centered PanelClass="mt-6 px-2" Style="width:100%">
+                    <MudTabPanel Text="Общее">
+                        <Shared.Components.Pages.Events.Shared.Tab_About ScheduleForEventView="@ScheduleForEventView" />
+                    </MudTabPanel>
+                    <MudTabPanel Text="Обсуждение" BadgeData="@ScheduleForEventView.Event.Statistic?.NumOfDiscussions" BadgeColor="Color.Transparent">
+                        <Shared.Components.Pages.Events.Shared.Tab_Discussions ScheduleForEventView="@ScheduleForEventView" />
+                    </MudTabPanel>
+                    <MudTabPanel Text="Участники" Disabled="@(ScheduleForEventView.Statistic?.NumOfRegAccounts == 0)" BadgeData="@ScheduleForEventView.Statistic?.NumOfRegAccounts" BadgeColor="Color.Transparent">
+                        <Shared.Components.Pages.Events.Shared.Tab_Accounts ScheduleForEventView="@ScheduleForEventView" />
+                    </MudTabPanel>
+                </MudTabs>
+            </div>
+        </DialogContent>
+
+        <DialogActions>
+            @if (CurrentState.Account?.Id == ScheduleForEventView.Event.Admin?.Id)
+            {
+                <MudButton Href="@($"/events/edit/{ScheduleForEventView.EventId}")" Color="Color.Primary">Редактировать</MudButton>
+            }
+            <MudButton Color="Color.Error" OnClick="() => MudDialog.Close(DialogResult.Ok(true))">Закрыть</MudButton>
+        </DialogActions>
+    </MudDialog>
+}

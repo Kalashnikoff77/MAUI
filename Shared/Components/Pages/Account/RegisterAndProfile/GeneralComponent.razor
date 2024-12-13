@@ -1,0 +1,53 @@
+﻿<MudExpansionPanel Expanded>
+    <TitleContent>
+        <div class="d-flex">
+            <MudIcon Color="Data.IsPanel1Valid ? Color.Success : Color.Default" Icon="@Icons.Material.Filled.Settings" class="mr-3" />
+            <MudText Color="Data.IsPanel1Valid ? Color.Success : Color.Default"><b>1. ОБЩИЕ ДАННЫЕ</b></MudText>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        <MudGrid>
+            <MudItem sm="6" xs="12">
+                <MudTextField @bind-Value="Data.AccountRequestDto.Name" Validation="@(new Func<string, Task<string?>>(Data.NameValidator))" HelperText="Пример: Иван да Марья Мск" AdornmentIcon="@Icons.Material.Outlined.Person" AdornmentColor="@Data.NameIconColor" Adornment="Adornment.End" Label="Имя учётной записи" Typo="Typo.body1" Margin="Margin.Normal" Variant="Variant.Text" MaxLength="StaticData.DB_ACCOUNTS_NAME_MAX" />
+            </MudItem>
+            <MudItem sm="6" xs="12">
+                <MudTextField @bind-Value="Data.AccountRequestDto.Email" Validation="@(new Func<string, Task<string?>>(Data.EmailValidator))" HelperText="Пример: email@mail.ru" AdornmentIcon="@Icons.Material.Outlined.Mail" AdornmentColor="@Data.EmailIconColor" Adornment="Adornment.End" Label="Email" Typo="Typo.body1" Margin="Margin.Normal" Variant="Variant.Text" MaxLength="StaticData.DB_ACCOUNTS_EMAIL_MAX" />
+            </MudItem>
+        </MudGrid>
+        <MudGrid>
+            <MudItem sm="6" xs="12">
+                <MudTextField @bind-Value="Data.Password" Validation="@(new Func<string, string?>(Data.PasswordValidator))" AdornmentColor="@Data.PasswordIconColor" HelperText="Длина от 4 до 35 символов" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Outlined.Lock" Label="Пароль" Typo="Typo.body1" Margin="Margin.Normal" Variant="Variant.Text" MaxLength="StaticData.DB_ACCOUNTS_PASSWORD_MAX" />
+            </MudItem>
+            <MudItem sm="6" xs="12">
+                <MudTextField @bind-Value="Data.Password2" Validation="@(new Func<string, string?>(Data.Password2Validator))" AdornmentColor="@Data.Password2IconColor" HelperText="Повторите тот же пароль" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Outlined.Lock" Label="Повтор пароля" Typo="Typo.body1" Margin="Margin.Normal" Variant="Variant.Text" MaxLength="StaticData.DB_ACCOUNTS_PASSWORD_MAX" />
+            </MudItem>
+        </MudGrid>
+        <MudGrid>
+            <MudItem sm="6" xs="12">
+                <div class="d-flex mt-2 gap-0">
+                    <MudAutocomplete AdornmentIcon="@Icons.Material.Outlined.LocationOn" AdornmentColor="@Data.CountryIconColor" Validation="@(new Func<string, string?>(Data.CountryValidator))" T="string" Label="Страна" @bind-Value="Data.CountryText" SearchFunc="@Data.SearchCountryAsync" ResetValueOnEmptyText CoerceText CoerceValue="false" />
+                </div>
+            </MudItem>
+            <MudItem sm="6" xs="12">
+                <div class="d-flex gap-0 mt-2">
+                    <MudAutocomplete AdornmentIcon="@Icons.Material.Outlined.LocationOn" AdornmentColor="@Data.RegionIconColor" Validation="@(new Func<string, string?>(Data.RegionValidator))" T="string" Label="Регион" @bind-Value="Data.RegionText" SearchFunc="@Data.SearchRegionAsync" ResetValueOnEmptyText CoerceText CoerceValue="false" Disabled="Data.CountryText == null ? true : false" />
+                </div>
+            </MudItem>
+            <MudItem sm="6" xs="12">
+                <div class="d-flex gap-0 align-center mt-1" title="Сообщать о новых уведомлениях на сайте">
+                    <MudSwitch @bind-Value="Data.AccountRequestDto.Informings.IsNewNotification" Label="Получать уведомления" Color="Color.Primary" />
+                </div>
+            </MudItem>
+            <MudItem sm="6" xs="12">
+                <div class="d-flex gap-0 align-center mt-1" title="Уведомлять о новых личных сообщениях на сайте">
+                    <MudSwitch @bind-Value="Data.AccountRequestDto.Informings.IsNewMessage" Label="Получать сообщения" Color="Color.Primary" />
+                </div>
+            </MudItem>
+        </MudGrid>
+    </ChildContent>
+</MudExpansionPanel>
+
+@code {
+    [CascadingParameter] public CurrentState CurrentState { get; set; } = null!;
+    [Parameter, EditorRequired] public AccountDtoBase Data { get; set; } = null!;
+}

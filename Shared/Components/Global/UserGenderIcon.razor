@@ -1,0 +1,16 @@
+﻿@if (User != null)
+{
+    if (User.Gender == 0)
+    {
+        <MudIcon Icon="@Icons.Material.Outlined.Face5" Color="Color.Primary" Style="@Style" />
+    }
+    else
+    {
+        <MudIcon Icon="@Icons.Material.Outlined.Face3" Color="Color.Error" Style="@Style" />
+    }
+}
+
+@code {
+    [Parameter, EditorRequired] public UsersDto User { get; set; } = null!;
+    [Parameter] public string? Style { get; set; }
+}

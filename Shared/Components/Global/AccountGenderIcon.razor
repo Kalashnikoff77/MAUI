@@ -1,0 +1,23 @@
+﻿@if (Account.Users != null && Account.Users.Count > 0)
+{
+    @if (Account.Users.Count > 1)
+    {
+        <MudIcon Icon="@Icons.Material.Outlined.PeopleAlt" Color="Color.Tertiary" />
+    }
+    else
+    {
+        if (Account.Users.First().Gender == 0)
+        {
+            <MudIcon Icon="@Icons.Material.Outlined.Face5" Color="Color.Primary" />
+        }
+        else
+        {
+            <MudIcon Icon="@Icons.Material.Outlined.Face3" Color="Color.Error" />
+        }
+    }
+
+}
+
+@code {
+    [Parameter, EditorRequired] public AccountsViewDto Account { get; set; } = null!;
+}

@@ -1,0 +1,34 @@
+﻿<div class="d-flex gap-2 flex-wrap align-center justify-center mb-3">
+    @if (ScheduleDates != null)
+    {
+        <MudSelect T="SchedulesDatesViewDto" Value="SelectedSchedule" ValueChanged="ScheduleChangedAsync" Variant="Variant.Outlined" Dense AnchorOrigin="Origin.BottomCenter" Margin="Margin.Dense" Label="Расписание" AdornmentIcon="@Icons.Material.Outlined.CalendarMonth">
+            @foreach (var schedule in ScheduleDates)
+            {
+                <MudSelectItem Value="@schedule" />
+            }
+        </MudSelect>
+    }
+    @if (CurrentState.Account != null)
+    {
+        bool isRegistered = false;
+        if (CurrentState.Account.Schedules != null)
+            isRegistered = CurrentState.Account.Schedules.Any(a => a.ScheduleId == ScheduleForEventView.Id);
+
+        <MudButton OnClick="() => ShowDialogs.RegistrationForEventDialogAsync(ScheduleForEventView, isRegistered)"
+            Style="height:39px; margin:2px 3px 0 0; padding: 0 20px" Color="Color.Primary" IconSize="Size.Large" Size="Size.Small" StartIcon="@Icons.Material.Outlined.GroupAdd"
+            Variant="isRegistered ? Variant.Filled : Variant.Outlined"
+            title="@(isRegistered ? "Отменить регистрацию" : "Зарегистрироваться на мероприятие")">
+            @(isRegistered ? "Вы зарегистрированы" : "Регистрация")
+        </MudButton>
+    }
+</div>
+
+@code {
+    [Inject] public CurrentState CurrentState { get; set; } = null!;
+    [Inject] public ShowDialogs ShowDialogs { get; set; } = null!;
+
+    [Parameter, EditorRequired] public SchedulesForEventsViewDto ScheduleForEventView { get; set; } = null!;
+    [Parameter, EditorRequired] public IEnumerable<SchedulesDatesViewDto> ScheduleDates { get; set; } = null!;
+    [Parameter, EditorRequired] public SchedulesDatesViewDto SelectedSchedule { get; set; } = null!;
+    [Parameter, EditorRequired] public EventCallback<SchedulesDatesViewDto> ScheduleChangedAsync { get; set; }
+}

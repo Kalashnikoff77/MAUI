@@ -1,0 +1,23 @@
+﻿<MudExpansionPanel Disabled="!(Data.IsPanel1Valid && Data.IsPanel2Valid)" Expanded="(Data.IsPanel1Valid && Data.IsPanel2Valid)">
+    <TitleContent>
+        <div class="d-flex">
+            <MudIcon Color="Data.IsPanel3Valid ? Color.Success : Color.Default" Icon="@Icons.Material.Filled.Window" class="mr-3" />
+            <MudText Color="Data.IsPanel3Valid ? Color.Success : Color.Default"><b>3. ХОББИ, УВЛЕЧЕНИЯ</b></MudText>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        <div class="d-flex flex-wrap gap-4 justify-center">
+            @foreach (var hobby in Data.Hobbies)
+            {
+                var btnColor = Data.AccountRequestDto.Hobbies != null && Data.AccountRequestDto.Hobbies.Any(x => x.Id == hobby.Id) ? Color.Info : Color.Default;
+                var disabled = Data.AccountRequestDto.Hobbies != null && Data.AccountRequestDto.Hobbies.Count >= 5 && btnColor == Color.Default ? true : false;
+                <MudButton OnClick="() => Data.OnHobbyChanged(hobby)" Disabled="@disabled" Variant="Variant.Filled" Size="Size.Small" Color="btnColor">@hobby.Name</MudButton>
+            }
+        </div>
+    </ChildContent>
+</MudExpansionPanel>
+
+
+@code {
+    [Parameter, EditorRequired] public AccountDtoBase Data { get; set; } = null!;
+}

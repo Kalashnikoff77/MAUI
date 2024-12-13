@@ -1,0 +1,27 @@
+﻿<MudDialog Style="width:550px; min-width:360px">
+    <DialogContent>
+        <MudSimpleTable>
+            <thead>
+                <tr>
+                    <th>Название</th>
+                    <th>Дата</th>
+                    <th>Стоимость</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><b>@ScheduleForEventView.Event!.Name</b></td>
+                    <td>@ScheduleForEventView.ToStartEndString()</td>
+                    <td><EventCost SchedulesForEventsViewDto="@ScheduleForEventView" /></td>
+                </tr>
+            </tbody>
+        </MudSimpleTable>
+    </DialogContent>
+
+    <DialogActions>
+        <MudButton Color="Color.Error" StartIcon="@Icons.Material.Outlined.Close" OnClick="Cancel">Отмена</MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" StartIcon="@Icons.Material.Outlined.GroupAdd" Size="Size.Small" OnClick="Submit">
+            @(IsRegistered ? "Отменить регистрацию" : "Зарегистрироваться")
+        </MudButton>
+    </DialogActions>
+</MudDialog>

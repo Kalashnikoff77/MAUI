@@ -1,0 +1,31 @@
+﻿@page "/remember"
+
+<PageTitle>Восстановление пароля</PageTitle>
+
+<div class="d-flex flex-column ml-3" style="min-width:300px; max-width:750px">
+
+    <MudText Align="Align.Left" Typo="Typo.h6" Class="mb-3">Восстановление пароля</MudText>
+    <MudDivider DividerType="DividerType.FullWidth" Light="false" Class="mb-5" />
+
+    <MudPaper Class="pa-7" Style="min-width:300px; max-width:500px" Elevation="3">
+
+        <div class="d-flex gap-0 flex-column">
+            <MudTextField @bind-Value="rememberRequestDto.Email" InputType="InputType.Email" Validation="@(new Func<string, string?>(EmailValidator))" AdornmentIcon="@Icons.Material.Outlined.Mail" Adornment="Adornment.End" AdornmentColor="@EmailIconColor" Label="Email" Margin="Margin.Normal" Variant="Variant.Text" />
+            <MudStack Spacing="0" Justify="Justify.Center" AlignItems="AlignItems.Center">
+                <MudButton ButtonType="ButtonType.Submit" Disabled="!(EmailIconColor == Color.Success)" Color="Color.Primary" Variant="Variant.Filled" OnClick="OnRememberAsync" Class="mt-5" Style="width:180px">Напомнить</MudButton>
+            </MudStack>
+        </div>
+
+        @if (!string.IsNullOrWhiteSpace(errorRemember))
+        {
+            <MudAlert Dense ContentAlignment="HorizontalAlignment.Center" Severity="Severity.Error" Class="mt-3">@errorRemember</MudAlert>
+        }
+
+        @if (!string.IsNullOrWhiteSpace(okRemember))
+        {
+            <MudAlert Dense ContentAlignment="HorizontalAlignment.Center" Severity="Severity.Success" Class="mt-3">@okRemember</MudAlert>
+        }
+
+    </MudPaper>
+
+</div>

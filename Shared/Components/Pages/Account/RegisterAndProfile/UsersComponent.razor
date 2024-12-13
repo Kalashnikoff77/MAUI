@@ -1,0 +1,48 @@
+﻿<MudExpansionPanel Disabled="!Data.IsPanel1Valid" Expanded="Data.IsPanel1Valid">
+    <TitleContent>
+        <div class="d-flex">
+            <MudIcon Color="Data.IsPanel2Valid ? Color.Success : Color.Default" Icon="@Icons.Material.Filled.Group" class="mr-3" />
+            <MudText Color="Data.IsPanel2Valid ? Color.Success : Color.Default"><b>2. ПАРТНЁРЫ</b></MudText>
+        </div>
+    </TitleContent>
+    <ChildContent>
+
+        <MudDataGrid T="UsersDto" Items="@Data.AccountRequestDto.Users" Striped Hover ReadOnly EditMode="DataGridEditMode.Form">
+            <Columns>
+                <TemplateColumn Title="Общее" Context="user">
+                    <CellTemplate>
+                        <div class="d-flex gap-2 align-center">
+                            <UserGenderIcon User="@user.Item" />
+                            <MudText Typo="Typo.body2"><b>@user.Item.Name</b><br />@user.Item.ToGenderAgeString()</MudText>
+                        </div>
+                    </CellTemplate>
+                </TemplateColumn>
+
+                <TemplateColumn HeaderStyle="width:135px" Context="user" Title="Рост / вес">
+                    <CellTemplate>
+                        <MudText Typo="Typo.body2">@user.Item.Height см / @user.Item.Weight кг</MudText>
+                    </CellTemplate>
+                </TemplateColumn>
+
+                <TemplateColumn HeaderStyle="width:90px">
+                    <CellTemplate>
+                        <div class="d-flex gap-2">
+                            <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Edit" Color="Color.Primary" OnClick="async () => await Data.UpdateUserDialogAsync(context.Item)" />
+                            <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Delete" Color="Color.Error" OnClick="async () => await Data.DeleteUserDialogAsync(context.Item)" />
+                        </div>
+                    </CellTemplate>
+                </TemplateColumn>
+
+            </Columns>
+        </MudDataGrid>
+
+        <div class="d-flex flex-column align-end">
+            <MudButton StartIcon="@Icons.Material.Outlined.Add" ButtonType="ButtonType.Button" Color="Color.Primary" Size="Size.Small" Variant="Variant.Filled" OnClick="Data.AddUserDialogAsync" Disabled="Data.AccountRequestDto.Users.Count < 2 ? false : true" Class="mt-5">Добавить</MudButton>
+        </div>
+    </ChildContent>
+</MudExpansionPanel>
+
+
+@code {
+    [Parameter, EditorRequired] public AccountDtoBase Data { get; set; } = null!;
+}

@@ -1,0 +1,44 @@
+﻿@page "/events/add"
+
+@inherits EventDtoBase
+
+@if (CurrentState?.Account != null)
+{
+    <PageTitle>Добавление мероприятия</PageTitle>
+
+    <div class="d-flex flex-column ml-3" style="min-width:300px; max-width:750px">
+        
+        <MudText Typo="Typo.h6" Class="mb-1" Style="text-align:center">Добавление мероприятия</MudText>
+
+        <MudExpansionPanels MultiExpansion Elevation="3">
+
+            @* ОБЩИЕ *@
+            <GeneralComponent Data="@this" />
+
+            @* РАСПИСАНИЕ *@
+            <ScheduleComponent Data="@this" />
+
+            @* ФОТО *@
+            <PhotosComponent Data="@this" />
+
+        </MudExpansionPanels>
+
+        
+        @* КНОПКА СОХРАНЕНИЯ *@
+        <MudStack AlignItems="AlignItems.Center" Class="mt-5" Row="false">
+            <MudButton OnClick="AddAsync" StartIcon="@Icons.Material.Outlined.Add" Disabled="!(IsPanel1Valid && IsPanel2Valid && IsPanel3Valid && !processingEvent)" Variant="Variant.Filled" Size="Size.Large" Color="Color.Primary" Style="margin:auto">
+                @if (processingEvent)
+                {
+                    <MudProgressCircular Size="Size.Small" Style="margin:auto" Indeterminate="true" />
+                    <MudText Class="ms-2">Добавляем...</MudText>
+                }
+                else
+                {
+                    <MudText>Добавить мероприятие</MudText>
+                }
+            </MudButton>
+        </MudStack>
+
+    </div>
+}
+

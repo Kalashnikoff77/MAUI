@@ -1,0 +1,41 @@
+﻿@inherits ScheduleInfoBase
+
+@page "/events/{EventId:int}"
+
+@if (Event != null && ScheduleForEventView != null)
+{
+    <PageTitle>@Event.Name</PageTitle>
+
+    <div class="d-flex flex-column ml-3" style="min-width:300px; max-width:750px">
+
+        <MudText Align="Align.Center" Typo="Typo.h6">@Event.Name</MudText>
+        <MudDivider DividerType="DividerType.FullWidth" Light="false" />
+
+        @if (CurrentState.Account != null && CurrentState.Account.Id == Event.Admin!.Id)
+        {
+            <div class="d-flex justify-end">
+                <MudButton Href="@($"/events/edit/{EventId}")" Size="Size.Small" StartIcon="@Icons.Material.Outlined.EditNote" Color="Color.Primary" Variant="Variant.Text">Изменить</MudButton>
+            </div>
+        }
+
+        <div class="d-flex flex-column mt-4 align-center">
+            @* Фото в карусели *@
+            <Shared.Components.Pages.Events.Shared.CarouselPhotosComponent Photos="Event.Photos" />
+            @* Расписания и кнопка регистрации *@
+            <Shared.Components.Pages.Events.Shared.SchedulesAndButtonComponent ScheduleForEventView="ScheduleForEventView" ScheduleDates="scheduleDates" ScheduleChangedAsync="ScheduleChangedAsync" SelectedSchedule="selectedSchedule" />
+        </div>
+
+        @* Закладки *@
+        <MudTabs Centered PanelClass="mt-6 px-2" Style="width:100%">
+            <MudTabPanel Text="Общее">
+                <Shared.Components.Pages.Events.Shared.Tab_About ScheduleForEventView="@ScheduleForEventView" />
+            </MudTabPanel>
+            <MudTabPanel Text="Обсуждение" BadgeData="@ScheduleForEventView!.Event!.Statistic?.NumOfDiscussions" BadgeColor="Color.Transparent">
+                <Shared.Components.Pages.Events.Shared.Tab_Discussions ScheduleForEventView="@ScheduleForEventView" />
+            </MudTabPanel>
+            <MudTabPanel Text="Участники" Disabled="@(ScheduleForEventView.Statistic?.NumOfRegAccounts == 0)" BadgeData="@ScheduleForEventView.Statistic?.NumOfRegAccounts" BadgeColor="Color.Transparent">
+                <Shared.Components.Pages.Events.Shared.Tab_Accounts ScheduleForEventView="@ScheduleForEventView" />
+            </MudTabPanel>
+        </MudTabs>
+    </div>
+}

@@ -1,0 +1,70 @@
+﻿@if (Account != null)
+{
+    <MudDialog Style="width:550px; min-width:360px">
+        <DialogContent>
+            @if (Account.Photos != null)
+            {
+                <div class="d-flex flex-column align-center mb-3">
+                    <MudCarousel Class="d-flex" @ref="Carousel" TData="PhotosForEventsDto" ShowArrows ShowBullets="false" AutoCycle Style="width:300px; height:400px">
+                        @foreach (var photo in Account.Photos.OrderByDescending(o => o.IsAvatar).ThenByDescending(o => o.CreateDate))
+                        {
+                            <MudCarouselItem Transition="Transition.Fade">
+                                <MudImage Src=@($"/images/AccountsPhotos/{photo.RelatedId}/{photo.Guid}/{EnumImageSize.s450x600}.jpg") Style="border-radius:2%; width:300px; height:400px" />
+                            </MudCarouselItem>
+                        }
+                    </MudCarousel>
+                </div>
+            }
+
+            <div class="d-flex flex-column align-center gap-1">
+                <div class="d-flex align-center gap-2">
+                    <AccountGenderIcon Account="@Account" />
+                    <MudText Typo="Typo.h6">@Account.Name</MudText>
+                </div>
+                <MudText Typo="Typo.body2">@Account.ToGendersAgesString()</MudText>
+                <div class="d-flex align-center gap-1">
+                    <MudIcon Icon="@Icons.Material.Outlined.LocationOn" Style="font-size:20px" />
+                    <MudText Typo="Typo.body2">@Account.ToRegionString()</MudText>
+                </div>
+            </div>
+
+            <MudDivider Class="mt-4" />
+
+            <div class="d-flex flex-column">
+                @if (Account?.Users != null)
+                {
+                    <MudSimpleTable Hover Elevation="0" Style="overflow:hidden">
+                        <tbody>
+                            @foreach (var user in Account.Users)
+                            {
+                                <tr>
+                                    <td class="px-2">
+                                        <MudGrid Class="d-flex align-center">
+                                            <MudItem xs="5" Class="d-flex align-center">
+                                                <UserGenderIcon User="user" Style="margin-bottom:3px"/>
+                                                <p class="ml-2"><b>@user.Name</b></p>
+                                            </MudItem>
+                                            <MudItem xs="2"><p>@user.ToGenderAgeString()</p></MudItem>
+                                            <MudItem xs="5"><p>@user.Height см. / @user.Weight кг.</p></MudItem>
+                                            @if (!string.IsNullOrWhiteSpace(user.About)) 
+                                            {
+                                                <MudItem xs="12" Class="pt-2"><p style="font-size:12px">@user.About</p></MudItem>
+                                            }
+                                        </MudGrid>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </MudSimpleTable>
+                }
+            </div>
+
+            <MudDivider />
+
+        </DialogContent>
+
+        <DialogActions>
+            <MudButton Color="Color.Error" OnClick="() => MudDialog.Close(DialogResult.Ok(true))">Закрыть</MudButton>
+        </DialogActions>
+    </MudDialog>
+}

@@ -1,0 +1,196 @@
+﻿<MudDialog>
+    <TitleContent>Добавление расписания</TitleContent>
+
+    <DialogContent>
+        <MudStack AlignItems="AlignItems.Center" Class="mb-2">
+            <MudText Typo="Typo.h6">Выберите тип мероприятия</MudText>
+            <MudRadioGroup @bind-Value="isOneTimeEvent">
+                <MudRadio Class="ml-3" Value="true" Color="Color.Primary" Dense><span style="font-weight:500">Разовое</span></MudRadio>
+                <MudRadio Value="false" Color="Color.Secondary" Dense><span style="font-weight:500">Повторяющееся</span></MudRadio>
+            </MudRadioGroup>
+
+            <MudText Typo="Typo.body2" Align="Align.Center"><i>
+                @if (isOneTimeEvent) 
+                {
+                        <span>Разовое мероприятие, проводимое в указанные дату и время.</span>
+                }
+                else
+                {
+                        <span>
+                            Ряд однотипных мероприятий в рамках выбираемых дат <u>длительностью
+                            не более суток</u>, проводимых в фиксированное время по указанным дням недели.<br />
+                            Например: С 01.06.24 по 30.06.24 по Пт и Сб с 23:00 до 06:00.
+                        </span>
+                }
+                </i>
+            </MudText>
+        </MudStack>
+
+        @* РАЗОВОЕ *@
+        @if (isOneTimeEvent)
+        {
+            <MudGrid Spacing="3">
+                <MudItem sm="6" xs="12">
+                    <MudDatePicker Label="Дата начала"
+                                   Date="startDate"
+                                   DateChanged="(_startDate) => startDate = _startDate"
+                                   Mask="@(new DateMask("dd.MM.yyyy"))" DateFormat="dd.MM.yyyy"
+                                   AdornmentIcon="@Icons.Material.Filled.CalendarMonth" AdornmentColor="Color.Default" Adornment="Adornment.End"
+                                   OpenTo="OpenTo.Date"
+                                   MinDate="DateTime.Now"
+                                   MaxDate="DateTime.Now.AddDays(maxStartDateDays)"
+                                   HelperText="@($"Не позднее {DateTime.Now.AddDays(maxStartDateDays).ToString("dd.MM.yyyy")}")" ShowToolbar="false" />
+                </MudItem>
+                <MudItem sm="6" xs="12">
+                    <MudTimePicker Label="Время начала" 
+                                   Editable="false" @bind-Time="startTime" MinuteSelectionStep="5"
+                                   AdornmentIcon="@Icons.Material.Filled.AccessTime" AdornmentColor="Color.Default" Adornment="Adornment.End"
+                                   HelperText="Пример: 19:00" />
+                </MudItem>
+
+                <MudItem sm="6" xs="12">
+                    <MudDatePicker Label="Дата окончания"
+                                   Date="endDate"
+                                   DateChanged="(_endDate) => endDate = _endDate"
+                                   Mask="@(new DateMask("dd.MM.yyyy"))" DateFormat="dd.MM.yyyy"
+                                   AdornmentIcon="@Icons.Material.Filled.CalendarMonth" AdornmentColor="Color.Default" Adornment="Adornment.End"
+                                   OpenTo="OpenTo.Date"
+                                   StartMonth="startDate"
+                                   MinDate="startDate == DateTime.MinValue ? DateTime.Now : startDate"
+                                   MaxDate="startDate == null ? DateTime.Now : startDate.Value.AddDays(maxEndDateDays)"
+                                   HelperText="@(startDate.HasValue ? $"Не позднее {startDate!.Value.AddDays(maxEndDateDays).ToString("dd.MM.yyyy")}" : "Выберите начальную дату")" ShowToolbar="false" />
+                </MudItem>
+                <MudItem sm="6" xs="12">
+                    <MudTimePicker Label="Время окончания" 
+                                   Editable="false" @bind-Time="endTime" MinuteSelectionStep="5"
+                                   AdornmentIcon="@Icons.Material.Filled.AccessTime" AdornmentColor="Color.Default" Adornment="Adornment.End"
+                                   HelperText="Пример: 23:30" />
+                </MudItem>
+
+                <MudItem sm="4" xs="12">
+                    <MudNumericField @bind-Value="schedule.CostPair" Label="Цена для пары" Variant="Variant.Text" Min="0" Max="500000" />
+                </MudItem>
+                <MudItem sm="4" xs="12">
+                    <MudNumericField @bind-Value="schedule.CostMan" Label="Цена для мужчины" Variant="Variant.Text" Min="0" Max="500000" />
+                </MudItem>
+                <MudItem sm="4" xs="12">
+                    <MudNumericField @bind-Value="schedule.CostWoman" Label="Цена для женщины" Variant="Variant.Text" Min="0" Max="500000" />
+                </MudItem>
+
+                <MudItem sm="12">
+                    <MudStack Row Wrap="Wrap.Wrap" Spacing="1" Justify="Justify.Center" Class="mt-3">
+                        @{
+                            var btnColor = Color.Default;
+                            bool disabled = false;
+                            foreach (var feature in AllFeatures.OrderBy(o => o.Name))
+                            {
+                                btnColor = schedule.Features!.Any(x => x.Id == feature.Id) ? Color.Info : Color.Default;
+                                disabled = schedule.Features!.Count >= 5 && btnColor == Color.Default ? true : false;
+                                <MudButton OnClick="() => OnFeatureChanged(feature)" Color="@btnColor" Disabled="@disabled" Variant="Variant.Outlined" Size="Size.Small" Style="padding: 0 5px 0 5px; font-size:12px; text-transform:none;">@feature.Name</MudButton>
+                            }
+                        }
+                    </MudStack>
+                </MudItem>
+
+                <MudItem xs="12">
+                    <MudTextField T="string" Label="Описание" Lines="3" MaxLines="8" AutoGrow Variant="Variant.Text" Validation="@(new Func<string?, string?>(DescriptionValidator))" @bind-Value="@schedule.Description" />
+                </MudItem>
+
+            </MudGrid>
+        }
+
+        @* ПОВТОРЯЮЩЕЕСЯ *@
+        else
+        {
+            <MudGrid Spacing="3">
+                <MudItem sm="6" xs="12">
+                    <MudDatePicker Label="Начиная с даты"
+                                   Date="startDate"
+                                   DateChanged="(_startDate) => startDate = _startDate"
+                                   Mask="@(new DateMask("dd.MM.yyyy"))" DateFormat="dd.MM.yyyy"
+                                   AdornmentIcon="@Icons.Material.Filled.CalendarMonth" AdornmentColor="Color.Default" Adornment="Adornment.End"
+                                   OpenTo="OpenTo.Date"
+                                   MinDate="DateTime.Now"
+                                   MaxDate="DateTime.Now.AddDays(maxStartDateDays)"
+                                   HelperText="@($"Не позднее {DateTime.Now.AddDays(maxStartDateDays).ToString("dd.MM.yyyy")}")" ShowToolbar="false" />
+                </MudItem>
+                <MudItem sm="6" xs="12">
+                    <MudDatePicker Label="Заканчивая датой"
+                                   Date="endDate"
+                                   DateChanged="(_endDate) => endDate = _endDate"
+                                   Mask="@(new DateMask("dd.MM.yyyy"))" DateFormat="dd.MM.yyyy"
+                                   AdornmentIcon="@Icons.Material.Filled.CalendarMonth" AdornmentColor="Color.Default" Adornment="Adornment.End"
+                                   OpenTo="OpenTo.Date"
+                                   StartMonth="startDate"
+                                   MinDate="startDate == DateTime.MinValue ? DateTime.Now : startDate"
+                                   MaxDate="startDate == null ? DateTime.Now : startDate.Value.AddDays(maxEndDateDays)"
+                                   HelperText="@(startDate.HasValue ? $"Не позднее {startDate!.Value.AddDays(maxEndDateDays).ToString("dd.MM.yyyy")}" : "Выберите начальную дату")" ShowToolbar="false" />
+                </MudItem>
+
+                <MudItem sm="6" xs="12">
+                    <MudTimePicker Label="Время начала" Editable="false" @bind-Time="startTime" MinuteSelectionStep="5"
+                                   AdornmentIcon="@Icons.Material.Filled.AccessTime" AdornmentColor="Color.Default" Adornment="Adornment.End"
+                                   HelperText="Пример: 19:00" />
+                </MudItem>
+                
+                <MudItem sm="6" xs="12">
+                    <MudTimePicker Label="Время окончания" Editable="false" @bind-Time="endTime" MinuteSelectionStep="5"
+                                   AdornmentIcon="@Icons.Material.Filled.AccessTime" AdornmentColor="Color.Default" Adornment="Adornment.End"
+                                   HelperText="Пример: 23:30" />
+                </MudItem>
+
+                <MudItem xs="12">
+                    <MudText Align="Align.Center" Typo="Typo.subtitle1" Style="font-weight:500">Повторять в указанные дни недели:</MudText>
+                    <MudStack Row Wrap="Wrap.Wrap" Spacing="4" Justify="Justify.Center">
+                        <MudCheckBox Label="Пн" T="bool" ValueChanged="(isChecked) => OnWeekChanged(1, isChecked)" Dense Color="Color.Primary"></MudCheckBox>
+                        <MudCheckBox Label="Вт" T="bool" ValueChanged="(isChecked) => OnWeekChanged(2, isChecked)" Dense Color="Color.Primary"></MudCheckBox>
+                        <MudCheckBox Label="Ср" T="bool" ValueChanged="(isChecked) => OnWeekChanged(3, isChecked)" Dense Color="Color.Primary"></MudCheckBox>
+                        <MudCheckBox Label="Чт" T="bool" ValueChanged="(isChecked) => OnWeekChanged(4, isChecked)" Dense Color="Color.Primary"></MudCheckBox>
+                        <MudCheckBox Label="Пт" T="bool" ValueChanged="(isChecked) => OnWeekChanged(5, isChecked)" Dense Color="Color.Primary"></MudCheckBox>
+                        <MudCheckBox Label="Сб" T="bool" ValueChanged="(isChecked) => OnWeekChanged(6, isChecked)" Dense Color="Color.Secondary"></MudCheckBox>
+                        <MudCheckBox Label="Вс" T="bool" ValueChanged="(isChecked) => OnWeekChanged(0, isChecked)" Dense Color="Color.Secondary"></MudCheckBox>
+                    </MudStack>
+                </MudItem>
+
+                <MudItem xs="12">
+                    <ScheduleToTextComponent IsOneTimeEvent="isOneTimeEvent" StartDate="startDate" EndDate="endDate" StartTime="startTime" EndTime="endTime" DaysOfWeek="daysOfWeek" />
+                </MudItem>
+
+                <MudItem xs="12">
+                    <MudText Align="Align.Center" Typo="Typo.body2" Color="Color.Error">@errorMessage</MudText>
+                </MudItem>
+
+                <MudItem sm="4" xs="12">
+                    <MudNumericField @bind-Value="schedule.CostPair" Label="Цена для пары" Variant="Variant.Text" Min="0" Max="500000" />
+                </MudItem>
+                <MudItem sm="4" xs="12">
+                    <MudNumericField @bind-Value="schedule.CostMan" Label="Цена для мужчины" Variant="Variant.Text" Min="0" Max="500000" />
+                </MudItem>
+                <MudItem sm="4" xs="12">
+                    <MudNumericField @bind-Value="schedule.CostWoman" Label="Цена для женщины" Variant="Variant.Text" Min="0" Max="500000" />
+                </MudItem>
+
+                <MudItem sm="12">
+                    <MudStack Row Wrap="Wrap.Wrap" Spacing="1" Justify="Justify.Center" Class="mt-3">
+                        @foreach (var feature in AllFeatures)
+                        {
+                            var btnColor = schedule.Features!.Any(x => x.Id == feature.Id) ? Color.Info : Color.Default;
+                            var disabled = schedule.Features!.Count >= 5 && btnColor == Color.Default ? true : false;
+                            <MudButton OnClick="() => OnFeatureChanged(feature)" Disabled="@disabled" Variant="Variant.Outlined" Size="Size.Small" Color="btnColor" Style="padding: 0 5px 0 5px; font-size:12px; text-transform:none;">@feature.Name</MudButton>
+                        }
+                    </MudStack>
+                </MudItem>
+
+                <MudItem xs="12">
+                    <MudTextField T="string" Label="Описание" Variant="Variant.Text" Validation="@(new Func<string?, string?>(DescriptionValidator))" @bind-Value="schedule.Description" Lines="2" />
+                </MudItem>
+
+            </MudGrid>
+        }
+    </DialogContent>
+
+    <DialogActions>
+        <MudButton Color="Color.Error" StartIcon="@Icons.Material.Outlined.Close" OnClick="Cancel">Отмена</MudButton>
+        <MudButton Color="Color.Primary" Disabled="!isFormValid" Variant="Variant.Filled" StartIcon="@Icons.Material.Outlined.Add" Size="Size.Small" OnClick="Submit">Добавить</MudButton>
+    </DialogActions>
+</MudDialog>

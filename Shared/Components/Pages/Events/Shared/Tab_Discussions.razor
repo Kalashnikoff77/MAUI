@@ -1,0 +1,47 @@
+﻿<div class="d-flex flex-column" style="height:250px; overflow:auto" id="DivDiscussionsFrame">
+
+    @if (discussions.Count > 0)
+    {
+        @if (moreDiscussionsButton)
+        {
+            <MudButton Class="pa-3 mb-3" Variant="Variant.Text" StartIcon="@Icons.Material.Filled.MoreHoriz" EndIcon="@Icons.Material.Filled.MoreHoriz" Color="Color.Primary" OnClick="GetDiscussionsAsync">Ещё</MudButton>
+        }
+
+        @foreach (var discussion in discussions)
+        {
+            <div class="d-flex gap-3 mt-1 mb-2">
+                <ImageAvatar Account="discussion.Sender" Size="EnumImageSize.s64x64" Class="avatar s40" />
+                <div class="mr-2" id="@("id_" + discussion.Id)">
+                    <ColorizedAccountName Account="discussion.Sender" Style="font-weight:500" />
+                    <MudText Typo="Typo.body2">@discussion.Text</MudText>
+                    <MudText Style="text-align:left; font-size:12px; color:lightgray">@discussion.CreateDate.ToMyString()</MudText>
+                </div>
+            </div>
+        }
+    }
+    else 
+    {
+        // Если обсуждения загружены, но их нет, значит, выведем заглушку "Пока тихо..."
+        @if (isDiscussionsLoaded) 
+        {
+            <div class="d-flex align-center justify-center" style="height:250px; font-weight:300">
+                <MudIcon Icon="@Icons.Material.Outlined.ChatBubbleOutline" Class="mr-2" Style="font-weight:300" /><i>Здесь пока тихо...</i>
+            </div>
+        }
+    }
+
+    @* Метка конца списка обсужений *@
+    <div id="id_0" />
+
+</div>
+
+
+@if (CurrentState.Account != null)
+{
+    <MudStack Wrap="Wrap.Wrap" Row Spacing="1" Justify="Justify.FlexEnd" AlignItems="AlignItems.Center">
+        <ImageAvatar Account="CurrentState.Account" Size="EnumImageSize.s64x64" Class="avatar s50" />
+        <MudTextField @bind-Value="@_text" T="string" Label="Ваше сообщение" Variant="Variant.Outlined" Lines="1" MaxLines="5" AutoGrow MaxLength="1024" Clearable Class="mt-2" />
+        <MudFlexBreak />
+        <MudButton Disabled="@_sending" OnClick="OnDiscussionAdded" Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Send" Size="Size.Small">Отправить</MudButton>
+    </MudStack>
+}
