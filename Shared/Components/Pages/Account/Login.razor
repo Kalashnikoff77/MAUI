@@ -1,0 +1,39 @@
+﻿@page "/login"
+
+<PageTitle>Вход</PageTitle>
+
+<div class="d-flex flex-column ml-3" Style="min-width:300px; max-width:750px">
+
+    <MudText Align="Align.Left" Typo="Typo.h6" Class="mb-3">Вход на сайт</MudText>
+    <MudDivider DividerType="DividerType.FullWidth" Light="false" Class="mb-5" />
+
+    <MudPaper Class="pa-7" Style="min-width:300px; max-width:500px" Elevation="3">
+
+        <div class="d-flex flex-column gap-0">
+            <MudTextField @bind-Value="loginRequestDto.Email" InputType="InputType.Email" Validation="@(new Func<string, string?>(EmailValidator))" AdornmentIcon="@Icons.Material.Outlined.Mail" Adornment="Adornment.End" AdornmentColor="@EmailIconColor" Label="Email" Margin="Margin.Normal" Variant="Variant.Text" />
+            <MudTextField @bind-Value="loginRequestDto.Password" InputType="InputType.Password" Validation="@(new Func<string, string?>(PasswordValidator))" AdornmentIcon="@Icons.Material.Outlined.Lock" Adornment="Adornment.End" AdornmentColor="@PasswordIconColor" Label="Пароль" Margin="Margin.Normal" Variant="Variant.Text" />
+            <div class="d-flex flex-column gap-0 justify-center align-center">
+                <MudCheckBox @bind-Value="loginRequestDto.Remember" Label="Запомнить меня" Color="Color.Primary" Class="mr-4" />
+                <MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled" OnClick="OnLoginAsync" Style="width:180px">Войти</MudButton>
+            </div>
+        </div>
+
+        @if (!string.IsNullOrWhiteSpace(errorLogin))
+        {
+            <MudAlert Dense ContentAlignment="HorizontalAlignment.Center" Severity="Severity.Error" Class="mt-3">@errorLogin</MudAlert>
+        }
+
+        <MudDivider Class="mt-8" />
+
+        <div class="d-flex justify-space-between mt-2">
+            <MudButton OnClick="@(() => Navigation.NavigateTo("/register"))" ButtonType="ButtonType.Button" Color="Color.Primary" Size="Size.Small" Variant="Variant.Text">
+                <MudText Typo="Typo.body2"><b>РЕГИСТРАЦИЯ</b></MudText>
+            </MudButton>
+            <MudButton OnClick="@(() => Navigation.NavigateTo("/remember"))" ButtonType="ButtonType.Button" Color="Color.Secondary" Size="Size.Small" Variant="Variant.Text">
+                <MudText Typo="Typo.body2">ЗАБЫЛИ ПАРОЛЬ?</MudText>
+            </MudButton>
+        </div>
+
+    </MudPaper>
+
+</div>

@@ -20,8 +20,10 @@ namespace MAUI
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                 });
 
-            builder.Services.AddSingleton<IFormFactor, FormFactor>();
             builder.Services.AddScoped(typeof(IRepository<,>), typeof(Repository<,>));
+            builder.Services.AddScoped<IJSProcessor, JSProcessor>();
+            builder.Services.AddSingleton<IFormFactor, FormFactor>();
+
             builder.Services.AddScoped<CurrentState>();
 
             builder.Services.AddMudServices();

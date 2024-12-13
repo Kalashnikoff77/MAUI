@@ -1,5 +1,11 @@
 ﻿using Common.Enums;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
 using PhotoSauce.MagicScaler;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 namespace Common.Models
 {
@@ -89,6 +95,33 @@ namespace Common.Models
         // Префикс (метка) для кэширования запросов, связанных с мероприятиями
         public const string CachePrefixEvents = "events";
 
+
+
+        /// <summary>
+        /// Генерация токена JWT
+        /// </summary>
+        /// <param name="Id">Id пользователя</param>
+        /// <param name="Guid">Guid пользователя</param>
+        /// <param name="configuration">Ссылка на IConfiguration</param>
+        /// <returns>JWT токен</returns>
+        public static string GenerateToken(int Id, Guid Guid, IConfiguration configuration)
+        {
+            var claims = new List<Claim>()
+            {
+                new Claim("Id", Id.ToString()),
+                new Claim(ClaimTypes.NameIdentifier, Id.ToString()),
+                new Claim("Guid", Guid.ToString()),
+                new Claim("IssueDate", DateTime.Now.ToString())
+            };
+            var jwt = new JwtSecurityToken(
+                issuer: configuration.GetRequiredSection("JWT:JwtValidIssuer").Value,
+                audience: configuration.GetRequiredSection("JWT:JwtValidAudience").Value,
+                claims: claims,
+                expires: DateTime.UtcNow.Add(TimeSpan.FromDays(180)),
+                signingCredentials: new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration.GetRequiredSection("JWT:IssuerSigningKey").Value!)), SecurityAlgorithms.HmacSha256));
+
+            return new JwtSecurityTokenHandler().WriteToken(jwt);
+        }
 
     }
 }
