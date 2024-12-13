@@ -1,11 +1,11 @@
 ﻿using Common.Dto.Requests;
 using Common.Dto.Responses;
 using Common.Dto.Views;
-using Common.Repository;
+using Shared.Repository;
 using Microsoft.AspNetCore.Components;
 using Common.Extensions;
 
-namespace SH.Shared.Components.Pages
+namespace Shared.Components.Pages
 {
     public partial class Home : IDisposable
     {

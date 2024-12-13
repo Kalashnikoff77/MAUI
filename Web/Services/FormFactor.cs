@@ -1,4 +1,4 @@
-using SH.Shared.Services;
+using Shared.Services;
 
 namespace SH.Web.Services
 {

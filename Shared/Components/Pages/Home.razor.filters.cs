@@ -1,6 +1,6 @@
 ﻿using Common.Dto.Views;
 
-namespace SH.Shared.Components.Pages
+namespace Shared.Components.Pages
 {
     public partial class Home
     {

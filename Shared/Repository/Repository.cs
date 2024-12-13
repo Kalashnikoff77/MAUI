@@ -1,12 +1,12 @@
 ﻿using Common.Dto.Requests;
 using Common.Dto.Responses;
 using Microsoft.Extensions.Configuration;
-using SH.Shared.Services;
+using Shared.Services;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 
-namespace Common.Repository
+namespace Shared.Repository
 {
     public class Repository<TRequestDto, TResponseDto> : IRepository<TRequestDto, TResponseDto>
         where TRequestDto : RequestDtoBase

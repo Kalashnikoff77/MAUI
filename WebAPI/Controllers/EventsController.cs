@@ -40,12 +40,6 @@ namespace WebAPI.Controllers
             return response;
         }
 
-        [Route("test"), HttpGet]
-        public void Test()
-        {
-
-        }
-
 
         [Route("GetSchedules"), HttpPost]
         public async Task<GetSchedulesResponseDto?> GetSchedulesAsync(GetSchedulesRequestDto request)

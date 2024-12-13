@@ -1,4 +1,4 @@
-namespace SH.Shared.Services
+namespace Shared.Services
 {
     public interface IFormFactor
     {

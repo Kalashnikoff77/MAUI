@@ -73,7 +73,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SH.Shared\SH.Shared.csproj" />
+    <ProjectReference Include="..\Shared\Shared.csproj" />
     <ProjectReference Include="..\Common\Common.csproj" />
   </ItemGroup>
 

@@ -1,8 +1,8 @@
-using Common.Repository;
 using MudBlazor.Services;
-using SH.Shared.Services;
-using SH.Web.Components;
 using SH.Web.Services;
+using Shared.Repository;
+using Shared.Services;
+using Web.Components;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,6 +35,6 @@ app.UseAntiforgery();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode()
-    .AddAdditionalAssemblies(typeof(SH.Shared._Imports).Assembly);
+    .AddAdditionalAssemblies(typeof(Shared._Imports).Assembly);
 
 app.Run();

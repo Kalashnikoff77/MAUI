@@ -1,7 +1,7 @@
 ﻿using Common.Dto.Requests;
 using Common.Dto.Responses;
 
-namespace Common.Repository
+namespace Shared.Repository
 {
     public interface IRepository<TRequestDto, TResponseDto> 
         where TRequestDto : RequestDtoBase
