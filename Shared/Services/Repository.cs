@@ -13,13 +13,9 @@ namespace Shared.Services
     {
 
         readonly IConfiguration _config;
-        readonly IFormFactor _formFactor;
 
-        public Repository(IConfiguration config, IFormFactor formFactor)
-        {
+        public Repository(IConfiguration config) =>
             _config = config;
-            _formFactor = formFactor;
-        }
 
 
         public async Task<ApiResponse<TResponseDto>> HttpPostAsync(TRequestDto request)

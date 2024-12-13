@@ -1,6 +1,7 @@
 using MudBlazor.Services;
 using SH.Web.Services;
 using Shared.Services;
+using Shared.State;
 using Web.Components;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,6 +15,7 @@ builder.Services.AddMudServices();
 
 builder.Services.AddSingleton<IFormFactor, FormFactor>();
 builder.Services.AddScoped(typeof(IRepository<,>), typeof(Repository<,>));
+builder.Services.AddScoped<CurrentState>();
 
 builder.Services.AddMudServices();
 

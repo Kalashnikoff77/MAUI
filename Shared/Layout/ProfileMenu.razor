@@ -1,0 +1,20 @@
+﻿    @if (CurrentState.Account != null)
+    {
+        <MudMenu Icon="@Icons.Material.Filled.MoreVert" AnchorOrigin="Origin.TopLeft" TransformOrigin="Origin.TopCenter">
+            <MudMenuItem Href="/profile" Icon="@Icons.Material.Filled.Settings">Настройки профиля</MudMenuItem>
+            <MudMenuItem Href="/" Icon="@Icons.Material.Filled.PeopleAlt">Мои друзья</MudMenuItem>
+            <MudDivider />
+            <MudMenuItem Icon="@Icons.Material.Filled.Logout" OnClick="async() => { await CurrentState.LogOutAsync(); }">Выйти</MudMenuItem>
+        </MudMenu>
+    }
+    else
+    {
+        <MudMenu Icon="@Icons.Material.Filled.MoreVert" AnchorOrigin="Origin.TopLeft" TransformOrigin="Origin.TopCenter">
+            <MudMenuItem Href="/login" Icon="@Icons.Material.Filled.Login">Войти</MudMenuItem>
+            <MudMenuItem Href="/register" Icon="@Icons.Material.Filled.HowToReg">Зарегистрироваться</MudMenuItem>
+        </MudMenu>
+    }
+
+@code {
+    [CascadingParameter] CurrentState CurrentState { get; set; } = null!;
+}

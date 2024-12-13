@@ -1,0 +1,18 @@
+﻿<MudNavMenu Color="Color.Primary" Bordered="true">
+    <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Главная</MudNavLink>
+    <MudNavLink Href="/events" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Groups3">Клубы и мероприятия</MudNavLink>
+    <MudNavLink Href="/private" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Group">Частные встречи</MudNavLink>
+    @if (CurrentState.Account == null)
+    {
+        <MudNavLink Href="/login" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Login">Войти</MudNavLink>
+    }
+    else
+    {
+        <MudNavLink Href="/messages" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Message">Общение</MudNavLink>
+        <MudNavLink OnClick="async() => { await CurrentState.LogOutAsync(); }" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Logout">Выйти</MudNavLink>
+    }
+</MudNavMenu>
+
+@code {
+    [CascadingParameter] CurrentState CurrentState { get; set; } = null!;
+}

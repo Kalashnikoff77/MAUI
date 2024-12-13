@@ -4,6 +4,7 @@ using MudBlazor.Services;
 using MAUI.Services;
 using Shared.Services;
 using System.Reflection;
+using Shared.State;
 
 namespace MAUI
 {
@@ -21,6 +22,7 @@ namespace MAUI
 
             builder.Services.AddSingleton<IFormFactor, FormFactor>();
             builder.Services.AddScoped(typeof(IRepository<,>), typeof(Repository<,>));
+            builder.Services.AddScoped<CurrentState>();
 
             builder.Services.AddMudServices();
 
