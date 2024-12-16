@@ -1,11 +1,11 @@
 ﻿using AutoMapper;
-using Common.Dto;
-using Common.Dto.Functions;
-using Common.Dto.Sp;
-using Common.Dto.Views;
-using DataContext.Entities;
-using DataContext.Entities.Sp;
-using DataContext.Entities.Views;
+using Data.Dto;
+using Data.Dto.Functions;
+using Data.Dto.Sp;
+using Data.Dto.Views;
+using Data.Entities;
+using Data.Entities.Sp;
+using Data.Entities.Views;
 using WebAPI.Mapping.Converters;
 
 namespace WebAPI.Mapping

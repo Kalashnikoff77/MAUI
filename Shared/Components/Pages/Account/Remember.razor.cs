@@ -1,9 +1,9 @@
-﻿using Common.Dto.Requests;
-using Common.Dto.Responses;
-using Common.Models;
+﻿using Data.Dto.Requests;
+using Data.Dto.Responses;
+using Data.Models;
+using Data.Services;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
-using Shared.Services;
 using System.Net;
 using System.Text.RegularExpressions;
 

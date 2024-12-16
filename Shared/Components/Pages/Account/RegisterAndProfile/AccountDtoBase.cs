@@ -1,16 +1,16 @@
-﻿using Common.Dto;
-using Common.Dto.Requests;
-using Common.Dto.Responses;
-using Common.Dto.Views;
-using Common.Extensions;
-using Common.Models;
+﻿using Data.Dto;
+using Data.Dto.Requests;
+using Data.Dto.Responses;
+using Data.Dto.Views;
+using Data.Extensions;
+using Data.Models;
+using Data.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.Extensions.Configuration;
 using MudBlazor;
 using Shared.Components.Dialogs;
-using Shared.Services;
 using Shared.State;
 using System.Text.RegularExpressions;
 

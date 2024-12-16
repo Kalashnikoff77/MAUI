@@ -1,13 +1,13 @@
-﻿using Common.Dto.Requests;
-using Common.Dto.Responses;
-using Common.Models;
+﻿using Data.Dto.Requests;
+using Data.Dto.Responses;
+using Data.Models;
+using Data.Services;
 //using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.AspNetCore.Components;
-using System.Net;
+using Microsoft.Extensions.Configuration;
 using MudBlazor;
 using Shared.State;
-using Shared.Services;
-using Microsoft.Extensions.Configuration;
+using System.Net;
 
 namespace Shared.Components.Pages.Account
 {

@@ -1,4 +1,4 @@
-﻿using Common.Extensions;
+﻿using Data.Extensions;
 using Microsoft.AspNetCore.Components;
 using System.Text;
 

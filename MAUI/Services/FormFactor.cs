@@ -1,4 +1,4 @@
-using Shared.Services;
+using Data.Services;
 
 namespace MAUI.Services
 {

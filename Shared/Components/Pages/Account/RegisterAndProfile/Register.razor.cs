@@ -1,6 +1,6 @@
-﻿using Common.Dto;
-using Common.Dto.Requests;
-using Common.Models;
+﻿using Data.Dto;
+using Data.Dto.Requests;
+using Data.Models;
 using System.Net;
 
 namespace Shared.Components.Pages.Account.RegisterAndProfile

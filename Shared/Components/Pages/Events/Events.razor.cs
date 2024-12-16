@@ -1,12 +1,12 @@
-﻿using Common.Dto.Requests;
-using Common.Dto.Responses;
-using Common.Dto.Views;
+﻿using Data.Dto.Requests;
+using Data.Dto.Responses;
+using Data.Dto.Views;
+using Data.Services;
 using Microsoft.AspNetCore.Components;
-using Shared.Services;
 
-namespace Shared.Components.Pages
+namespace Shared.Components.Pages.Events
 {
-    public partial class Home : IDisposable
+    public partial class Events : IDisposable
     {
         [Inject] IRepository<GetSchedulesRequestDto, GetSchedulesResponseDto> _repoGetSchedules { get; set; } = null!;
         [Inject] IRepository<GetFeaturesForEventsRequestDto, GetFeaturesForEventsResponseDto> _repoGetFeatures { get; set; } = null!;

@@ -1,8 +1,8 @@
-﻿using Common.Dto.Requests;
-using Common.Extensions;
-using Common.Models;
+﻿using Data.Dto.Requests;
+using Data.Extensions;
+using Data.Models;
 using Dapper;
-using DataContext.Entities;
+using Data.Entities;
 using PhotoSauce.MagicScaler;
 using WebAPI.Exceptions;
 using WebAPI.Models;

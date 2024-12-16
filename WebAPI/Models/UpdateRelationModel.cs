@@ -1,7 +1,7 @@
-﻿using Common.Dto.Responses;
-using Common.Enums;
+﻿using Data.Dto.Responses;
+using Data.Enums;
 using Dapper;
-using DataContext.Entities;
+using Data.Entities;
 using System.Data.Common;
 
 namespace WebAPI.Models

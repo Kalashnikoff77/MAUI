@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using Common.Dto.Requests;
-using Common.Dto.Responses;
+using Data.Dto.Requests;
+using Data.Dto.Responses;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Caching.Memory;
 using System.Data.Common;

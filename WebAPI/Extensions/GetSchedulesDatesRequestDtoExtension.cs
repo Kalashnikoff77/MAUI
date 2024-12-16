@@ -1,8 +1,8 @@
-﻿using Common.Dto.Requests;
-using Common.Dto.Responses;
-using Common.Dto.Views;
+﻿using Data.Dto.Requests;
+using Data.Dto.Responses;
+using Data.Dto.Views;
 using Dapper;
-using DataContext.Entities.Views;
+using Data.Entities.Views;
 using WebAPI.Models;
 
 namespace WebAPI.Extensions

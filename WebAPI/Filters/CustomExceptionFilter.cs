@@ -1,4 +1,4 @@
-﻿using Common.Dto.Responses;
+﻿using Data.Dto.Responses;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System.Net;

@@ -1,10 +1,10 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Data.Services;
+using MAUI.Services;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using MudBlazor.Services;
-using MAUI.Services;
-using Shared.Services;
-using System.Reflection;
 using Shared.State;
+using System.Reflection;
 
 namespace MAUI
 {

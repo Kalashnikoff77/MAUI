@@ -1,10 +1,10 @@
-﻿using Common.Dto;
-using Common.Dto.Requests;
-using Common.Dto.Responses;
-using Common.Dto.Views;
+﻿using Data.Dto;
+using Data.Dto.Requests;
+using Data.Dto.Responses;
+using Data.Dto.Views;
+using Data.Services;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
-using Shared.Services;
 using Shared.State;
 
 namespace Shared.Components.Pages.Account

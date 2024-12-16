@@ -1,4 +1,4 @@
-﻿using Common.Dto.Views;
+﻿using Data.Dto.Views;
 using MudBlazor;
 using Shared.Components.Pages.Account;
 using Shared.Components.Pages.Events;

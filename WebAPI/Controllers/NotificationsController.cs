@@ -1,10 +1,10 @@
 ﻿using AutoMapper;
-using Common.Dto.Requests;
-using Common.Dto.Responses;
-using Common.Dto.Views;
+using Data.Dto.Requests;
+using Data.Dto.Responses;
+using Data.Dto.Views;
 using Dapper;
-using DataContext.Entities;
-using DataContext.Entities.Views;
+using Data.Entities;
+using Data.Entities.Views;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;

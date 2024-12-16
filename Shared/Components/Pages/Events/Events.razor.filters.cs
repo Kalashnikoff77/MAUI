@@ -1,8 +1,8 @@
-﻿using Common.Dto.Views;
+﻿using Data.Dto.Views;
 
-namespace Shared.Components.Pages
+namespace Shared.Components.Pages.Events
 {
-    public partial class Home
+    public partial class Events
     {
         Filters Filters { get; set; } = new Filters();
 
