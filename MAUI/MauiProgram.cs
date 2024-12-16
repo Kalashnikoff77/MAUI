@@ -1,4 +1,5 @@
-﻿using Data.Services;
+﻿using Blazored.LocalStorage;
+using Data.Services;
 using MAUI.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -23,11 +24,11 @@ namespace MAUI
             builder.Services.AddScoped(typeof(IRepository<,>), typeof(Repository<,>));
             builder.Services.AddScoped<IJSProcessor, JSProcessor>();
             builder.Services.AddSingleton<IFormFactor, FormFactor>();
-
             builder.Services.AddScoped<CurrentState>();
 
             builder.Services.AddMudServices();
-
+           
+            builder.Services.AddBlazoredLocalStorage();
             builder.Services.AddMauiBlazorWebView();
 
 #if DEBUG

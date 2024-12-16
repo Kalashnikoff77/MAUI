@@ -6,15 +6,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <base href="/" />
     <link rel="stylesheet" href="_content/Shared/app.css" />
+    <link rel="stylesheet" href="/css/custom.css">
     <link rel="stylesheet" href="Web.styles.css" />
     <HeadOutlet @rendermode="InteractiveServer" />
 
-<link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
-<link href="_content/MudBlazor/MudBlazor.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
+    <link href="_content/MudBlazor/MudBlazor.min.css" rel="stylesheet" />
 </head>
 
 <body>
     <Routes @rendermode="InteractiveServer" />
+
+    <script src="/js/jquery-3.7.1.min.js"></script>
+    <script src="/js/linq.min.js"></script>
+    <script src="/js/enums.js"></script>
+    <script src="/js/local.js"></script>
+    <script src="/js/SignalRMethods.js"></script>
+
     <script src="_framework/blazor.web.js"></script>
     <script src="_content/MudBlazor/MudBlazor.min.js"></script>
 </body>

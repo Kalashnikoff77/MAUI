@@ -1,4 +1,5 @@
 using Data.Services;
+using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using MudBlazor.Services;
 using SH.Web.Services;
 using Shared.State;
@@ -12,9 +13,12 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddScoped(typeof(IRepository<,>), typeof(Repository<,>));
 builder.Services.AddScoped<IJSProcessor, JSProcessor>();
-builder.Services.AddSingleton<IFormFactor, FormFactor>();
+builder.Services.AddScoped<IFormFactor, FormFactor>();
 
 builder.Services.AddScoped<CurrentState>();
+
+builder.Services.AddScoped<ProtectedLocalStorage>();
+builder.Services.AddScoped<ProtectedSessionStorage>();
 
 builder.Services.AddMudServices();
 

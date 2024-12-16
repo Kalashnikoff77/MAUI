@@ -2,7 +2,7 @@
 
 namespace Shared.Components.Pages
 {
-    public partial class Home
+    public partial class Index
     {
         IEnumerable<CItems> _selectedItems = new List<CItems>();
         IEnumerable<CItems> selectedItems { get; set; } = new HashSet<CItems>();

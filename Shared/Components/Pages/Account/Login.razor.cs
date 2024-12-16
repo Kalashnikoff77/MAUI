@@ -14,9 +14,8 @@ namespace Shared.Components.Pages.Account
     public partial class Login
     {
         [CascadingParameter] CurrentState CurrentState { get; set; } = null!;
+        [Inject] IFormFactor _formFactor { get; set; } = null!;
         [Inject] IRepository<LoginRequestDto, LoginResponseDto> _repoLogin { get; set; } = null!;
-        //[Inject] ProtectedLocalStorage _protectedLocalStore { get; set; } = null!;
-        //[Inject] ProtectedSessionStorage _protectedSessionStore { get; set; } = null!;
         [Inject] IConfiguration _configuration { get; set; } = null!;
         [Inject] IJSProcessor _JSProcessor { get; set; } = null!;
         [Inject] NavigationManager Navigation { get; set; } = null!;
@@ -42,10 +41,7 @@ namespace Shared.Components.Pages.Account
                 apiResponse.Response.Account!.Token = StaticData.GenerateToken(apiResponse.Response.Account.Id, apiResponse.Response.Account.Guid, _configuration);
                 CurrentState.SetAccount(apiResponse.Response.Account);
 
-                //if (loginRequestDto.Remember)
-                //    await _protectedLocalStore.SetAsync(nameof(LoginRequestDto), loginRequestDto);
-                //else
-                //    await _protectedSessionStore.SetAsync(nameof(LoginRequestDto), loginRequestDto);
+                await _formFactor.StoreLoginDataAsync(loginRequestDto);
 
                 await _JSProcessor.Redirect("/");
             }

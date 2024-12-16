@@ -10,6 +10,16 @@ namespace Shared.State
 {
     public partial class CurrentState
     {
+        [Inject] IJSProcessor _JSProcessor { get; set; } = null!;
+
+        IFormFactor _formFactor { get; set; }
+
+        public CurrentState(IFormFactor formFactor, IJSProcessor JSProcessor)
+        {
+            _formFactor = formFactor;
+            _JSProcessor = JSProcessor;
+        }
+
         /// <summary>
         /// Данные о залогиненном пользователе
         /// </summary>
@@ -58,20 +68,21 @@ namespace Shared.State
 
         public async Task LogOutAsync()
         {
-            //// Снимает статус онлайн с аватаров текущего пользователя
+            // Снимает статус онлайн с аватаров текущего пользователя
             //if (Account != null)
             //    ConnectedAccounts.Remove(Account.Id.ToString());
 
+            await _formFactor.ClearLoginDataAsync();
+
             //await _JSProcessor.UpdateOnlineAccountsClient(ConnectedAccounts);
 
-            //SetAccount(null);
-            //await _protectedLocalStore.DeleteAsync(nameof(LoginRequestDto));
-            //await _protectedSessionStore.DeleteAsync(nameof(LoginRequestDto));
-            //StateHasChanged();
+            SetAccount(null);
+
+            StateHasChanged();
 
             //await SignalRConnect();
 
-            //_navigationManager.NavigateTo("/");
+            await _JSProcessor.Redirect("/");
         }
     }
 }
