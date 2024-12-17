@@ -13,9 +13,13 @@ namespace Data.Services
     {
 
         readonly IConfiguration _config;
+        readonly IFormFactor _formFactor;
 
-        public Repository(IConfiguration config) =>
+        public Repository(IConfiguration config, IFormFactor formFactor) 
+        {
             _config = config;
+            _formFactor = formFactor;
+        }
 
 
         public async Task<ApiResponse<TResponseDto>> HttpPostAsync(TRequestDto request)
@@ -40,7 +44,12 @@ namespace Data.Services
                 if (!string.IsNullOrWhiteSpace(request.Token))
                     client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", request.Token);
 
-                var host = _config.GetRequiredSection("WebAPI:Host").Value;
+                string? host;
+                if (_formFactor.GetFormFactor() == "Phone")
+                    host = _config.GetRequiredSection("WebAPI:AndroidHost").Value;
+                else
+                    host = _config.GetRequiredSection("WebAPI:WinHost").Value;
+
                 var response = await client.PostAsJsonAsync($"{host}{request.Uri}", request);
 
                 apiResponse.StatusCode = response.StatusCode;
