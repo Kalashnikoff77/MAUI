@@ -1,8 +1,5 @@
 ﻿using Data.Enums;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using PhotoSauce.MagicScaler;
 using System.IdentityModel.Tokens.Jwt;
@@ -124,26 +121,5 @@ namespace Data.Models
 
             return new JwtSecurityTokenHandler().WriteToken(jwt);
         }
-
-
-        public static IServiceCollection AddJwtToken(this IServiceCollection services, WebApplicationBuilder builder)
-        {
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(options =>
-                {
-                    options.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateIssuer = true, // указывает, будет ли валидироваться издатель при валидации токена
-                        ValidIssuer = builder.Configuration.GetRequiredSection("JWT:JwtValidIssuer").Value, // строка, представляющая издателя
-                        ValidateAudience = true, // будет ли валидироваться потребитель токена
-                        ValidAudience = builder.Configuration.GetRequiredSection("JWT:JwtValidAudience").Value, // установка потребителя токена
-                        ValidateLifetime = true, // будет ли валидироваться время существования
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration.GetRequiredSection("JWT:IssuerSigningKey").Value!)), // установка ключа безопасности
-                        ValidateIssuerSigningKey = true // валидация ключа безопасности
-                    };
-                });
-            return services;
-        }
-
     }
 }

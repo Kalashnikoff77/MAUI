@@ -15,53 +15,53 @@ namespace Shared.Components.Pages
 
         void OnAdded()
         {
-            try
-            {
-                SmtpClient mySmtpClient = new SmtpClient("mail.yandex.ru");
+            //try
+            //{
+            //    SmtpClient mySmtpClient = new SmtpClient("mail.yandex.ru");
 
-                // set smtp-client with basicAuthentication
-                mySmtpClient.UseDefaultCredentials = false;
-                System.Net.NetworkCredential basicAuthenticationInfo = new
-                   System.Net.NetworkCredential("rusfaq02@yandex.ru", "");
-                mySmtpClient.Credentials = basicAuthenticationInfo;
+            //    // set smtp-client with basicAuthentication
+            //    mySmtpClient.UseDefaultCredentials = false;
+            //    System.Net.NetworkCredential basicAuthenticationInfo = new
+            //       System.Net.NetworkCredential("rusfaq02@yandex.ru", "");
+            //    mySmtpClient.Credentials = basicAuthenticationInfo;
 
-                // add from,to mailaddresses
-                MailAddress from = new MailAddress("rusfaq02@yandex.ru", "RusFAQ.ru");
-                MailAddress to = new MailAddress("adm@rfpro.ru", "TestToName");
-                MailMessage myMail = new System.Net.Mail.MailMessage(from, to);
+            //    // add from,to mailaddresses
+            //    MailAddress from = new MailAddress("rusfaq02@yandex.ru", "RusFAQ.ru");
+            //    MailAddress to = new MailAddress("adm@rfpro.ru", "TestToName");
+            //    MailMessage myMail = new System.Net.Mail.MailMessage(from, to);
 
-                // add ReplyTo
-                MailAddress replyTo = new MailAddress("rusfaq02@yandex.ru");
-                myMail.ReplyToList.Add(replyTo);
+            //    // add ReplyTo
+            //    MailAddress replyTo = new MailAddress("rusfaq02@yandex.ru");
+            //    myMail.ReplyToList.Add(replyTo);
 
-                // set subject and encoding
-                myMail.Subject = "Test message";
-                myMail.SubjectEncoding = System.Text.Encoding.UTF8;
+            //    // set subject and encoding
+            //    myMail.Subject = "Test message";
+            //    myMail.SubjectEncoding = System.Text.Encoding.UTF8;
 
-                // set body-message and encoding
-                myMail.Body = "<b>Test Mail</b><br>using <b>HTML</b>.";
-                myMail.BodyEncoding = System.Text.Encoding.UTF8;
-                // text or html
-                myMail.IsBodyHtml = true;
+            //    // set body-message and encoding
+            //    myMail.Body = "<b>Test Mail</b><br>using <b>HTML</b>.";
+            //    myMail.BodyEncoding = System.Text.Encoding.UTF8;
+            //    // text or html
+            //    myMail.IsBodyHtml = true;
 
-                mySmtpClient.Send(myMail);
-            }
+            //    mySmtpClient.Send(myMail);
+            //}
 
-            catch (SmtpException ex)
-            {
-                throw new ApplicationException
-                  ("SmtpException has occured: " + ex.Message);
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
+            //catch (SmtpException ex)
+            //{
+            //    throw new ApplicationException
+            //      ("SmtpException has occured: " + ex.Message);
+            //}
+            //catch (Exception ex)
+            //{
+            //    throw ex;
+            //}
 
-            var item = new CItems { Id = 3, Name = "Sasha" };
-            items.Add(item);
+            //var item = new CItems { Id = 3, Name = "Sasha" };
+            //items.Add(item);
 
-            item.Id = 4;
-            items.Add(item);
+            //item.Id = 4;
+            //items.Add(item);
         }
 
         void OnDeleted()

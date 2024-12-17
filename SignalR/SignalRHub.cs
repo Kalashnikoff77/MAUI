@@ -50,10 +50,6 @@ namespace SignalR
             await base.OnConnectedAsync();
         }
 
-        private string nameof(object updateOnlineAccountsClient)
-        {
-            throw new NotImplementedException();
-        }
 
         [Authorize]
         public override async Task OnDisconnectedAsync(Exception? exception)

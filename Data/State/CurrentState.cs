@@ -3,6 +3,7 @@ using Data.Dto.Responses;
 using Data.Dto.Views;
 using Data.Services;
 using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.Configuration;
 using Microsoft.JSInterop;
 using System.Net;
 
@@ -10,14 +11,18 @@ namespace Data.State
 {
     public partial class CurrentState
     {
-        [Inject] IJSProcessor _JSProcessor { get; set; } = null!;
-
         IFormFactor _formFactor { get; set; }
+        IJSProcessor _JSProcessor { get; set; } = null!;
+        IConfiguration _config { get; set; } = null!;
+        NavigationManager _navigationManager { get; set; } = null!;
 
-        public CurrentState(IFormFactor formFactor, IJSProcessor JSProcessor)
+        public CurrentState(IFormFactor formFactor, IJSProcessor JSProcessor, IJSRuntime JS, IConfiguration config, NavigationManager navigationManager)
         {
             _formFactor = formFactor;
             _JSProcessor = JSProcessor;
+            _config = config;
+            _navigationManager = navigationManager;
+            this.JS = JS;
         }
 
         /// <summary>
@@ -32,8 +37,6 @@ namespace Data.State
 
         public event Action? OnChange;
         public IJSRuntime JS { get; set; } = null!;
-
-        NavigationManager _navigationManager { get; set; } = null!;
 
         IRepository<AccountReloadRequestDto, AccountReloadResponseDto> _repoReload { get; set; } = null!;
 

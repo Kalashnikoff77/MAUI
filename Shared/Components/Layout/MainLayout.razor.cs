@@ -39,7 +39,7 @@ namespace Shared.Components.Layout
                     }
                 }
 
-                //await CurrentState.SignalRConnect();
+                await CurrentState.SignalRConnect();
             }
         }
 
