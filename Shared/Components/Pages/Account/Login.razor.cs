@@ -6,7 +6,7 @@ using Data.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Configuration;
 using MudBlazor;
-using Shared.State;
+using Data.State;
 using System.Net;
 
 namespace Shared.Components.Pages.Account

@@ -4,7 +4,7 @@ using Data.Models;
 using Data.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Configuration;
-using Shared.State;
+using Data.State;
 
 namespace Shared.Components.Layout
 {

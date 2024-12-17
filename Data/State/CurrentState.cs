@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using System.Net;
 
-namespace Shared.State
+namespace Data.State
 {
     public partial class CurrentState
     {

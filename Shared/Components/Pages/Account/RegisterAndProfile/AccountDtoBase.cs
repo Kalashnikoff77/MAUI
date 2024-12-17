@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.Extensions.Configuration;
 using MudBlazor;
 using Shared.Components.Dialogs;
-using Shared.State;
+using Data.State;
 using System.Text.RegularExpressions;
 
 namespace Shared.Components.Pages.Account.RegisterAndProfile

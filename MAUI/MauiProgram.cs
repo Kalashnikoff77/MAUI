@@ -4,7 +4,7 @@ using MAUI.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using MudBlazor.Services;
-using Shared.State;
+using Data.State;
 using System.Reflection;
 
 namespace MAUI

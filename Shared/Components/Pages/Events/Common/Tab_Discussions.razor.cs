@@ -4,7 +4,7 @@ using Data.Dto.Views;
 using Data.Models;
 using Data.Services;
 using Microsoft.AspNetCore.Components;
-using Shared.State;
+using Data.State;
 
 namespace Shared.Components.Pages.Events.Common
 {

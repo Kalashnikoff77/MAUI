@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using MudBlazor;
 using Shared.Components.Dialogs;
-using Shared.State;
+using Data.State;
 
 namespace Shared.Components.Pages.Events.AddAndEdit
 {

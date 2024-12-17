@@ -2,7 +2,7 @@ using Data.Services;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using MudBlazor.Services;
 using SH.Web.Services;
-using Shared.State;
+using Data.State;
 using Web.Components;
 
 var builder = WebApplication.CreateBuilder(args);
