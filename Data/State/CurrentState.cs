@@ -72,18 +72,18 @@ namespace Data.State
         public async Task LogOutAsync()
         {
             // Снимает статус онлайн с аватаров текущего пользователя
-            //if (Account != null)
-            //    ConnectedAccounts.Remove(Account.Id.ToString());
+            if (Account != null)
+                ConnectedAccounts.Remove(Account.Id.ToString());
 
             await _formFactor.ClearLoginDataAsync();
 
-            //await _JSProcessor.UpdateOnlineAccountsClient(ConnectedAccounts);
+            await _JSProcessor.UpdateOnlineAccountsClient(ConnectedAccounts);
 
             SetAccount(null);
 
             StateHasChanged();
 
-            //await SignalRConnect();
+            await SignalRConnect();
 
             await _JSProcessor.Redirect("/");
         }

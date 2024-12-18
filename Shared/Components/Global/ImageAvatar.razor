@@ -7,7 +7,7 @@
     [Parameter] public string? Class { get; set; }
     [Parameter] public string? Style { get; set; }
 
-    // [Inject] CurrentState CurrentState { get; set; } = null!;
+    [Inject] CurrentState CurrentState { get; set; } = null!;
 
     string uri = null!;
     string online = null!;
@@ -26,7 +26,7 @@
             else
                 uri = $"/images/AccountsPhotos/no-avatar/{Size}.jpg";
 
-            // online = CurrentState.ConnectedAccounts.Contains(Account.Id.ToString()) ? "img-online" : "";
+            online = CurrentState.ConnectedAccounts.Contains(Account.Id.ToString()) ? "img-online" : "";
         }
         else
         {
