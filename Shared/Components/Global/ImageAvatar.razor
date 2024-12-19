@@ -16,21 +16,21 @@
 
     protected override void OnParametersSet()
     {
-        if (Account != null) 
+        if (Account != null)
         {
             width = StaticData.Images[Size].Width;
             height = StaticData.Images[Size].Height;
 
             if (Account.Avatar != null)
-                uri = $"/images/AccountsPhotos/{Account.Id}/{Account.Avatar.Guid}/{Size}.jpg";
+                uri = $"{CurrentState.WebUrl}/images/AccountsPhotos/{Account.Id}/{Account.Avatar.Guid}/{Size}.jpg";
             else
-                uri = $"/images/AccountsPhotos/no-avatar/{Size}.jpg";
+                uri = $"{CurrentState.WebUrl}/images/AccountsPhotos/no-avatar/{Size}.jpg";
 
             online = CurrentState.ConnectedAccounts.Contains(Account.Id.ToString()) ? "img-online" : "";
         }
         else
         {
-            uri = $"/images/AccountsPhotos/no-avatar/{Size}.jpg";
+            uri = $"{CurrentState.WebUrl}/images/AccountsPhotos/no-avatar/{Size}.jpg";
             online = "";
         }
     }

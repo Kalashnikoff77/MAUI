@@ -17,36 +17,30 @@ namespace Data.State
 
         public async Task SignalRConnect()
         {
-            try
-            {
-                await SignalRDisconnect();
+            await SignalRDisconnect();
 
-                string? host;
-                if (_formFactor.GetFormFactor() == "Phone")
-                    host = _config.GetRequiredSection("SignalR:AndroidHost").Value;
-                else
-                    host = _config.GetRequiredSection("SignalR:WinHost").Value;
+            string? host;
+            if (_formFactor.GetFormFactor() == "Phone")
+                host = _config.GetRequiredSection("SignalR:AndroidHost").Value;
+            else
+                host = _config.GetRequiredSection("SignalR:WinHost").Value;
 
-                SignalR = new HubConnectionBuilder()
-                    .WithUrl(_navigationManager.ToAbsoluteUri(host), (c) => { c.AccessTokenProvider = () => Task.FromResult(Account?.Token); })
-                    .WithAutomaticReconnect()
-                    .WithServerTimeout(TimeSpan.FromHours(24))
-                    .Build();
+            SignalR = new HubConnectionBuilder()
+                .WithUrl(_navigationManager.ToAbsoluteUri(host), (c) => { c.AccessTokenProvider = () => Task.FromResult(Account?.Token); })
+                .WithAutomaticReconnect()
+                .WithServerTimeout(TimeSpan.FromHours(24))
+                .Build();
 
-                // Пользователь подключился
-                updateOnlineAccountsHandler = updateOnlineAccountsHandler.SignalRClient<OnAccountConnectedResponse>(this);
+            // Пользователь подключился
+            updateOnlineAccountsHandler = updateOnlineAccountsHandler.SignalRClient<OnAccountConnectedResponse>(this);
 
-                //// Пользователь сменил аватар
-                onAvatarChangedHandler = onAvatarChangedHandler.SignalRClient<OnAvatarChangedResponse>(this);
+            //// Пользователь сменил аватар
+            onAvatarChangedHandler = onAvatarChangedHandler.SignalRClient<OnAvatarChangedResponse>(this);
 
-                //// Пользователь изменил взаимоотношения с другим (дружба, подписка, блокировка)
-                //updateRelationsTriggerHandler = updateRelationsTriggerHandler.SignalRClient<GetRelationsModel>(this);
+            //// Пользователь изменил взаимоотношения с другим (дружба, подписка, блокировка)
+            //updateRelationsTriggerHandler = updateRelationsTriggerHandler.SignalRClient<GetRelationsModel>(this);
 
-                await SignalR.StartAsync();
-            }
-            catch (Exception ex)
-            {
-            }
+            await SignalR.StartAsync();
         }
 
         public async Task SignalRDisconnect()

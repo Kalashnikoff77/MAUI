@@ -11,7 +11,6 @@ namespace Data.Services
         where TRequestDto : RequestDtoBase
         where TResponseDto : ResponseDtoBase, new()
     {
-
         readonly IConfiguration _config;
         readonly IFormFactor _formFactor;
 
@@ -37,7 +36,15 @@ namespace Data.Services
 
             try
             {
-                var client = new HttpClient();
+                var handler = new HttpClientHandler();
+                handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) =>
+                {
+                    if (cert != null && cert.Issuer.Equals("CN=localhost"))
+                        return true;
+                    return errors == System.Net.Security.SslPolicyErrors.None;
+                };
+
+                var client = new HttpClient(handler);
 
                 client.DefaultRequestHeaders.Authorization = null;
 

@@ -16,6 +16,10 @@ namespace Data.State
         IConfiguration _config { get; set; } = null!;
         NavigationManager _navigationManager { get; set; } = null!;
 
+        public readonly string WebAPIUrl;
+        public readonly string SignalRUrl;
+        public readonly string WebUrl;
+
         public CurrentState(IFormFactor formFactor, IJSProcessor JSProcessor, IJSRuntime JS, IConfiguration config, NavigationManager navigationManager)
         {
             _formFactor = formFactor;
@@ -23,7 +27,21 @@ namespace Data.State
             _config = config;
             _navigationManager = navigationManager;
             this.JS = JS;
+
+            if (_formFactor.GetFormFactor() == "Phone")
+            {
+                WebAPIUrl = _config.GetRequiredSection("WebAPI:AndroidHost").Value!;
+                SignalRUrl = _config.GetRequiredSection("SignalR:AndroidHost").Value!;
+                WebUrl = _config.GetRequiredSection("Web:AndroidHost").Value!;
+            }
+            else
+            {
+                WebAPIUrl = _config.GetRequiredSection("WebAPI:WinHost").Value!;
+                SignalRUrl = _config.GetRequiredSection("SignalR:WinHost").Value!;
+                WebUrl = _config.GetRequiredSection("Web:WinHost").Value!;
+            }
         }
+
 
         /// <summary>
         /// Данные о залогиненном пользователе
