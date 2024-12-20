@@ -1,0 +1,19 @@
+﻿<span>
+    
+    @htmlText
+    
+    @if (!string.IsNullOrWhiteSpace(Message.Text) && Message.Text.Length > MaxTextLength)
+    {
+        <span @onclick="OnWrap" @onclick:stopPropagation="true" class="mud-primary-text" style="font-size:14px; font-weight:500; cursor:pointer">
+            @(isShortText ? " далее »" : " « скрыть")
+        </span>
+    }
+    else 
+    {
+        if (Message.Recipient?.Id == CurrentState.Account?.Id && Message.ReadDate == null)
+        {
+            <MudIconButton OnClick="OnWrap" Icon="@Icons.Material.Outlined.DoneAll" Size="Size.Small" Color="Color.Primary" Variant="Variant.Text" Class="ml-3" title="Пометить как прочитанное" />
+        }
+    }
+
+</span>

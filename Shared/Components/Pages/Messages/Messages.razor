@@ -1,0 +1,80 @@
+﻿@page "/messages"
+
+<PageTitle>Общение</PageTitle>
+
+@if (CurrentState.Account != null) 
+{
+    <div id="top" class="d-flex flex-column ml-sx-0 ml-sm-3" Style="min-width:300px; max-width:750px">
+
+        <MudText Align="Align.Left" Typo="Typo.h6" Class="mb-3">Общение</MudText>
+        <MudDivider DividerType="DividerType.FullWidth" Light="false" Class="mb-5" />
+
+        <MudTextField Placeholder="Поиск" T="string" ValueChanged="@(s => OnSearch(s))" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Clearable Class="mb-4" />
+
+        <MudSimpleTable Hover Striped Elevation="0">
+            <tbody>
+                @foreach (var message in LastMessagesList)
+                {
+                    AccountsViewDto? accountsViewDto = CurrentState.Account.Id == message.Sender?.Id ? message.Recipient : message.Sender;
+                    if (accountsViewDto != null)
+                    {
+                        <tr>
+                            <td>
+                                <div class="d-flex align-center gap-3">
+                                    <div @onclick="@(() => ShowDialogs.AccountInfoCardDialogAsync(accountsViewDto))" style="cursor:pointer">
+                                        <ImageAvatar Account="@accountsViewDto" Class="d-none d-sm-block avatar" Size="EnumImageSize.s64x64" />
+                                        <ImageAvatar Account="@accountsViewDto" Class="d-xs-block d-sm-none avatar" Style="width:45px; height:45px" Size="EnumImageSize.s64x64" />
+                                    </div>
+
+                                    <div class="d-flex flex-column gap-0" style="width:100%">
+                                        <div style="text-align:end">
+                                            <MudMenu Dense Icon="@Icons.Material.Filled.MoreVert" Size="Size.Small" AnchorOrigin="Origin.TopLeft" TransformOrigin="Origin.TopRight">
+                                                <MudMenuItem Icon="@Icons.Material.Filled.Check" IconColor="Color.Primary" Disabled="@(message.UnreadMessages == 0)" OnClick="() => MarkAsReadCallback(message.Id)">Пометить сообщение прочитанными</MudMenuItem>
+                                                <MudMenuItem Icon="@Icons.Material.Filled.ChecklistRtl" IconColor="Color.Primary" Disabled="@(message.UnreadMessages == 0)" OnClick="() => MarkAllAsReadAsync(message.Id)">Пометить все прочитанными</MudMenuItem>
+                                                <MudMenuItem Icon="@Icons.Material.Filled.Block" IconColor="Color.Error" OnClick="BlockAccountAsync">Заблокировать отправителя</MudMenuItem>
+                                            </MudMenu>
+                                        </div>
+
+                                        <div class="d-flex align-center" @onclick="@(() => ShowDialogs.AccountInfoCardDialogAsync(accountsViewDto))" style="cursor:pointer">
+
+                                            <div class="d-none d-sm-block flex-grow-1">
+                                                <MessageTextComponent Message="message" MaxTextLength="120" MarkAsReadCallback="MarkAsReadCallback" MarkAsReadId="@message.Id" />
+                                            </div>
+                                            <div class="d-xs-block d-sm-none flex-grow-1">
+                                                <MessageTextComponent Message="message" MaxTextLength="50" MarkAsReadCallback="MarkAsReadCallback" MarkAsReadId="@message.Id" />
+                                            </div>
+
+                                            @if (message.UnreadMessages > 0)
+                                            {
+                                                <div class="flex-grow-0" title="Непрочитанные сообщения"><MudAvatar Size="Size.Small" Color="Color.Primary">@message.UnreadMessages</MudAvatar></div>
+                                            }
+                                        </div>
+
+                                        <div class="d-flex justify-end align-center" style="font-size:12px; height:29px">
+                                            <p class="d-none d-sm-block" style="color:darkgrey">@message.CreateDate.ToMyString()</p>
+                                            <p class="d-sx-block d-sm-none" style="color:darkgrey" title="Отправлено: @message.CreateDate.ToMyString()">@message.CreateDate.ToMyPastShortString()</p>
+
+                                            <p class="ml-2 mr-1"><MudIcon Icon="@(CurrentState.Account.Id == message.Sender?.Id ? @Icons.Material.Filled.ArrowForward : @Icons.Material.Filled.ArrowBack)" Style="font-size:11px; margin-top:3px" /></p>
+
+                                            <p @onclick="@(() => ShowDialogs.AccountInfoCardDialogAsync(accountsViewDto))" class="mud-primary-text" style="cursor:pointer; font-weight:500">@accountsViewDto.Name</p>
+                                            <p>
+                                                @if (message.ReadDate == null)
+                                                {
+                                                    <MudIcon Icon="@Icons.Material.Filled.Done" Color="Color.Default" Style="font-size:15px; margin: 3px 0 0 5px" />
+                                                }
+                                                else
+                                                {
+                                                    <MudIcon Icon="@Icons.Material.Filled.DoneAll" Color="Color.Primary" Style="font-size:15px; margin: 3px 0 0 5px" />
+                                                }
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </MudSimpleTable>
+    </div>
+}
