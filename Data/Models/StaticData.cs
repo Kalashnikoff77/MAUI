@@ -87,9 +87,9 @@ namespace Data.Models
         public const short DB_EVENT_ADDRESS_MIN = 10;
         public const short DB_EVENT_ADDRESS_MAX = 150;
 
-        public const string TempPhotosDir = "../UI/wwwroot/images/temp";
-        public const string AccountsPhotosDir = "../UI/wwwroot/images/AccountsPhotos";
-        public const string EventsPhotosDir = "../UI/wwwroot/images/EventsPhotos";
+        public const string TempPhotosDir = "../Web/wwwroot/images/temp";
+        public const string AccountsPhotosDir = "../Web/wwwroot/images/AccountsPhotos";
+        public const string EventsPhotosDir = "../Web/wwwroot/images/EventsPhotos";
 
         // Префикс (метка) для кэширования запросов, связанных с мероприятиями
         public const string CachePrefixEvents = "events";

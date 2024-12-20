@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using PhotoSauce.MagicScaler;
 using WebAPI.Exceptions;
+using Data.Enums;
 
 namespace WebAPI.Controllers
 {
@@ -128,8 +129,8 @@ namespace WebAPI.Controllers
                 // Сохраняем временный аватар файла 250x250
                 using (MemoryStream output = new MemoryStream(50000))
                 {
-                    //MagicImageProcessor.ProcessImage(new MemoryStream(request.File), output, StaticData.Images[EnumImageSize.s250x250]);
-                    //await System.IO.File.WriteAllBytesAsync($"{tempDir}/{EnumImageSize.s250x250}.jpg", output.ToArray());
+                    MagicImageProcessor.ProcessImage(new MemoryStream(request.File), output, StaticData.Images[EnumImageSize.s250x250]);
+                    await System.IO.File.WriteAllBytesAsync($"{tempDir}/{EnumImageSize.s250x250}.jpg", output.ToArray());
                 }
 
                 if (request.AccountId.HasValue)

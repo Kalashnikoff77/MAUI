@@ -180,14 +180,14 @@ namespace WebAPI.Extensions
                                 Directory.CreateDirectory($"{StaticData.AccountsPhotosDir}/{request.Id}/{photo.Guid}");
                                 var sourceFileName = $"{StaticData.TempPhotosDir}/{photo.Guid}/original.jpg";
 
-                                //foreach (var image in StaticData.Images)
-                                //{
-                                //    var destFileName = $@"{StaticData.AccountsPhotosDir}/{request.Id}/{photo.Guid}/{image.Key}.jpg";
+                                foreach (var image in StaticData.Images)
+                                {
+                                    var destFileName = $@"{StaticData.AccountsPhotosDir}/{request.Id}/{photo.Guid}/{image.Key}.jpg";
 
-                                //    MemoryStream output = new MemoryStream(300000);
-                                //    MagicImageProcessor.ProcessImage(sourceFileName, output, image.Value);
-                                //    File.WriteAllBytes(destFileName, output.ToArray());
-                                //}
+                                    MemoryStream output = new MemoryStream(300000);
+                                    MagicImageProcessor.ProcessImage(sourceFileName, output, image.Value);
+                                    File.WriteAllBytes(destFileName, output.ToArray());
+                                }
 
                                 sql = "INSERT INTO PhotosForAccounts " +
                                     $"({nameof(PhotosForAccountsEntity.Guid)}, {nameof(PhotosForAccountsEntity.RelatedId)}, {nameof(PhotosForEventsEntity.Comment)}, {nameof(PhotosForAccountsEntity.IsAvatar)}) " +
