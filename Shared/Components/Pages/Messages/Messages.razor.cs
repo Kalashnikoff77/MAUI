@@ -27,24 +27,24 @@ namespace Shared.Components.Pages.Messages
             }
         }
 
-        async Task MarkAsReadCallback(int markAsReadId)
+        async Task MarkAsReadCallbackAsync(int markAsReadMessageId)
         {
-            var index = LastMessagesList.FindIndex(x => x.Id == markAsReadId);
+            var index = LastMessagesList.FindIndex(x => x.Id == markAsReadMessageId);
             // Проверим, помечено ли сообщение как прочитанное и адресовано ли нам?
             if (index >= 0 && LastMessagesList[index].Recipient?.Id == CurrentState.Account?.Id && LastMessagesList[index].ReadDate == null)
             {
-                var apiResponse = await _markMessageAsRead.HttpPostAsync(new MarkMessageAsReadRequestDto { MessageId = markAsReadId, Token = CurrentState.Account?.Token });
+                var apiResponse = await _markMessageAsRead.HttpPostAsync(new MarkMessageAsReadRequestDto { MessageId = markAsReadMessageId, MarkAllAsRead = false, Token = CurrentState.Account?.Token });
                 if (apiResponse.Response.UpdatedMessage != null)
                     LastMessagesList[index] = apiResponse.Response.UpdatedMessage;
             }
         }
 
-        async Task MarkAllAsReadAsync(int markAsReadId)
+        async Task MarkAllAsReadAsync(int markAsReadMessageId)
         {
-            var index = LastMessagesList.FindIndex(x => x.Id == markAsReadId);
+            var index = LastMessagesList.FindIndex(x => x.Id == markAsReadMessageId);
             if (index >= 0 && LastMessagesList[index].Sender != null)
             {
-                var apiResponse = await _markMessageAsRead.HttpPostAsync(new MarkMessageAsReadRequestDto { MessageId = markAsReadId, SenderId = LastMessagesList[index].Sender!.Id, Token = CurrentState.Account?.Token });
+                var apiResponse = await _markMessageAsRead.HttpPostAsync(new MarkMessageAsReadRequestDto { MessageId = markAsReadMessageId, MarkAllAsRead = true, Token = CurrentState.Account?.Token });
                 if (apiResponse.Response.UpdatedMessage != null)
                     LastMessagesList[index] = apiResponse.Response.UpdatedMessage;
             }
