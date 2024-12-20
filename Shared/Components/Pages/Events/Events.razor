@@ -62,7 +62,7 @@
                 @foreach (var schedule in SchedulesList)
                 {
                     <tr>
-                        <td style="cursor:pointer">
+                        <td style="cursor:pointer" @onclick="() => ShowDialogs.ScheduleInfoCardDialogAsync(schedule)">
                             <MudStack Wrap="Wrap.NoWrap" Class="flex-sm-row" StretchItems="StretchItems.Middle" Spacing="1" AlignItems="AlignItems.Center">
                                 <ImageEvent Event="schedule.Event" Size="EnumImageSize.s150x150" Title="@schedule.Event!.Name" Class="d-none d-sm-block mr-2" Style="border-radius:3%; border:solid; border-width:1px; border-color:lightgray; width:140px; height:140px" />
                                 <ImageEvent Event="schedule.Event" Size="EnumImageSize.s150x150" Title="@schedule.Event.Name" Class="d-xs-block d-sm-none" Style="border-radius:4%; border:solid; border-width:1px; border-color:lightgray; width:210px; height:210px" />
@@ -125,7 +125,7 @@
                                     }
                                 </div>
 
-                                <div class="d-none d-sm-flex flex-column align-center gap-2" @onclick:stopPropagation="true" style="width:100px; min-width:100px">
+                                <div class="d-none d-sm-flex flex-column align-center gap-2" @onclick="() => ShowDialogs.AccountInfoCardDialogAsync(schedule.Event.Admin!)" @onclick:stopPropagation="true" style="width:100px; min-width:100px">
                                     <ImageAvatar Account="schedule.Event.Admin" Size="EnumImageSize.s64x64" Title="Организатор" class="s45" Style="border-radius:50%" />
                                     <ColorizedAccountName Account="@schedule.Event.Admin" Typo="Typo.body2" Style="font-size:12px; text-align:center" />
                                 </div>

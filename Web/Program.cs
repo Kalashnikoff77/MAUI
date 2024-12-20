@@ -4,6 +4,7 @@ using MudBlazor.Services;
 using SH.Web.Services;
 using Data.State;
 using Web.Components;
+using Shared.Components.Dialogs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +15,7 @@ builder.Services.AddRazorComponents()
 builder.Services.AddScoped(typeof(IRepository<,>), typeof(Repository<,>));
 builder.Services.AddScoped<IJSProcessor, JSProcessor>();
 builder.Services.AddScoped<IFormFactor, FormFactor>();
+builder.Services.AddScoped<ShowDialogs>();
 
 builder.Services.AddScoped<CurrentState>();
 

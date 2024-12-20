@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using MudBlazor.Services;
 using Data.State;
 using System.Reflection;
+using Shared.Components.Dialogs;
 
 namespace MAUI
 {
@@ -25,6 +26,7 @@ namespace MAUI
             builder.Services.AddScoped<IJSProcessor, JSProcessor>();
             builder.Services.AddSingleton<IFormFactor, FormFactor>();
             builder.Services.AddScoped<CurrentState>();
+            builder.Services.AddScoped<ShowDialogs>();
 
             builder.Services.AddMudServices();
            

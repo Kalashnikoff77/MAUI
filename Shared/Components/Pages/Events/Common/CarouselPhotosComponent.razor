@@ -2,12 +2,13 @@
     @foreach (var photo in Photos.OrderByDescending(o => o.IsAvatar).ThenByDescending(o => o.CreateDate))
     {
         <MudCarouselItem Transition="Transition.Fade">
-            <MudImage Src=@($"/images/EventsPhotos/{photo.RelatedId}/{photo.Guid}/{EnumImageSize.s450x600}.jpg") Style="border-radius:2%; border:solid; border-width:1px; border-color:lightgray; width:300px; height:400px" />
+            <MudImage Src=@($"{CurrentState.WebUrl}/images/EventsPhotos/{photo.RelatedId}/{photo.Guid}/{EnumImageSize.s450x600}.jpg") Style="border-radius:2%; border:solid; border-width:1px; border-color:lightgray; width:300px; height:400px" />
         </MudCarouselItem>
     }
 </MudCarousel>
 
 @code {
+    [Inject] CurrentState CurrentState { get; set; } = null!;
     [Parameter, EditorRequired] public IEnumerable<PhotosForEventsDto> Photos { get; set; } = null!;
     MudCarousel<PhotosForEventsDto> Carousel = null!;
 }

@@ -36,15 +36,17 @@ namespace Data.Services
 
             try
             {
-                var handler = new HttpClientHandler();
-                handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) =>
-                {
-                    if (cert != null && cert.Issuer.Equals("CN=localhost"))
-                        return true;
-                    return errors == System.Net.Security.SslPolicyErrors.None;
-                };
+                //var handler = new HttpClientHandler();
+                //handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) =>
+                //{
+                //    if (cert != null && cert.Issuer.Equals("CN=localhost"))
+                //        return true;
+                //    return errors == System.Net.Security.SslPolicyErrors.None;
+                //};
 
-                var client = new HttpClient(handler);
+                //var client = new HttpClient(handler);
+
+                var client = new HttpClient();
 
                 client.DefaultRequestHeaders.Authorization = null;
 

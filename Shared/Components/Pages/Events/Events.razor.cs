@@ -3,6 +3,7 @@ using Data.Dto.Responses;
 using Data.Dto.Views;
 using Data.Services;
 using Microsoft.AspNetCore.Components;
+using Shared.Components.Dialogs;
 
 namespace Shared.Components.Pages.Events
 {
@@ -12,6 +13,7 @@ namespace Shared.Components.Pages.Events
         [Inject] IRepository<GetFeaturesForEventsRequestDto, GetFeaturesForEventsResponseDto> _repoGetFeatures { get; set; } = null!;
         [Inject] IRepository<GetRegionsForEventsRequestDto, GetRegionsForEventsResponseDto> _repoGetRegions { get; set; } = null!;
         [Inject] IRepository<GetAdminsForEventsRequestDto, GetAdminsForEventsResponseDto> _repoGetAdmins { get; set; } = null!;
+        [Inject] ShowDialogs ShowDialogs { get; set; } = null!;
 
         GetSchedulesRequestDto request = new GetSchedulesRequestDto { IsPhotosIncluded = true };
         List<SchedulesForEventsViewDto> SchedulesList = new List<SchedulesForEventsViewDto>();
