@@ -41,11 +41,11 @@
                     <MudPaper Outlined class="pa-3 mb-8" style="@("max-width:274px; " + (photo.IsAvatar ? "background-color:#EDFFEE" : null))">
                         @if (CurrentState.Account != null)
                         {
-                            <MudImage Width="250" Height="250" Src="@($"/images/" + (photo.Id == 0 ? "temp" : $"AccountsPhotos/{CurrentState.Account.Id}") + $"/{photo.Guid}/{EnumImageSize.s250x250}.jpg")" Class="mb-2" />
+                            <MudImage Width="250" Height="250" Src="@($"{CurrentState.WebUrl}/images/" + (photo.Id == 0 ? "temp" : $"AccountsPhotos/{CurrentState.Account.Id}") + $"/{photo.Guid}/{EnumImageSize.s250x250}.jpg")" Class="mb-2" />
                         }
                         else
                         {
-                            <MudImage Width="250" Height="250" Src="@($"/images/temp/{photo.Guid}/{EnumImageSize.s250x250}.jpg")" Class="mb-2" />
+                            <MudImage Width="250" Height="250" Src="@($"{CurrentState.WebUrl}/images/temp/{photo.Guid}/{EnumImageSize.s250x250}.jpg")" Class="mb-2" />
                         }
                         <div class="d-flex">
                             <MudTextField T="string" Value="@photo.Comment" ValueChanged="@((c) => Data.UpdateCommentPhoto(photo, c))" Label="Описание" Variant="Variant.Text" />

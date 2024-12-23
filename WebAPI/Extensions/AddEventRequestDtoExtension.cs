@@ -155,14 +155,14 @@ namespace WebAPI.Extensions
                             Directory.CreateDirectory($"{StaticData.EventsPhotosDir}/{request.Event.Id}/{photo.Guid}");
                             var sourceFileName = $"{StaticData.TempPhotosDir}/{photo.Guid}/original.jpg";
 
-                            //foreach (var image in StaticData.Images)
-                            //{
-                            //    var destFileName = $@"{StaticData.EventsPhotosDir}/{request.Event.Id}/{photo.Guid}/{image.Key}.jpg";
+                            foreach (var image in StaticData.Images)
+                            {
+                                var destFileName = $@"{StaticData.EventsPhotosDir}/{request.Event.Id}/{photo.Guid}/{image.Key}.jpg";
 
-                            //    MemoryStream output = new MemoryStream(300000);
-                            //    MagicImageProcessor.ProcessImage(sourceFileName, output, image.Value);
-                            //    File.WriteAllBytes(destFileName, output.ToArray());
-                            //}
+                                MemoryStream output = new MemoryStream(300000);
+                                MagicImageProcessor.ProcessImage(sourceFileName, output, image.Value);
+                                File.WriteAllBytes(destFileName, output.ToArray());
+                            }
 
                             sql = "INSERT INTO PhotosForEvents " +
                                 $"({nameof(PhotosForEventsEntity.Guid)}, {nameof(PhotosForEventsEntity.RelatedId)}, {nameof(PhotosForEventsEntity.Comment)}, {nameof(PhotosForEventsEntity.IsAvatar)}) " +

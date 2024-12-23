@@ -2,6 +2,7 @@
 using Data.Dto.Responses;
 using Data.Dto.Views;
 using Data.Services;
+using Data.State;
 using Microsoft.AspNetCore.Components;
 using Shared.Components.Dialogs;
 
@@ -9,6 +10,7 @@ namespace Shared.Components.Pages.Events
 {
     public partial class Events : IDisposable
     {
+        [CascadingParameter] public CurrentState CurrentState { get; set; } = null!;
         [Inject] IRepository<GetSchedulesRequestDto, GetSchedulesResponseDto> _repoGetSchedules { get; set; } = null!;
         [Inject] IRepository<GetFeaturesForEventsRequestDto, GetFeaturesForEventsResponseDto> _repoGetFeatures { get; set; } = null!;
         [Inject] IRepository<GetRegionsForEventsRequestDto, GetRegionsForEventsResponseDto> _repoGetRegions { get; set; } = null!;

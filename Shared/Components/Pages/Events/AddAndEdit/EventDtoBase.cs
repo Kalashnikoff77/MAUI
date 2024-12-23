@@ -2,13 +2,14 @@
 using Data.Dto.Requests;
 using Data.Dto.Responses;
 using Data.Dto.Views;
+using Data.Extensions;
 using Data.Models;
 using Data.Services;
+using Data.State;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using MudBlazor;
 using Shared.Components.Dialogs;
-using Data.State;
 
 namespace Shared.Components.Pages.Events.AddAndEdit
 {
@@ -310,21 +311,21 @@ namespace Shared.Components.Pages.Events.AddAndEdit
                 if (Event.Photos == null)
                     Event.Photos = new List<PhotosForEventsDto>();
 
-                //foreach (var photo in browserPhotos)
-                //{
-                //    var newPhoto = await photo.Upload<PhotosForEventsDto>(CurrentState.Account?.Token, _repoUploadPhotoToTemp, eventId: Event.Id);
+                foreach (var photo in browserPhotos)
+                {
+                    var newPhoto = await photo.Upload<PhotosForEventsDto>(CurrentState.Account?.Token, _repoUploadPhotoToTemp, eventId: Event.Id);
 
-                //    if (newPhoto != null)
-                //    {
-                //        // Если это первая фотка, то отметим её как аватар
-                //        if (Event.Photos.Count(x => x.IsDeleted == false) == 0)
-                //            newPhoto.IsAvatar = true;
-                //        Event.Photos.Insert(0, newPhoto);
-                //    }
+                    if (newPhoto != null)
+                    {
+                        // Если это первая фотка, то отметим её как аватар
+                        if (Event.Photos.Count(x => x.IsDeleted == false) == 0)
+                            newPhoto.IsAvatar = true;
+                        Event.Photos.Insert(0, newPhoto);
+                    }
 
-                //    StateHasChanged();
-                //    if (Event.Photos.Count(x => x.IsDeleted == false) >= 20) break;
-                //}
+                    StateHasChanged();
+                    if (Event.Photos.Count(x => x.IsDeleted == false) >= 20) break;
+                }
 
                 processingPhoto = false;
                 StateHasChanged();
