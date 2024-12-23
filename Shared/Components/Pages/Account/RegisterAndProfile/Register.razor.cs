@@ -44,8 +44,8 @@ namespace Shared.Components.Pages.Account.RegisterAndProfile
                 Password2 = "pass1234",
                 Users = new List<UsersDto>
                 {
-                    new UsersDto { Id = 0, Name = "Олег", Gender = 0, Weight=80, Height=180, BirthDate = DateTime.Parse("29.01.1977") },
-                    new UsersDto { Id = 1, Name = "Марина", Gender = 1, Weight=74, Height=173, BirthDate = DateTime.Parse("01.07.1969") }
+                    new UsersDto { Id = 0, Name = "Олег", Gender = 0, Weight=80, Height=180, BirthDate = DateTime.Parse("1977.01.29") },
+                    new UsersDto { Id = 1, Name = "Марина", Gender = 1, Weight=74, Height=173, BirthDate = DateTime.Parse("1969.07.01") }
                 }
             };
         }
@@ -81,10 +81,7 @@ namespace Shared.Components.Pages.Account.RegisterAndProfile
                     apiResponse.Response.Account!.Token = StaticData.GenerateToken(apiResponse.Response.Account.Id, apiResponse.Response.Account.Guid, _config);
                     CurrentState.SetAccount(apiResponse.Response.Account);
 
-                    //if (loginRequestDto.Remember)
-                    //    await _protectedLocalStore.SetAsync(nameof(LoginRequestDto), loginRequestDto);
-                    //else
-                    //    await _protectedSessionStore.SetAsync(nameof(LoginRequestDto), loginRequestDto);
+                    await _formFactor.StoreLoginDataAsync(loginRequestDto);
 
                     await _JSProcessor.Redirect("/");
                 }
