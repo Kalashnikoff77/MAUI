@@ -34,9 +34,13 @@
             {
                 <MudAlert Severity="Severity.Error">@AccountRequestDto.ErrorMessage</MudAlert>
             }
-            <MudCheckBox @bind-Value="AccountRequestDto.Remember" Disabled="!(IsPanel1Valid && IsPanel2Valid && IsPanel3Valid && IsPanel4Valid)" Color="Color.Primary">
-                <MudText Typo="Typo.body2">Запомнить меня</MudText>
-            </MudCheckBox>
+
+            @if (_formFactor.GetFormFactor() == "Web") 
+            {
+                <MudCheckBox @bind-Value="AccountRequestDto.Remember" Disabled="!(IsPanel1Valid && IsPanel2Valid && IsPanel3Valid && IsPanel4Valid)" Color="Color.Primary">
+                    <MudText Typo="Typo.body2">Запомнить меня</MudText>
+                </MudCheckBox>
+            }
 
             <MudButton OnClick="SubmitAsync" StartIcon="@Icons.Material.Outlined.Save" Disabled="!(IsPanel1Valid && IsPanel2Valid && IsPanel3Valid && IsPanel4Valid && !ProcessingAccount)" Variant="Variant.Filled" Size="Size.Large" Color="Color.Primary" Style="margin:auto">
                 @if (ProcessingAccount)

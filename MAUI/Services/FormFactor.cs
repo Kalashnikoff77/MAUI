@@ -1,4 +1,3 @@
-using Blazored.LocalStorage;
 using Data.Dto.Requests;
 using Data.Services;
 
@@ -6,13 +5,6 @@ namespace MAUI.Services
 {
     public class FormFactor : IFormFactor
     {
-        ILocalStorageService _localStorage { get; set; }
-
-        public FormFactor(ILocalStorageService localStorage)
-        {
-            _localStorage = localStorage;
-        }
-
         public Task StoreLoginDataAsync(LoginRequestDto loginRequestDto)
         {
             Preferences.Set(nameof(loginRequestDto.Email), loginRequestDto.Email);

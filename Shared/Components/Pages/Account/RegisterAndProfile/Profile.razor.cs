@@ -51,9 +51,8 @@ namespace Shared.Components.Pages.Account.RegisterAndProfile
                 CountryText = CurrentState.Account.Country!.Name;
                 RegionText = CurrentState.Account.Country!.Region.Name;
 
-                //var storage = await _protectedLocalStore.GetAsync<LoginRequestDto>(nameof(LoginRequestDto));
-                //if (storage.Success)
-                //    AccountRequestDto.Remember = true;
+                var loginData = await _formFactor.GetLoginDataAsync();
+                AccountRequestDto.Remember = loginData!.Remember;
 
                 NameIconColor = EmailIconColor = PasswordIconColor = Password2IconColor = CountryIconColor = RegionIconColor = Color.Success;
 
@@ -90,10 +89,7 @@ namespace Shared.Components.Pages.Account.RegisterAndProfile
                     apiResponse.Response.Account!.Token = StaticData.GenerateToken(apiResponse.Response.Account.Id, apiResponse.Response.Account.Guid, _config);
                     CurrentState.SetAccount(apiResponse.Response.Account);
 
-                    //if (loginRequestDto.Remember)
-                    //    await _protectedLocalStore.SetAsync(nameof(LoginRequestDto), loginRequestDto);
-                    //else
-                    //    await _protectedSessionStore.SetAsync(nameof(LoginRequestDto), loginRequestDto);
+                    await _formFactor.StoreLoginDataAsync(loginRequestDto);
 
                     IsDataSaved = true;
                 }

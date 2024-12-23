@@ -25,8 +25,7 @@ namespace Shared.Components.Pages.Account.RegisterAndProfile
         [Inject] protected IRepository<LoginRequestDto, LoginResponseDto> _repoLogin { get; set; } = null!;
         [Inject] protected IRepository<GetIdentityRequestDto, GetIdentityResponseDto> _repoGetIdentity { get; set; } = null!;
 
-        //[Inject] protected ProtectedLocalStorage _protectedLocalStore { get; set; } = null!;
-        //[Inject] protected ProtectedSessionStorage _protectedSessionStore { get; set; } = null!;
+        [Inject] protected IFormFactor _formFactor { get; set; } = null!;
         [Inject] protected IDialogService _dialogService { get; set; } = null!;
         [Inject] protected IConfiguration _config { get; set; } = null!;
         [Inject] protected IJSProcessor _JSProcessor { get; set; } = null!;

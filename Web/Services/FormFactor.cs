@@ -17,6 +17,8 @@ namespace SH.Web.Services
 
         public async Task StoreLoginDataAsync(LoginRequestDto loginRequestDto)
         {
+            await ClearLoginDataAsync();
+
             if (loginRequestDto.Remember)
                 await _protectedLocalStore.SetAsync(nameof(LoginRequestDto), loginRequestDto);
             else
@@ -25,12 +27,19 @@ namespace SH.Web.Services
 
         public async Task<LoginRequestDto?> GetLoginDataAsync()
         {
+            bool remember = true;
             var storage = await _protectedLocalStore.GetAsync<LoginRequestDto>(nameof(LoginRequestDto));
             if (!storage.Success)
+            {
                 storage = await _protectedSessionStore.GetAsync<LoginRequestDto>(nameof(LoginRequestDto));
+                remember = false;
+            }
 
             if (storage.Success && storage.Value != null)
+            {
+                storage.Value.Remember = remember;
                 return storage.Value;
+            }
             else
                 return null;
         }
