@@ -29,7 +29,7 @@ namespace SH.Web.Services
         {
             bool remember = true;
             var storage = await _protectedLocalStore.GetAsync<LoginRequestDto>(nameof(LoginRequestDto));
-            if (!storage.Success)
+            if (storage.Success == false)
             {
                 storage = await _protectedSessionStore.GetAsync<LoginRequestDto>(nameof(LoginRequestDto));
                 remember = false;

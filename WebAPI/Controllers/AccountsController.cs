@@ -1,19 +1,18 @@
 ﻿using AutoMapper;
+using Dapper;
 using Data.Dto;
 using Data.Dto.Requests;
 using Data.Dto.Responses;
 using Data.Dto.Views;
-using Data.Enums;
-using Dapper;
 using Data.Entities;
 using Data.Entities.Views;
+using Data.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using WebAPI.Exceptions;
 using WebAPI.Extensions;
 using WebAPI.Models;
-using static Dapper.SqlMapper;
 
 namespace WebAPI.Controllers
 {
@@ -95,7 +94,7 @@ namespace WebAPI.Controllers
             var account = await _unitOfWork.SqlConnection.QueryFirstOrDefaultAsync<AccountsViewEntity>(sql, new { identity.AccountId });
             response.Account = _unitOfWork.Mapper.Map<AccountsViewDto>(account);
 
-            sql = $"SELECT TOP 1 * FROM Informings WHERE Id = @AccountId";
+            sql = $"SELECT TOP 1 * FROM Informings WHERE AccountId = @AccountId";
             var informings = await _unitOfWork.SqlConnection.QueryFirstOrDefaultAsync<InformingsEntity?>(sql, new { identity.AccountId });
             response.Account.Informings = _unitOfWork.Mapper.Map<InformingsDto>(informings);
 

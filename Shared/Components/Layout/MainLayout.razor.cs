@@ -2,9 +2,9 @@
 using Data.Dto.Responses;
 using Data.Models;
 using Data.Services;
+using Data.State;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Configuration;
-using Data.State;
 
 namespace Shared.Components.Layout
 {
@@ -46,7 +46,7 @@ namespace Shared.Components.Layout
         public async ValueTask DisposeAsync()
         {
             CurrentState.OnChange -= StateHasChanged;
-            //await CurrentState.SignalRDisconnect();
+            await CurrentState.SignalRDisconnect();
         }
     }
 }

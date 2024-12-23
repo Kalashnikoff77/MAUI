@@ -163,21 +163,21 @@ namespace WebAPI.Extensions
                             Directory.CreateDirectory($"{StaticData.AccountsPhotosDir}/{request.Id}/{photo.Guid}");
                             var sourceFileName = $"{StaticData.TempPhotosDir}/{photo.Guid}/original.jpg";
 
-                            //foreach (var image in StaticData.Images)
-                            //{
-                            //    var destFileName = $@"{StaticData.AccountsPhotosDir}/{request.Id}/{photo.Guid}/{image.Key}.jpg";
+                            foreach (var image in StaticData.Images)
+                            {
+                                var destFileName = $@"{StaticData.AccountsPhotosDir}/{request.Id}/{photo.Guid}/{image.Key}.jpg";
 
-                            //    MemoryStream output = new MemoryStream(300000);
-                            //    MagicImageProcessor.ProcessImage(sourceFileName, output, image.Value);
-                            //    File.WriteAllBytes(destFileName, output.ToArray());
-                            //}
+                                MemoryStream output = new MemoryStream(300000);
+                                MagicImageProcessor.ProcessImage(sourceFileName, output, image.Value);
+                                File.WriteAllBytes(destFileName, output.ToArray());
+                            }
 
-                            //sql = "INSERT INTO PhotosForAccounts " +
-                            //    $"({nameof(PhotosForAccountsEntity.Guid)}, {nameof(PhotosForAccountsEntity.RelatedId)}, {nameof(PhotosForAccountsEntity.Comment)}, {nameof(PhotosForAccountsEntity.IsAvatar)}) " +
-                            //    "VALUES " +
-                            //    $"(@{nameof(PhotosForAccountsEntity.Guid)}, @{nameof(PhotosForAccountsEntity.RelatedId)}, @{nameof(PhotosForAccountsEntity.Comment)}, @{nameof(PhotosForAccountsEntity.IsAvatar)});" +
-                            //    $"SELECT CAST(SCOPE_IDENTITY() AS INT)";
-                            //var newId = await unitOfWork.SqlConnection.QuerySingleAsync<int>(sql, new { photo.Guid, RelatedId = request.Id, photo.Comment, photo.IsAvatar }, transaction: unitOfWork.SqlTransaction);
+                            sql = "INSERT INTO PhotosForAccounts " +
+                                $"({nameof(PhotosForAccountsEntity.Guid)}, {nameof(PhotosForAccountsEntity.RelatedId)}, {nameof(PhotosForAccountsEntity.Comment)}, {nameof(PhotosForAccountsEntity.IsAvatar)}) " +
+                                "VALUES " +
+                                $"(@{nameof(PhotosForAccountsEntity.Guid)}, @{nameof(PhotosForAccountsEntity.RelatedId)}, @{nameof(PhotosForAccountsEntity.Comment)}, @{nameof(PhotosForAccountsEntity.IsAvatar)});" +
+                                $"SELECT CAST(SCOPE_IDENTITY() AS INT)";
+                            var newId = await unitOfWork.SqlConnection.QuerySingleAsync<int>(sql, new { photo.Guid, RelatedId = request.Id, photo.Comment, photo.IsAvatar }, transaction: unitOfWork.SqlTransaction);
                         }
                         Directory.Delete($"{StaticData.TempPhotosDir}/{photo.Guid}", true);
                     }
