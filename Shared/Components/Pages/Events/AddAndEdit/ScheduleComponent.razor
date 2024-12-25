@@ -7,50 +7,51 @@
     </TitleContent>
 
     <ChildContent>
-        <MudDataGrid T="SchedulesForEventsViewDto" Items="@Data.Event.Schedule?.Where(x => x.IsDeleted == false)" HeaderClass="dataGridHideTHead" Elevation="0" Striped Hover Bordered>
-            <Columns>
-                <TemplateColumn CellClass="py-3">
-                    <CellTemplate>
-                        <MudStack StretchItems="StretchItems.Start" AlignItems="AlignItems.Center" Spacing="0" Row >
-                            <MudStack Spacing="0">
-                                <MudStack Row AlignItems="AlignItems.Center" Spacing="2">
-                                    <MudIcon Icon="@Icons.Material.Outlined.CalendarToday" Class="@context.Item.ToDateClass()" Style="font-size:17px" />
-                                    <MudText Typo="Typo.subtitle1" Align="Align.Left"><b>@context.Item.ToStartEndString()</b></MudText>
-                                </MudStack>
-                                <MudText Align="Align.Left" Style="font-size:13px">@context.Item.Description</MudText>
-                                <MudStack Row AlignItems="AlignItems.Center" Spacing="1" Style="font-size:13px">
-                                    <MudIcon Icon="@Icons.Material.Filled.PeopleAlt" Color="Color.Tertiary" Style="font-size:17px" />@(context.Item.CostPair == 0 ? "Бесплатно" : context.Item.CostPair.ToString() + " руб.")
-                                    <MudIcon Icon="@Icons.Material.Filled.Face5" Color="Color.Primary" Style="font-size:16px" Class="ml-2" />@(context.Item.CostMan == 0 ? "Бесплатно" : context.Item.CostMan.ToString() + " руб.")
-                                    <MudIcon Icon="@Icons.Material.Filled.Face3" Color="Color.Error" Style="font-size:15px" Class="ml-2" />@(context.Item.CostWoman == 0 ? "Бесплатно" : context.Item.CostWoman.ToString() + " руб.")
-                                </MudStack>
-                                @if (context.Item.Features != null)
-                                {
-                                    <MudStack Row Wrap="Wrap.Wrap" Spacing="2" Class="mt-1">
-                                        @foreach (var feature in context.Item.Features.OrderBy(o => o.Name))
-                                        {
-                                            <span style="padding: 0 5px 0 5px; font-size:12px; font-weight:500; opacity:0.6; border-width:1px; border-style:dotted">@feature.Name</span>
-                                        }
-                                    </MudStack>
-                                }
-                            </MudStack>
-                        </MudStack>
-                    </CellTemplate>
-                </TemplateColumn>
 
-                <TemplateColumn CellStyle="width:90px">
-                    <CellTemplate>
-                        <MudStack Row Spacing="2">
-                            <MudIconButton Size="@Size.Small" title="Редактировать расписание" Icon="@Icons.Material.Outlined.Edit" Color="Color.Primary" OnClick="async () => await Data.EditScheduleForEventDialogAsync(context.Item)" />
-                            <MudIconButton Size="@Size.Small" title="Удалить расписание" Icon="@Icons.Material.Outlined.Delete" Color="Color.Error" OnClick="async () => await Data.DeleteScheduleForEventDialogAsync(context.Item)" />
-                        </MudStack>
-                    </CellTemplate>
-                </TemplateColumn>
-            </Columns>
-        </MudDataGrid>
+        @if (Data.Event.Schedule != null) 
+        {
+            <MudSimpleTable Hover Elevation="0" Style="overflow:hidden">
+                <tbody>
+                    @foreach (var schedule in Data.Event.Schedule.Where(x => x.IsDeleted == false)) 
+                    {
+                        <tr>
+                            <td class="px-1 py-4">
+                                <div class="d-flex flex-column gap-0">
+                                    <div class="d-flex align-center">
+                                        <MudIcon Icon="@Icons.Material.Outlined.CalendarToday" Class="@(schedule.ToDateClass())" Style="font-size:17px; margin:0 5px 3px 0" />
+                                        <p><b>@schedule.ToStartEndString()</b></p>
+                                        <div class="d-flex ml-3">
+                                            <MudIconButton Size="@Size.Small" title="Редактировать расписание" Icon="@Icons.Material.Outlined.Edit" Color="Color.Primary" OnClick="async () => await Data.EditScheduleForEventDialogAsync(schedule)" />
+                                            <MudIconButton Size="@Size.Small" title="Удалить расписание" Icon="@Icons.Material.Outlined.Delete" Color="Color.Error" OnClick="async () => await Data.DeleteScheduleForEventDialogAsync(schedule)" />
+                                        </div>
+                                    </div>
+                                    <MudText Style="font-size:13px">@schedule.Description</MudText>
+                                    <div class="d-flex gap-1" style="font-size:13px">
+                                        <MudIcon Icon="@Icons.Material.Filled.PeopleAlt" Color="Color.Tertiary" Style="font-size:17px" />@(schedule.CostPair == 0 ? "Бесплатно" : schedule.CostPair.ToString() + " руб.")
+                                        <MudIcon Icon="@Icons.Material.Filled.Face5" Color="Color.Primary" Style="font-size:16px" Class="ml-2" />@(schedule.CostMan == 0 ? "Бесплатно" : schedule.CostMan.ToString() + " руб.")
+                                        <MudIcon Icon="@Icons.Material.Filled.Face3" Color="Color.Error" Style="font-size:15px" Class="ml-2" />@(schedule.CostWoman == 0 ? "Бесплатно" : schedule.CostWoman.ToString() + " руб.")
+                                    </div>
+                                    @if (schedule.Features != null)
+                                    {
+                                        <div class="d-flex gap-1 mt-1">
+                                            @foreach (var feature in schedule.Features.OrderBy(o => o.Name))
+                                            {
+                                                <span style="padding: 0 5px 0 5px; font-size:12px; font-weight:500; opacity:0.6; border-width:1px; border-style:dotted">@feature.Name</span>
+                                            }
+                                        </div>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </MudSimpleTable>
+        }
 
         <MudStack AlignItems="AlignItems.End">
             <MudButton StartIcon="@Icons.Material.Outlined.Add" ButtonType="ButtonType.Button" Color="Color.Primary" Size="Size.Small" Variant="Variant.Filled" OnClick="Data.AddScheduleDialogAsync" Class="mt-5">Добавить</MudButton>
         </MudStack>
+
     </ChildContent>
 
 </MudExpansionPanel>

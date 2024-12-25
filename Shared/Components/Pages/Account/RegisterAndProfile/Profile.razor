@@ -6,12 +6,12 @@
 {
     <PageTitle>Настройки профиля: @CurrentState.Account.Name</PageTitle>
 
-    <div id="top" class="d-flex flex-column ml-sx-0 ml-sm-3" Style="min-width:300px; max-width:750px">
+    <div id="top" class="d-flex flex-column align-center ml-sx-0 ml-sm-3" Style="min-width:300px; max-width:750px">
     
         <MudText Align="Align.Left" Typo="Typo.h6" Class="mb-3">Настройки профиля: @CurrentState.Account.Name</MudText>
         <MudDivider DividerType="DividerType.FullWidth" Light="false" Class="mb-5" />
 
-        <MudExpansionPanels MultiExpansion Elevation="3">
+        <MudExpansionPanels MultiExpansion Elevation="3" Class="mb-5">
 
             @* ОБЩИЕ *@
             <GeneralComponent Data="@this" />
@@ -28,31 +28,29 @@
         </MudExpansionPanels>
 
         @* КНОПКА СОХРАНЕНИЯ *@
-        <div class="d-flex align-center mt-5 flex-column">
-            @if (!string.IsNullOrEmpty(AccountRequestDto.ErrorMessage))
-            {
-                <MudAlert Severity="Severity.Error">@AccountRequestDto.ErrorMessage</MudAlert>
-            }
+        @if (!string.IsNullOrEmpty(AccountRequestDto.ErrorMessage))
+        {
+            <MudAlert Severity="Severity.Error">@AccountRequestDto.ErrorMessage</MudAlert>
+        }
 
-            @if (_formFactor.GetFormFactor() == "Web") 
-            {
-                <MudCheckBox @bind-Value="AccountRequestDto.Remember" Disabled="!(IsPanel1Valid && IsPanel2Valid && IsPanel3Valid && IsPanel4Valid)" Color="Color.Primary">
-                    <MudText Typo="Typo.body2">Запомнить меня</MudText>
-                </MudCheckBox>
-            }
+        @if (_formFactor.GetFormFactor() == "Web") 
+        {
+            <MudCheckBox @bind-Value="AccountRequestDto.Remember" Disabled="!(IsPanel1Valid && IsPanel2Valid && IsPanel3Valid && IsPanel4Valid)" Color="Color.Primary">
+                <MudText Typo="Typo.body2">Запомнить меня</MudText>
+            </MudCheckBox>
+        }
 
-            <MudButton OnClick="SubmitAsync" StartIcon="@Icons.Material.Outlined.Save" Disabled="!(IsPanel1Valid && IsPanel2Valid && IsPanel3Valid && IsPanel4Valid && !ProcessingAccount)" Variant="Variant.Filled" Size="Size.Large" Color="Color.Primary" Style="margin:auto">
-                @if (ProcessingAccount)
-                {
-                    <MudProgressCircular Size="Size.Small" Style="margin:auto" Indeterminate="true" />
-                    <MudText Class="ms-2">Сохраняем...</MudText>
-                }
-                else
-                {
-                    <MudText>@(IsDataSaved ? "Изменения сохранены" : "Сохранить изменения")</MudText>
-                }
-            </MudButton>
-        </div>
+        <MudButton OnClick="SubmitAsync" StartIcon="@Icons.Material.Outlined.Save" Disabled="!(IsPanel1Valid && IsPanel2Valid && IsPanel3Valid && IsPanel4Valid && !ProcessingAccount)" Variant="Variant.Filled" Size="Size.Large" Color="Color.Primary" Style="margin:auto">
+            @if (ProcessingAccount)
+            {
+                <MudProgressCircular Size="Size.Small" Style="margin:auto" Indeterminate="true" />
+                <MudText Class="ms-2">Сохраняем...</MudText>
+            }
+            else
+            {
+                <MudText>@(IsDataSaved ? "Изменения сохранены" : "Сохранить изменения")</MudText>
+            }
+        </MudButton>
 
     </div>
 }

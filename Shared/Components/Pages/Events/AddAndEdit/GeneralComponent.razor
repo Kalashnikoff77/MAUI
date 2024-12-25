@@ -27,21 +27,21 @@
             <MudItem sm="4" xs="4" Class="pt-2">
                 <MudNumericField @bind-Value="Data.Event.MaxPairs"
                                     Validation="@(new Func<short?, string?>(Data.MaxPairsValidator))"
-                                    HelperText="Максимальное кол-во пар"
+                                    HelperText="Макс. кол-во пар"
                                     AdornmentIcon="@Icons.Material.Filled.PeopleAlt" Adornment="Adornment.End" AdornmentColor="@Data.MaxPairsIconColor"
                                     Typo="Typo.body1" Margin="Margin.Dense" Variant="Variant.Outlined" />
             </MudItem>
             <MudItem sm="4" xs="4" Class="pt-2">
                 <MudNumericField @bind-Value="Data.Event.MaxMen"
                                     Validation="@(new Func<short?, string?>(Data.MaxMenValidator))"
-                                    HelperText="Максимальное кол-во мужчин"
+                                    HelperText="Макс. кол-во мужчин"
                                     AdornmentIcon="@Icons.Material.Filled.Face5" Adornment="Adornment.End" AdornmentColor="@Data.MaxMenIconColor"
                                     Typo="Typo.body1" Margin="Margin.Dense" Variant="Variant.Outlined" />
             </MudItem>
             <MudItem sm="4" xs="4" Class="pt-2">
                 <MudNumericField @bind-Value="Data.Event.MaxWomen"
                                     Validation="@(new Func<short?, string?>(Data.MaxWomenValidator))"
-                                    HelperText="Максимальное кол-во женщин"
+                                    HelperText="Макс. кол-во женщин"
                                     AdornmentIcon="@Icons.Material.Filled.Face3" Adornment="Adornment.End" AdornmentColor="@Data.MaxWomenIconColor"
                                     Typo="Typo.body1" Margin="Margin.Dense" Variant="Variant.Outlined" />
             </MudItem>
