@@ -7,7 +7,35 @@
     </TitleContent>
     <ChildContent>
 
-        <MudDataGrid T="UsersDto" Items="@Data.AccountRequestDto.Users" Striped Hover ReadOnly EditMode="DataGridEditMode.Form">
+        <MudSimpleTable Hover Elevation="0" Style="overflow:hidden">
+            <tbody>
+                @foreach (var user in Data.AccountRequestDto.Users) 
+                {
+                    <tr>
+                        <td class="py-4 px-2">
+                            <div class="d-flex justify-space-between align-center">
+                                <div class="d-flex gap-4 align-center">
+                                    <UserGenderIcon User="@user" />
+                                    <div class="d-flex flex-column gap-0">
+                                        <div><b>@user.Name</b></div>
+                                        <div>@user.ToGenderAgeString() / @user.Height см / @user.Weight кг</div>
+                                        @* <div>@user.Height см / @user.Weight кг</div> *@
+                                    </div>
+                                </div>
+
+                                <div class="d-flex gap-1">
+                                    <div><MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Edit" Color="Color.Primary" OnClick="async () => await Data.UpdateUserDialogAsync(user)" /></div>
+                                    <div><MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Delete" Color="Color.Error" OnClick="async () => await Data.DeleteUserDialogAsync(user)" /></div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </MudSimpleTable>
+
+
+@*         <MudDataGrid T="UsersDto" Items="@Data.AccountRequestDto.Users" Striped Hover ReadOnly EditMode="DataGridEditMode.Form">
             <Columns>
                 <TemplateColumn Title="Общее" Context="user">
                     <CellTemplate>
@@ -35,7 +63,7 @@
 
             </Columns>
         </MudDataGrid>
-
+ *@
         <div class="d-flex flex-column align-end">
             <MudButton StartIcon="@Icons.Material.Outlined.Add" ButtonType="ButtonType.Button" Color="Color.Primary" Size="Size.Small" Variant="Variant.Filled" OnClick="Data.AddUserDialogAsync" Disabled="Data.AccountRequestDto.Users.Count < 2 ? false : true" Class="mt-5">Добавить</MudButton>
         </div>

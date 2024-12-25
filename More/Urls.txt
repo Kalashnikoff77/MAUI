@@ -1,26 +1,34 @@
-Web: "https://localhost:8000;http://localhost:8001"
-WebAPI: "http://localhost:7010;https://localhost:7011"
-SignalR: "http://localhost:7020/signalrhub"
-
-===========================
-
 Web:
-  "WebAPI": { "WinHost": "https://localhost:7011/api" },
-  "SignalR": { "WinHost": "http://localhost:7020/signalrhub" },
+//"applicationUrl": "https://localhost:8000;http://localhost:8001;https://192.168.0.101:8000;http://192.168.0.101:8001",
+"applicationUrl": "https://localhost:8000;http://localhost:8001",
+
+"WebAPI": { "WinHost": "https://localhost:7011/api" },
+"SignalR": { "WinHost": "http://localhost:7020/signalrhub" },
+"Web": { "WinHost": "https://localhost:8000" },
+//"WebAPI": { "WinHost": "http://192.168.0.101:7010/api" },
+//"SignalR": { "WinHost": "http://192.168.0.101:7020/signalrhub" },
+//"Web": { "WinHost": "http://192.168.0.101:8001" },
 
 
 MAUI:
-  "WebAPI": {
-    "AndroidHost": "http://10.0.2.2:7010/api",
-    "WinHost": "http://localhost:7010/api"
-  },
+//"applicationUrl": "http://localhost:7010;https://localhost:7011;http://192.168.0.101:7010;https://192.168.0.101:7011",
+"applicationUrl": "http://localhost:7010;https://localhost:7011",
 
-  "Web": {
-    "AndroidHost": "http://10.0.2.2:8001",
-    "WinHost": "http://localhost:8001"
-  },
+"WebAPI": {
+  "AndroidHost": "http://10.0.2.2:7010/api",
+  "WinHost": "http://localhost:7010/api"
+},
 
-  "SignalR": {
-    "AndroidHost": "http://10.0.2.2:7020/signalrhub",
-    "WinHost": "http://localhost:7020/signalrhub"
-  },
+"Web": {
+  "AndroidHost": "http://10.0.2.2:8001",
+  "WinHost": "http://localhost:8001"
+},
+
+"SignalR": {
+  "AndroidHost": "http://10.0.2.2:7020/signalrhub",
+  "WinHost": "http://localhost:7020/signalrhub"
+},
+
+SignalR:
+//"Urls": "http://192.168.0.101:7020;http://localhost:7020",
+"Urls": "http://localhost:7020",

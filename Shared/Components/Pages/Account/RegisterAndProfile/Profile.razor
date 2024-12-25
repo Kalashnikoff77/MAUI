@@ -6,10 +6,10 @@
 {
     <PageTitle>Настройки профиля: @CurrentState.Account.Name</PageTitle>
 
-    <MudText Align="Align.Left" Typo="Typo.h6" Class="mb-3">Настройки профиля: @CurrentState.Account.Name</MudText>
-    <MudDivider DividerType="DividerType.FullWidth" Light="false" Class="mb-8" />
-
-    <MudStack Style="min-width:300px; max-width:750px" Class="ml-5">
+    <div id="top" class="d-flex flex-column ml-sx-0 ml-sm-3" Style="min-width:300px; max-width:750px">
+    
+        <MudText Align="Align.Left" Typo="Typo.h6" Class="mb-3">Настройки профиля: @CurrentState.Account.Name</MudText>
+        <MudDivider DividerType="DividerType.FullWidth" Light="false" Class="mb-5" />
 
         <MudExpansionPanels MultiExpansion Elevation="3">
 
@@ -27,9 +27,8 @@
 
         </MudExpansionPanels>
 
-
         @* КНОПКА СОХРАНЕНИЯ *@
-        <MudStack AlignItems="AlignItems.Center" Class="mt-5" Row="false">
+        <div class="d-flex align-center mt-5 flex-column">
             @if (!string.IsNullOrEmpty(AccountRequestDto.ErrorMessage))
             {
                 <MudAlert Severity="Severity.Error">@AccountRequestDto.ErrorMessage</MudAlert>
@@ -53,7 +52,7 @@
                     <MudText>@(IsDataSaved ? "Изменения сохранены" : "Сохранить изменения")</MudText>
                 }
             </MudButton>
-        </MudStack>
+        </div>
 
-    </MudStack>
+    </div>
 }

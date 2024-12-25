@@ -9,8 +9,8 @@
                     {
                         <tr>
                             <td class="px-1">
-                                <MudStack @onclick="() => ShowDialogs.AccountInfoCardDialogAsync(schedule.Account)" StretchItems="StretchItems.Start" AlignItems="AlignItems.Center" Spacing="0" Row Style="width:100%; cursor:pointer">
-                                    <div class="d-flex">
+                                <MudStack @onclick="() => ShowDialogs.AccountInfoCardDialogAsync(schedule.Account)" StretchItems="StretchItems.Start" AlignItems="AlignItems.Center" Spacing="0" Row Style="width:100%; cursor:pointer" Class="pl-1 pr-3">
+                                    <div class="d-flex align-center">
                                         <ImageAvatar Account="schedule.Account" Size="EnumImageSize.s64x64" Class="avatar s55 mr-3" />
                                         <div class="d-flex flex-column gap-0">
                                             <p><b>@schedule.Account.Name</b></p>
