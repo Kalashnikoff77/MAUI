@@ -11,17 +11,17 @@
             </MudButton>
         }
 
-        <div class="d-flex align-center gap-1 mb-1">
+        <div class="d-flex gap-1 mb-1">
             <MudIcon Icon="@Icons.Material.Outlined.LocationOn" Style="font-size:19px" />
             <MudText Typo="Typo.body2">@ScheduleForEventView.Event.ToRegionString() (@ScheduleForEventView.Event.Address)</MudText>
         </div>
 
         <div class="d-flex align-center gap-1 mb-1">
-            <MudIcon Icon="@Icons.Material.Outlined.CalendarToday" Class="@ScheduleForEventView.ToDateClass()" Style="font-size:18px" />
+            <MudIcon Icon="@Icons.Material.Outlined.CalendarToday" Class="@ScheduleForEventView.ToDateClass()" Style="font-size:18px; margin-bottom:2px" />
             <MudText Typo="Typo.body2"><b>@ScheduleForEventView.ToStartEndString()</b></MudText>
         </div>
 
-        <div class="d-flex flex-wrap gap-2 mb-1">
+        <div class="d-flex flex-wrap gap-1 mb-1">
             @foreach (var feature in ScheduleForEventView.Features!.OrderBy(o => o.Name))
             {
                 <span style="padding: 0 5px 0 5px; font-size:12px; font-weight:500; opacity:0.6; border-width:1px; border-style:dotted">@feature.Name</span>
