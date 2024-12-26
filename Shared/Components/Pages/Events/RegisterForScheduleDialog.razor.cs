@@ -5,6 +5,7 @@ using Data.Services;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using Data.State;
+using Data.Models.SignalR;
 
 namespace Shared.Components.Pages.Events
 {
@@ -31,11 +32,11 @@ namespace Shared.Components.Pages.Events
 
                 await CurrentState.ReloadAccountAsync();
 
-                //var request = new SignalGlobalRequest
-                //{
-                //    OnScheduleChanged = new OnScheduleChanged { EventId = ScheduleForEventView.EventId, ScheduleId = ScheduleForEventView.Id }
-                //};
-                //await CurrentState.SignalRServerAsync(request);
+                var request = new SignalGlobalRequest
+                {
+                    OnScheduleChanged = new OnScheduleChanged { EventId = ScheduleForEventView.EventId, ScheduleId = ScheduleForEventView.Id }
+                };
+                await CurrentState.SignalRServerAsync(request);
             }
         }
 

@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using Data.Models.SignalR;
+using Data.State;
+using Microsoft.AspNetCore.Components;
 
 namespace Shared.Components.Pages.Events
 {
@@ -15,14 +17,14 @@ namespace Shared.Components.Pages.Events
 
         protected override void OnAfterRender(bool firstRender)
         {
-            //OnScheduleChangedHandler = OnScheduleChangedHandler.SignalRClient<OnScheduleChangedResponse>(CurrentState, async (response) =>
-            //{
-            //    if (response.UpdatedSchedule != null)
-            //    {
-            //        ScheduleForEventView = response.UpdatedSchedule;
-            //        await InvokeAsync(StateHasChanged);
-            //    }
-            //});
+            OnScheduleChangedHandler = OnScheduleChangedHandler.SignalRClient<OnScheduleChangedResponse>(CurrentState, async (response) =>
+            {
+                if (response.UpdatedSchedule != null)
+                {
+                    ScheduleForEventView = response.UpdatedSchedule;
+                    await InvokeAsync(StateHasChanged);
+                }
+            });
         }
     }
 }

@@ -16,12 +16,15 @@ namespace Data.State
         IConfiguration _config { get; set; } = null!;
         NavigationManager _navigationManager { get; set; } = null!;
 
+        IRepository<AccountReloadRequestDto, AccountReloadResponseDto> _repoReload { get; set; } = null!;
+
         public readonly string WebAPIUrl;
         public readonly string SignalRUrl;
         public readonly string WebUrl;
 
-        public CurrentState(IFormFactor formFactor, IJSProcessor JSProcessor, IJSRuntime JS, IConfiguration config, NavigationManager navigationManager)
+        public CurrentState(IRepository<AccountReloadRequestDto, AccountReloadResponseDto> repoReload, IFormFactor formFactor, IJSProcessor JSProcessor, IJSRuntime JS, IConfiguration config, NavigationManager navigationManager)
         {
+            _repoReload = repoReload;
             _formFactor = formFactor;
             _JSProcessor = JSProcessor;
             _config = config;
@@ -55,8 +58,6 @@ namespace Data.State
 
         public event Action? OnChange;
         public IJSRuntime JS { get; set; } = null!;
-
-        IRepository<AccountReloadRequestDto, AccountReloadResponseDto> _repoReload { get; set; } = null!;
 
         /// <summary>
         /// Вызывает StateHasChanged по всему сайту
