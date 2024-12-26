@@ -10,13 +10,9 @@ function UpdateOnlineAccountsClient(connectedAccounts) {
 
 // Пользователь сменил аватар
 function OnAvatarChangedClient(onAvatarChangedResponse) {
-    // Если isAvatar = true, значит отменяется текущий аватар (пользователь остаётся без аватара)
-    if (onAvatarChangedResponse.newAvatar.isAvatar)
-        var newPath = '/images/AccountsPhotos/no-avatar';
-    else
-        var newPath = '/images/AccountsPhotos/' + onAvatarChangedResponse.newAvatar.accountId + '/' + onAvatarChangedResponse.newAvatar.guid;
+    var newPath = '/images/AccountsPhotos/' + onAvatarChangedResponse.accountId + '/' + onAvatarChangedResponse.newAvatar.guid;
 
-    $('img[data-avatar=' + onAvatarChangedResponse.newAvatar.accountId + ']')
+    $('img[data-avatar=' + onAvatarChangedResponse.accountId + ']')
         .each(function () {
             $(this).fadeOut(120, function () {
                 $(this).attr('src', newPath + '/s64x64.jpg').fadeIn(120);

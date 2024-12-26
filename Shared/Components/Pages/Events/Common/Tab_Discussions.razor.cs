@@ -2,9 +2,10 @@
 using Data.Dto.Responses;
 using Data.Dto.Views;
 using Data.Models;
+using Data.Models.SignalR;
 using Data.Services;
-using Microsoft.AspNetCore.Components;
 using Data.State;
+using Microsoft.AspNetCore.Components;
 
 namespace Shared.Components.Pages.Events.Common
 {
@@ -33,22 +34,22 @@ namespace Shared.Components.Pages.Events.Common
             if (!firstRender)
                 await _JSProcessor.ScrollToElementWithinDiv($"id_{_currentElementId}", "DivDiscussionsFrame");
 
-            //OnScheduleChangedHandler = OnScheduleChangedHandler.SignalRClient<OnScheduleChangedResponse>(CurrentState, async (response) =>
-            //{
-            //    var responseApi = await _repoGetDiscussions.HttpPostAsync(new GetDiscussionsForEventsRequestDto()
-            //    {
-            //        EventId = ScheduleForEventView.EventId,
-            //        GetNextAfterId = discussions.Count > 0 ? discussions.Max(m => m.Id) : null,
-            //        Take = StaticData.EVENT_DISCUSSIONS_PER_BLOCK
-            //    });
-            //    discussions.AddRange(responseApi.Response.Discussions);
+            OnScheduleChangedHandler = OnScheduleChangedHandler.SignalRClient<OnScheduleChangedResponse>(CurrentState, async (response) =>
+            {
+                var responseApi = await _repoGetDiscussions.HttpPostAsync(new GetDiscussionsForEventsRequestDto()
+                {
+                    EventId = ScheduleForEventView.EventId,
+                    GetNextAfterId = discussions.Count > 0 ? discussions.Max(m => m.Id) : null,
+                    Take = StaticData.EVENT_DISCUSSIONS_PER_BLOCK
+                });
+                discussions.AddRange(responseApi.Response.Discussions);
 
-            //    moreDiscussionsButton = discussions.Count < responseApi.Response.NumOfDiscussions;
+                moreDiscussionsButton = discussions.Count < responseApi.Response.NumOfDiscussions;
 
-            //    _currentElementId = discussions.Any() ? discussions.Max(m => m.Id) : 0;
+                _currentElementId = discussions.Any() ? discussions.Max(m => m.Id) : 0;
 
-            //    await InvokeAsync(StateHasChanged);
-            //});
+                await InvokeAsync(StateHasChanged);
+            });
         }
 
         async Task GetDiscussionsAsync()
@@ -80,11 +81,11 @@ namespace Shared.Components.Pages.Events.Common
                     Text = _text
                 });
 
-                //var request = new SignalGlobalRequest
-                //{
-                //    OnScheduleChanged = new OnScheduleChanged { EventId = ScheduleForEventView.EventId, ScheduleId = ScheduleForEventView.Id }
-                //};
-                //await CurrentState.SignalRServerAsync(request);
+                var request = new SignalGlobalRequest
+                {
+                    OnScheduleChanged = new OnScheduleChanged { EventId = ScheduleForEventView.EventId, ScheduleId = ScheduleForEventView.Id }
+                };
+                await CurrentState.SignalRServerAsync(request);
 
                 _text = null;
                 _sending = false;
