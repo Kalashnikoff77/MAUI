@@ -20,7 +20,7 @@
                                     <div class="d-flex align-center">
                                         <MudIcon Icon="@Icons.Material.Outlined.CalendarToday" Class="@(schedule.ToDateClass())" Style="font-size:17px; margin:0 5px 3px 0" />
                                         <p><b>@schedule.ToStartEndString()</b></p>
-                                        <div class="d-flex ml-3">
+                                        <div class="d-flex ml-3 mb-1">
                                             <MudIconButton Size="@Size.Small" title="Редактировать расписание" Icon="@Icons.Material.Outlined.Edit" Color="Color.Primary" OnClick="async () => await Data.EditScheduleForEventDialogAsync(schedule)" />
                                             <MudIconButton Size="@Size.Small" title="Удалить расписание" Icon="@Icons.Material.Outlined.Delete" Color="Color.Error" OnClick="async () => await Data.DeleteScheduleForEventDialogAsync(schedule)" />
                                         </div>
