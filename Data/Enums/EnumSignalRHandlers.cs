@@ -12,6 +12,11 @@
         /// </summary>
         OnAvatarChangedClient,
 
+        /// <summary>
+        /// Добавлено новое сообщение в диалогах
+        /// </summary>
+        OnMessageAddedClient,
+
 
 
         // Требуется проверить, используются ли эти перечисления

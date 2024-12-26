@@ -78,8 +78,10 @@ function ScrollToElement(elementId) {
 
 function ScrollToElementWithinDiv(elementWithinDivId, divElement) {
     var myElement = document.getElementById(elementWithinDivId);
-    var topPos = myElement.offsetTop;
-    document.getElementById(divElement).scrollTop = topPos;
+    if (myElement != null) {
+        var topPos = myElement.offsetTop;
+        document.getElementById(divElement).scrollTop = topPos;
+    }
 }
 
 

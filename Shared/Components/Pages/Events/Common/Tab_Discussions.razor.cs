@@ -68,7 +68,7 @@ namespace Shared.Components.Pages.Events.Common
         }
 
 
-        async Task OnDiscussionAdded()
+        async Task SubmitDiscussionAsync()
         {
             if (!string.IsNullOrWhiteSpace(_text))
             {

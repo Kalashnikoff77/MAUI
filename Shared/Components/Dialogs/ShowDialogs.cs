@@ -2,6 +2,7 @@
 using MudBlazor;
 using Shared.Components.Pages.Account;
 using Shared.Components.Pages.Events;
+using Shared.Components.Pages.Messages;
 
 namespace Shared.Components.Dialogs
 {
@@ -53,6 +54,21 @@ namespace Shared.Components.Dialogs
                 { x => x.IsRegistered, isRegistered }
             };
             await _dialog.ShowAsync<RegisterForScheduleDialog>($"Подтверждение регистрации", dialogParams, dialogOptions);
+        }
+
+
+        /// <summary>
+        /// Окно общения двух пользователей
+        /// </summary>
+        public async Task MessagesDialogAsync(AccountsViewDto account)
+        {
+            DialogOptions dialogOptions = new() { CloseOnEscapeKey = true, CloseButton = true };
+
+            var dialogParams = new DialogParameters<MessagesDialog>
+            {
+                { x => x.Account, account }
+            };
+            await _dialog.ShowAsync<MessagesDialog>(account.Name, dialogParams, dialogOptions);
         }
     }
 }

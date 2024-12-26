@@ -196,22 +196,17 @@ namespace WebAPI.Controllers
             var recipientId = await _unitOfWork.SqlConnection.QueryFirstOrDefaultAsync<int?>(sql, new { request.RecipientId }) ?? throw new NotFoundException($"Пользователь-получатель с Id {_unitOfWork.AccountId} не найден!");
 
             sql = $"INSERT INTO Messages ({nameof(MessagesEntity.SenderId)}, {nameof(MessagesEntity.RecipientId)}, {nameof(MessagesEntity.Text)}) " +
-                "VALUES (@senderId, @recipientId, @Text)";
-            await _unitOfWork.SqlConnection.ExecuteAsync(sql, new { senderId, recipientId, request.Text });
-
-            var message = new MessagesEntity
-            {
-                SenderId = _unitOfWork.AccountId!.Value,
-                RecipientId = request.RecipientId,
-                Text = request.Text
-            };
+                $"OUTPUT INSERTED.Id " +
+                $"VALUES (@senderId, @recipientId, @Text)";
+            var newId = await _unitOfWork.SqlConnection.QuerySingleAsync<int>(sql, new { senderId, recipientId, request.Text });
 
             response.Message = new MessagesDto
             {
+                Id = newId,
                 SenderId = _unitOfWork.AccountId!.Value,
                 RecipientId = request.RecipientId,
                 CreateDate = DateTime.Now,
-                Text = message.Text
+                Text = request.Text
             };
 
             return response;

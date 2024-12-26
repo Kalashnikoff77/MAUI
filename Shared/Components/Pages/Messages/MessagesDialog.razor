@@ -1,0 +1,16 @@
+﻿@if (CurrentState.Account != null) {
+    <MudDialog Style="width:550px; min-width:300px">
+        <DialogContent>
+            <div class="d-flex flex-column mb-3 align-center" style="overflow-y:visible">
+                <div class="d-flex flex-column" style="height:250px; overflow:auto" id="DivMessagesFrame">
+                    <p>test</p>
+                    <MudButton OnClick="SubmitMessageAsync" Variant="Variant.Outlined">Отправить</MudButton>
+                </div>
+            </div>
+        </DialogContent>
+
+        <DialogActions>
+            <MudButton Color="Color.Error" OnClick="() => MudDialog.Close(DialogResult.Ok(true))">Закрыть</MudButton>
+        </DialogActions>
+    </MudDialog>
+}

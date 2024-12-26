@@ -74,7 +74,10 @@ namespace SignalR
         }
 
 
-        // Получить AccountDetails из строкового Id в контексте запроса
+        /// <summary>
+        /// Получить AccountDetails из строкового Id в контексте запроса
+        /// </summary>
+        /// <returns>True - пользователь залогинен, false - не залогинен</returns>
         private bool GetAccountDetails(out AccountDetails accountDetails, string? userIdentifier)
         {
             accountDetails = null!;

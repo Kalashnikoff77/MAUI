@@ -4,8 +4,9 @@ namespace Data.Models.SignalR
 {
     public class SignalGlobalRequest
     {
-        public OnScheduleChanged? OnScheduleChanged { get; set; }
         public OnAvatarChanged? OnAvatarChanged { get; set; }
+        public OnScheduleChanged? OnScheduleChanged { get; set; }
+        public OnMessageAdded? OnMessageAdded { get; set; }
     }
 
 
@@ -17,7 +18,13 @@ namespace Data.Models.SignalR
     public class OnScheduleChanged
     {
         public int? EventId { get; set; }
-
         public int ScheduleId { get; set; }
     }
+
+    public class OnMessageAdded
+    {
+        public MessagesDto Message { get; set; } = null;
+    }
+
 }
+

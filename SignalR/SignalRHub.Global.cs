@@ -34,18 +34,22 @@ namespace SignalR
         {
             // Изменения в расписании мероприятия (пока только добавлено одно сообщение в обсуждение)
             if (request.OnScheduleChanged != null)
-                await OnScheduleChanged(request.OnScheduleChanged);
+                await OnScheduleChangedAsync(request.OnScheduleChanged);
 
             // Пользователь изменил свой аватар
             if (request.OnAvatarChanged != null)
-                await OnAvatarChanged(request.OnAvatarChanged);
+                await OnAvatarChangedAsync(request.OnAvatarChanged);
+
+            // Пользователь отправил сообщение другому пользователю
+            if (request.OnMessageAdded != null)
+                await OnMessageAddedAsync(request.OnMessageAdded);
         }
 
 
         /// <summary>
         /// Изменение в расписании мероприятия
         /// </summary>
-        async Task OnScheduleChanged(OnScheduleChanged request)
+        async Task OnScheduleChangedAsync(OnScheduleChanged request)
         {
             var service = _serviceProvider.GetService<IRepository<GetSchedulesRequestDto, GetSchedulesResponseDto>>()!;
             var apiResponse = await service.HttpPostAsync(new GetSchedulesRequestDto { ScheduleId = request.ScheduleId });
@@ -56,12 +60,26 @@ namespace SignalR
         /// <summary>
         /// Пользователь изменил свой аватар, уведомляем всех об этом
         /// </summary>
-        async Task OnAvatarChanged(OnAvatarChanged request)
+        async Task OnAvatarChangedAsync(OnAvatarChanged request)
         {
             if (GetAccountDetails(out AccountDetails accountDetails, Context.UserIdentifier))
             {
                 var response = new OnAvatarChangedResponse { NewAvatar = request.NewAvatar, AccountId = accountDetails.Id };
                 await Clients.All.SendAsync(response.EnumSignalRHandlersClient.ToString(), response);
+            }
+        }
+
+        /// <summary>
+        /// Пользователь отправил сообщение другому пользователю
+        /// </summary>
+        async Task OnMessageAddedAsync(OnMessageAdded request)
+        {
+            if (GetAccountDetails(out AccountDetails accountDetails, Context.UserIdentifier))
+            {
+                var response = new OnMessageAddedResponse { Message = request.Message };
+                await Clients
+                    .Users([Context.UserIdentifier!, request.Message.RecipientId.ToString()])
+                    .SendAsync(response.EnumSignalRHandlersClient.ToString(), response);
             }
         }
     }
