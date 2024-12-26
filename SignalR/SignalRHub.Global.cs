@@ -58,8 +58,11 @@ namespace SignalR
         /// </summary>
         async Task OnAvatarChanged(OnAvatarChanged request)
         {
-            var response = new OnAvatarChangedResponse { NewAvatar = request.NewAvatar };
-            await Clients.All.SendAsync(response.EnumSignalRHandlersClient.ToString(), response);
+            if (GetAccountDetails(out AccountDetails accountDetails, Context.UserIdentifier))
+            {
+                var response = new OnAvatarChangedResponse { NewAvatar = request.NewAvatar, AccountId = accountDetails.Id };
+                await Clients.All.SendAsync(response.EnumSignalRHandlersClient.ToString(), response);
+            }
         }
     }
 }

@@ -7,6 +7,7 @@ namespace Data.Models.SignalR
     {
         public override EnumSignalRHandlers EnumSignalRHandlersClient => EnumSignalRHandlers.OnAvatarChangedClient;
 
+        public int AccountId { get; set; }
         public PhotosForAccountsDto NewAvatar { get; set; } = null!;
     }
 }

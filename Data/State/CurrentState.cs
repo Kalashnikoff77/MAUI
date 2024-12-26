@@ -4,6 +4,7 @@ using Data.Dto.Views;
 using Data.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.JSInterop;
 using System.Net;
 
@@ -15,16 +16,15 @@ namespace Data.State
         IJSProcessor _JSProcessor { get; set; } = null!;
         IConfiguration _config { get; set; } = null!;
         NavigationManager _navigationManager { get; set; } = null!;
-
-        IRepository<AccountReloadRequestDto, AccountReloadResponseDto> _repoReload { get; set; } = null!;
+        IServiceProvider _serviceProvider { get; set; } = null!;
 
         public readonly string WebAPIUrl;
         public readonly string SignalRUrl;
         public readonly string WebUrl;
 
-        public CurrentState(IRepository<AccountReloadRequestDto, AccountReloadResponseDto> repoReload, IFormFactor formFactor, IJSProcessor JSProcessor, IJSRuntime JS, IConfiguration config, NavigationManager navigationManager)
+        public CurrentState(IServiceProvider serviceProvider, IFormFactor formFactor, IJSProcessor JSProcessor, IJSRuntime JS, IConfiguration config, NavigationManager navigationManager)
         {
-            _repoReload = repoReload;
+            _serviceProvider = serviceProvider;
             _formFactor = formFactor;
             _JSProcessor = JSProcessor;
             _config = config;
@@ -79,8 +79,8 @@ namespace Data.State
         /// </summary>
         public async Task ReloadAccountAsync()
         {
-            var reloadResponse = await _repoReload.HttpPostAsync(new AccountReloadRequestDto() { Token = Account!.Token });
-
+            var service = _serviceProvider.GetService<IRepository<AccountReloadRequestDto, AccountReloadResponseDto>>()!;
+            var reloadResponse = await service.HttpPostAsync(new AccountReloadRequestDto() { Token = Account!.Token });
             if (reloadResponse.StatusCode == HttpStatusCode.OK)
             {
                 reloadResponse.Response.Account.Token = Account.Token;

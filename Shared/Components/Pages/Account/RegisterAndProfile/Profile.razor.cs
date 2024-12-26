@@ -1,6 +1,8 @@
 ﻿using Data.Dto.Requests;
 using Data.Extensions;
 using Data.Models;
+using Data.Models.SignalR;
+using Data.State;
 using MudBlazor;
 using System.Net;
 
@@ -75,6 +77,16 @@ namespace Shared.Components.Pages.Account.RegisterAndProfile
             }
             else
             {
+                var newAvatar = AccountRequestDto.Photos.First(x => x.IsAvatar == true);
+                if (CurrentState.Account?.Avatar!.Id != newAvatar.Id)
+                {
+                    var signalRequest = new SignalGlobalRequest
+                    {
+                        OnAvatarChanged = new OnAvatarChanged { NewAvatar = newAvatar }
+                    };
+                    await CurrentState.SignalRServerAsync(signalRequest);
+                }
+
                 LoginRequestDto loginRequestDto = new LoginRequestDto
                 {
                     Email = AccountRequestDto.Email,
