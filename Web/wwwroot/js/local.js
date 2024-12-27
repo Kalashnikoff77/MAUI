@@ -1,4 +1,17 @@
-﻿// Затухание и появление числа (напр.: изменилось кол-во непрочитанных сообщений в чате)
+﻿function FreezeScrollBar(tag) {
+    var element = $('#' + tag);
+    element.addClass('freezeScrollBar');
+    //$('body').addClass('freezeScrollBar');
+}
+
+function UnFreezeScrollBar(tag) {
+    var element = $('#' + tag);
+    element.removeClass('freezeScrollBar');
+    //$('body').removeClass('freezeScrollBar');
+}
+
+
+// Затухание и появление числа (напр.: изменилось кол-во непрочитанных сообщений в чате)
 function ChangeNumberFadeInOut(tagClass, number, isShowZero) {
     var tag = $('.' + tagClass);
     if (tag.text() != number) {

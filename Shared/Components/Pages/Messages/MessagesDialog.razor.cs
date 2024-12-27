@@ -36,6 +36,8 @@ namespace Shared.Components.Pages.Messages
         {
             OnMessagesReloadHandler = OnMessagesReloadHandler.SignalRClient<OnMessagesReloadResponse>(CurrentState, async (response) =>
             {
+                //await _JSProcessor.FreezeScrollBar("DivMessagesFrame");
+
                 var request = new GetMessagesRequestDto
                 {
                     RecipientId = Account.Id,
@@ -53,7 +55,9 @@ namespace Shared.Components.Pages.Messages
                 currentElementId = messages.Any() ? messages.Max(m => m.Id) : 0;
 
                 await InvokeAsync(StateHasChanged);
-                await _JSProcessor.ScrollToElementWithinDiv($"id_{currentElementId}", "DivMessagesFrame");
+                
+                //await _JSProcessor.ScrollToElementWithinDiv($"id_{currentElementId}", "DivMessagesFrame");
+                //await _JSProcessor.UnFreezeScrollBar("DivMessagesFrame");
             });
 
             var request = new SignalGlobalRequest { OnMessagesReload = new OnMessagesReload() };
@@ -92,6 +96,7 @@ namespace Shared.Components.Pages.Messages
 
         async Task GetPreviousMessagesAsync()
         {
+            await _JSProcessor.FreezeScrollBar("DivMessagesFrame");
             var request = new GetMessagesRequestDto
             {
                 RecipientId = Account.Id,
@@ -105,6 +110,9 @@ namespace Shared.Components.Pages.Messages
 
             currentElementId = response.Response.Messages.Any() ? response.Response.Messages.Max(m => m.Id) : 0;
             moreMessagesButton = messages.Count < response.Response.Count;
+            
+            StateHasChanged();
+            await _JSProcessor.UnFreezeScrollBar("DivMessagesFrame");
         }
 
         public void Dispose() =>
