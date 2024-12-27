@@ -40,8 +40,8 @@
 {
     <MudStack Wrap="Wrap.Wrap" Row Spacing="1" Justify="Justify.FlexEnd" AlignItems="AlignItems.Center">
         <ImageAvatar Account="CurrentState.Account" Size="EnumImageSize.s64x64" Class="avatar s50" />
-        <MudTextField @bind-Value="@_text" T="string" Label="Ваше сообщение" Variant="Variant.Outlined" Lines="1" MaxLines="5" AutoGrow MaxLength="1024" Clearable Class="mt-2" />
+        <MudTextField @bind-Value="@text" T="string" Label="Ваше сообщение" Variant="Variant.Outlined" Lines="1" MaxLines="5" AutoGrow MaxLength="1024" Clearable Class="mt-2" />
         <MudFlexBreak />
-        <MudButton Disabled="@_sending" OnClick="SubmitDiscussionAsync" Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Send" Size="Size.Small">Отправить</MudButton>
+        <MudButton Disabled="@sending" OnClick="SubmitDiscussionAsync" Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Send" Size="Size.Small">Отправить</MudButton>
     </MudStack>
 }

@@ -1,5 +1,5 @@
-﻿@if (CurrentState.Account != null && Messages != null) {
-    <MudDialog Style="width:550px; min-width:300px">
+﻿@if (CurrentState.Account != null) {
+    <MudDialog Style="width:550px; min-width:300px" id="DivMessagesFrame">
         <TitleContent>
             <div class="d-flex gap-3 align-center">
                 <ImageAvatar Account="Account" Size="EnumImageSize.s64x64" Class="avatar s45" />
@@ -7,39 +7,43 @@
             </div>
         </TitleContent>
         <DialogContent>
-            <div class="d-flex flex-column mb-3 align-center" style="overflow-y:visible">
-                <div class="d-flex flex-column" style="overflow:auto" id="DivMessagesFrame">
-                    @foreach(var message in Messages) 
+            <div class="d-flex flex-column mb-3" style="overflow:hidden; max-height:100%">
+                @if (moreMessagesButton)
+                {
+                    <MudButton Class="pa-3 mb-3" Variant="Variant.Text" StartIcon="@Icons.Material.Filled.MoreHoriz" EndIcon="@Icons.Material.Filled.MoreHoriz" Color="Color.Primary" OnClick="GetMessagesAsync">Ещё</MudButton>
+                }
+
+                <div class="d-flex flex-column" style="overflow:auto">
+                    @foreach(var message in messages) 
                     {
                         if (CurrentState.Account.Id == message.SenderId) 
                         {
-                            <div class="d-flex justify-end gap-3 mt-1 mb-2">
-                                <div class="pa-2" id="@("id_" + message.Id)" style="background-color: azure; border-radius:10%">
+                            <div id="@("id_" + message.Id)" class="d-flex justify-end pa-2">
+                                <div class="pa-2 ml-12" style="background-color:#d9f4ff; border-radius:7px">
                                     <MudText Typo="Typo.body2">@message.Text</MudText>
-                                    <MudText Style="text-align:left; font-size:12px; color:lightgray">@message.CreateDate.ToMyString()</MudText>
+                                    <MudText Style="text-align:left; font-size:12px; color:#85c3de">@message.CreateDate.ToMyString()</MudText>
                                 </div>
                             </div>
                         }
                         else
                         {
-                            <div class="d-flex mt-1 mb-2">
-                                <div class="d-flex gap-3 pa-2" style="background-color: azure; border-radius:10%">
-                                    <div class="mr-2" id="@("id_" + message.Id)">
-                                        <ColorizedAccountName Account="Accounts[message.SenderId]" Style="font-weight:500" />
-                                        <MudText Typo="Typo.body2">@message.Text</MudText>
-                                        <MudText Style="text-align:left; font-size:12px; color:lightgray">@message.CreateDate.ToMyString()</MudText>
-                                    </div>
+                            <div id="@("id_" + message.Id)" class="d-flex pa-2">
+                                <div class="pa-2 mr-12" style="background-color:#e8f7df; border-radius:7px">
+                                    <MudText Typo="Typo.body2">@message.Text</MudText>
+                                    <MudText Style="text-align:left; font-size:12px; color:#90d665">@message.CreateDate.ToMyString()</MudText>
                                 </div>
                             </div>
                         }
                     }
-                    <MudButton OnClick="SubmitMessageAsync" Variant="Variant.Outlined">Отправить</MudButton>
                 </div>
+
+                <MudStack Wrap="Wrap.Wrap" Row Spacing="1" Justify="Justify.FlexEnd" AlignItems="AlignItems.Center" Class="mt-4">
+                    <ImageAvatar Account="CurrentState.Account" Size="EnumImageSize.s64x64" Class="avatar s50" />
+                    <MudTextField @bind-Value="@text" T="string" Label="Ваше сообщение" Variant="Variant.Outlined" Lines="1" MaxLines="5" AutoGrow MaxLength="1024" Clearable Class="mt-2" />
+                    <MudFlexBreak />
+                    <MudButton Disabled="@sending" OnClick="SubmitMessageAsync" Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Send" Size="Size.Small">Отправить</MudButton>
+                </MudStack>
             </div>
         </DialogContent>
-
-        <DialogActions>
-            <MudButton Color="Color.Error" OnClick="() => MudDialog.Close(DialogResult.Ok(true))">Закрыть</MudButton>
-        </DialogActions>
     </MudDialog>
 }

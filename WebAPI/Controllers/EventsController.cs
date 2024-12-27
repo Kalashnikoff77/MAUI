@@ -107,7 +107,7 @@ namespace WebAPI.Controllers
                 // Получим кол-во сообщений в чате мероприятия
                 var sql = $"SELECT COUNT(*) FROM DiscussionsForEvents " +
                     $"WHERE {nameof(DiscussionsForEventsViewEntity.EventId)} = @{nameof(DiscussionsForEventsViewEntity.EventId)}";
-                response.NumOfDiscussions = await _unitOfWork.SqlConnection.QuerySingleAsync<int>(sql, new { request.EventId });
+                response.Count = await _unitOfWork.SqlConnection.QuerySingleAsync<int>(sql, new { request.EventId });
 
                 // Запрос на получение предыдущих сообщений
                 if (request.GetPreviousFromId.HasValue)

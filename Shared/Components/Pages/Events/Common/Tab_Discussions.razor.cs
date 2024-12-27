@@ -18,10 +18,10 @@ namespace Shared.Components.Pages.Events.Common
         [Inject] IJSProcessor _JSProcessor { get; set; } = null!;
 
         List<DiscussionsForEventsViewDto> discussions = new List<DiscussionsForEventsViewDto>();
-        string? _text { get; set; } = null!;
+        string? text { get; set; } = null!;
         bool isDiscussionsLoaded;
-        bool _sending;
-        int _currentElementId = 0;
+        bool sending;
+        int currentElementId = 0;
         bool moreDiscussionsButton = false;
 
         IDisposable? OnScheduleChangedHandler;
@@ -32,21 +32,21 @@ namespace Shared.Components.Pages.Events.Common
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             if (!firstRender)
-                await _JSProcessor.ScrollToElementWithinDiv($"id_{_currentElementId}", "DivDiscussionsFrame");
+                await _JSProcessor.ScrollToElementWithinDiv($"id_{currentElementId}", "DivDiscussionsFrame");
 
             OnScheduleChangedHandler = OnScheduleChangedHandler.SignalRClient<OnScheduleChangedResponse>(CurrentState, async (response) =>
             {
-                var responseApi = await _repoGetDiscussions.HttpPostAsync(new GetDiscussionsForEventsRequestDto()
+                var apiResponse = await _repoGetDiscussions.HttpPostAsync(new GetDiscussionsForEventsRequestDto()
                 {
                     EventId = ScheduleForEventView.EventId,
                     GetNextAfterId = discussions.Count > 0 ? discussions.Max(m => m.Id) : null,
                     Take = StaticData.EVENT_DISCUSSIONS_PER_BLOCK
                 });
-                discussions.AddRange(responseApi.Response.Discussions);
+                discussions.AddRange(apiResponse.Response.Discussions);
 
-                moreDiscussionsButton = discussions.Count < responseApi.Response.NumOfDiscussions;
+                moreDiscussionsButton = discussions.Count < apiResponse.Response.Count;
 
-                _currentElementId = discussions.Any() ? discussions.Max(m => m.Id) : 0;
+                currentElementId = discussions.Any() ? discussions.Max(m => m.Id) : 0;
 
                 await InvokeAsync(StateHasChanged);
             });
@@ -63,22 +63,22 @@ namespace Shared.Components.Pages.Events.Common
             discussions.InsertRange(0, response.Response.Discussions);
             
             isDiscussionsLoaded = true;
-            _currentElementId = response.Response.Discussions.Any() ? response.Response.Discussions.Max(m => m.Id) : 0;
-            moreDiscussionsButton = discussions.Count < response.Response.NumOfDiscussions;
+            currentElementId = response.Response.Discussions.Any() ? response.Response.Discussions.Max(m => m.Id) : 0;
+            moreDiscussionsButton = discussions.Count < response.Response.Count;
         }
 
 
         async Task SubmitDiscussionAsync()
         {
-            if (!string.IsNullOrWhiteSpace(_text))
+            if (!string.IsNullOrWhiteSpace(text))
             {
-                _sending = true;
+                sending = true;
 
                 var responseAdd = await _repoAddDiscussion.HttpPostAsync(new AddDiscussionsForEventsRequestDto()
                 {
                     Token = CurrentState.Account!.Token,
                     EventId = ScheduleForEventView.EventId,
-                    Text = _text
+                    Text = text
                 });
 
                 var request = new SignalGlobalRequest
@@ -87,8 +87,8 @@ namespace Shared.Components.Pages.Events.Common
                 };
                 await CurrentState.SignalRServerAsync(request);
 
-                _text = null;
-                _sending = false;
+                text = null;
+                sending = false;
             }
         }
 

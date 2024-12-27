@@ -20,13 +20,13 @@
                     {
                         <tr>
                             <td>
-                                <div class="d-flex align-center gap-3">
+                                <div class="d-flex align-center gap-3" >
                                     <div @onclick="@(() => ShowDialogs.AccountInfoCardDialogAsync(accountsViewDto))" style="cursor:pointer">
                                         <ImageAvatar Account="@accountsViewDto" Class="d-none d-sm-block avatar" Size="EnumImageSize.s64x64" />
                                         <ImageAvatar Account="@accountsViewDto" Class="d-xs-block d-sm-none avatar" Style="width:45px; height:45px" Size="EnumImageSize.s64x64" />
                                     </div>
 
-                                    <div class="d-flex flex-column gap-0" style="width:100%">
+                                    <div class="d-flex flex-column gap-0" @onclick="@(() => ShowDialogs.MessagesDialogAsync(accountsViewDto))" style="cursor:pointer; width:100%">
                                         <div style="text-align:end">
                                             <MudMenu Dense Icon="@Icons.Material.Filled.MoreVert" Size="Size.Small" AnchorOrigin="Origin.TopLeft" TransformOrigin="Origin.TopRight">
                                                 <MudMenuItem Icon="@Icons.Material.Filled.Check" IconColor="Color.Primary" Disabled="@(!(message.ReadDate == null && CurrentState.Account.Id == message.Recipient?.Id))" OnClick="() => MarkAsReadCallbackAsync(message.Id)">Пометить сообщение прочитанными</MudMenuItem>
@@ -35,7 +35,7 @@
                                             </MudMenu>
                                         </div>
 
-                                        <div class="d-flex align-center" @onclick="@(() => ShowDialogs.MessagesDialogAsync(accountsViewDto))" style="cursor:pointer">
+                                        <div class="d-flex align-center">
                                             <div class="d-none d-sm-block flex-grow-1">
                                                 <MessageTextComponent Message="message" MaxTextLength="120" MarkAsReadCallback="MarkAsReadCallbackAsync" MarkAsReadId="@message.Id" />
                                             </div>
@@ -55,7 +55,7 @@
 
                                             <p class="ml-2 mr-1"><MudIcon Icon="@(CurrentState.Account.Id == message.Sender?.Id ? @Icons.Material.Filled.ArrowForward : @Icons.Material.Filled.ArrowBack)" Style="font-size:11px; margin-top:3px" /></p>
 
-                                            <p @onclick="@(() => ShowDialogs.AccountInfoCardDialogAsync(accountsViewDto))" class="mud-primary-text" style="cursor:pointer; font-weight:500">@accountsViewDto.Name</p>
+                                            <p @onclick="@(() => ShowDialogs.AccountInfoCardDialogAsync(accountsViewDto))" @onclick:stopPropagation="true" class="mud-primary-text" style="cursor:pointer; font-weight:500">@accountsViewDto.Name</p>
                                             <p>
                                                 @if (message.ReadDate == null)
                                                 {
