@@ -44,17 +44,15 @@ namespace Shared.Components.Pages.Messages
                     Take = StaticData.MESSAGES_PER_BLOCK,
                     Token = CurrentState.Account?.Token
                 };
-
                 var apiResponse = await _repoGetMessages.HttpPostAsync(request);
+
                 messages.AddRange(apiResponse.Response.Messages);
                 accounts = apiResponse.Response.Accounts;
 
                 moreMessagesButton = messages.Count < apiResponse.Response.Count;
-
                 currentElementId = messages.Any() ? messages.Max(m => m.Id) : 0;
 
                 await InvokeAsync(StateHasChanged);
-
                 await _JSProcessor.ScrollToElementWithinDiv($"id_{currentElementId}", "DivMessagesFrame");
             });
 
@@ -63,10 +61,17 @@ namespace Shared.Components.Pages.Messages
         }
 
 
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            if (!firstRender)
+                await _JSProcessor.ScrollToElementWithinDiv($"id_{currentElementId}", "DivMessagesFrame");
+        }
+
         async Task SubmitMessageAsync()
         {
             if (!string.IsNullOrWhiteSpace(text))
             {
+                sending = true;
                 var response = await _repoAddMessage.HttpPostAsync(new AddMessageRequestDto
                 {
                     RecipientId = Account.Id,
@@ -74,16 +79,32 @@ namespace Shared.Components.Pages.Messages
                     Token = CurrentState.Account?.Token
                 });
 
+                moreMessagesButton = messages.Count < response.Response.Count;
+                currentElementId = response.Response.NewId;
+
                 var request = new SignalGlobalRequest { OnMessagesReload = new OnMessagesReload { RecipientId = Account.Id } };
                 await CurrentState.SignalRServerAsync(request);
 
                 text = null;
+                sending = false;
             }
         }
 
-        async Task GetMessagesAsync()
+        async Task GetPreviousMessagesAsync()
         {
+            var request = new GetMessagesRequestDto
+            {
+                RecipientId = Account.Id,
+                GetPreviousFromId = messages.Count > 0 ? messages.Min(m => m.Id) : null,
+                MarkAsRead = true,
+                Take = StaticData.MESSAGES_PER_BLOCK,
+                Token = CurrentState.Account?.Token
+            };
+            var response = await _repoGetMessages.HttpPostAsync(request);
+            messages.InsertRange(0, response.Response.Messages);
 
+            currentElementId = response.Response.Messages.Any() ? response.Response.Messages.Max(m => m.Id) : 0;
+            moreMessagesButton = messages.Count < response.Response.Count;
         }
 
         public void Dispose() =>

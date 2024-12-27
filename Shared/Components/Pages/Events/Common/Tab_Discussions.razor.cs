@@ -27,7 +27,7 @@ namespace Shared.Components.Pages.Events.Common
         IDisposable? OnScheduleChangedHandler;
 
         protected override async Task OnInitializedAsync() =>
-            await GetDiscussionsAsync();
+            await GetPreviousDiscussionsAsync();
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
@@ -52,7 +52,7 @@ namespace Shared.Components.Pages.Events.Common
             });
         }
 
-        async Task GetDiscussionsAsync()
+        async Task GetPreviousDiscussionsAsync()
         {
             var response = await _repoGetDiscussions.HttpPostAsync(new GetDiscussionsForEventsRequestDto()
             {

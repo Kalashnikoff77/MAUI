@@ -27,6 +27,16 @@ namespace Data.Models.SignalR
         /// Заполнить, если нужно дёрнуть дополнительно получателя. Иначе дёргаем только отправителя
         /// </summary>
         public int? RecipientId { get; set; }
+
+        /// <summary>
+        /// Получить новые сообщения?
+        /// </summary>
+        public bool IsGetNextId { get; set; } = false;
+
+        /// <summary>
+        /// Получить предыдущие сообщения?
+        /// </summary>
+        public bool IsGetPreviousId { get; set; } = false;
     }
 }
 
