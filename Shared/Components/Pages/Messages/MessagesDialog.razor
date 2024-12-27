@@ -1,9 +1,38 @@
-﻿@if (CurrentState.Account != null) {
+﻿@if (CurrentState.Account != null && Messages != null) {
     <MudDialog Style="width:550px; min-width:300px">
+        <TitleContent>
+            <div class="d-flex gap-3 align-center">
+                <ImageAvatar Account="Account" Size="EnumImageSize.s64x64" Class="avatar s45" />
+                <MudText Typo="Typo.h6">@Account.Name</MudText>
+            </div>
+        </TitleContent>
         <DialogContent>
             <div class="d-flex flex-column mb-3 align-center" style="overflow-y:visible">
-                <div class="d-flex flex-column" style="height:250px; overflow:auto" id="DivMessagesFrame">
-                    <p>test</p>
+                <div class="d-flex flex-column" style="overflow:auto" id="DivMessagesFrame">
+                    @foreach(var message in Messages) 
+                    {
+                        if (CurrentState.Account.Id == message.SenderId) 
+                        {
+                            <div class="d-flex justify-end gap-3 mt-1 mb-2">
+                                <div class="pa-2" id="@("id_" + message.Id)" style="background-color: azure; border-radius:10%">
+                                    <MudText Typo="Typo.body2">@message.Text</MudText>
+                                    <MudText Style="text-align:left; font-size:12px; color:lightgray">@message.CreateDate.ToMyString()</MudText>
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="d-flex mt-1 mb-2">
+                                <div class="d-flex gap-3 pa-2" style="background-color: azure; border-radius:10%">
+                                    <div class="mr-2" id="@("id_" + message.Id)">
+                                        <ColorizedAccountName Account="Accounts[message.SenderId]" Style="font-weight:500" />
+                                        <MudText Typo="Typo.body2">@message.Text</MudText>
+                                        <MudText Style="text-align:left; font-size:12px; color:lightgray">@message.CreateDate.ToMyString()</MudText>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
                     <MudButton OnClick="SubmitMessageAsync" Variant="Variant.Outlined">Отправить</MudButton>
                 </div>
             </div>

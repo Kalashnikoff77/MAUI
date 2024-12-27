@@ -6,7 +6,7 @@ namespace Data.Models.SignalR
     {
         public OnAvatarChanged? OnAvatarChanged { get; set; }
         public OnScheduleChanged? OnScheduleChanged { get; set; }
-        public OnMessageAdded? OnMessageAdded { get; set; }
+        public OnMessagesReload? OnMessagesReload { get; set; }
     }
 
 
@@ -21,10 +21,12 @@ namespace Data.Models.SignalR
         public int ScheduleId { get; set; }
     }
 
-    public class OnMessageAdded
+    public class OnMessagesReload
     {
-        public MessagesDto Message { get; set; } = null;
+        /// <summary>
+        /// Заполнить, если нужно дёрнуть дополнительно получателя. Иначе дёргаем только отправителя
+        /// </summary>
+        public int? RecipientId { get; set; }
     }
-
 }
 

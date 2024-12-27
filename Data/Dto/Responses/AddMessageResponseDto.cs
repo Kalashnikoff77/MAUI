@@ -2,6 +2,6 @@
 {
     public class AddMessageResponseDto : ResponseDtoBase
     {
-        public MessagesDto Message { get; set; } = null!;
+        public int NewId { get; set; }
     }
 }

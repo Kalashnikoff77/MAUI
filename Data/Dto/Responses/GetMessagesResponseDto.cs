@@ -4,9 +4,7 @@ namespace Data.Dto.Responses
 {
     public class GetMessagesResponseDto : ResponseDtoBase
     {
-        public AccountsViewDto Sender { get; set; } = null!;
-        public AccountsViewDto Recipient { get; set; } = null!;
-
         public List<MessagesDto> Messages { get; set; } = null!;
+        public Dictionary<int, AccountsViewDto> Accounts { get; set; } = null!;
     }
 }

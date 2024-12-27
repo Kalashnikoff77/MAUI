@@ -15,7 +15,7 @@
         /// <summary>
         /// Добавлено новое сообщение в диалогах
         /// </summary>
-        OnMessageAddedClient,
+        OnMessagesReloadClient,
 
 
 

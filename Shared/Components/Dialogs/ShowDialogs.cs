@@ -68,7 +68,7 @@ namespace Shared.Components.Dialogs
             {
                 { x => x.Account, account }
             };
-            await _dialog.ShowAsync<MessagesDialog>(account.Name, dialogParams, dialogOptions);
+            await _dialog.ShowAsync<MessagesDialog>(null, dialogParams, dialogOptions);
         }
     }
 }

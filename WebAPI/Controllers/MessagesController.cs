@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using WebAPI.Exceptions;
+using System.Linq;
 
 namespace WebAPI.Controllers
 {
@@ -97,8 +98,8 @@ namespace WebAPI.Controllers
             var columns = GetRequiredColumns<AccountsViewEntity>();
             sql = $"SELECT TOP 2 {columns.Aggregate((a, b) => a + ", " + b)} FROM AccountsView WHERE Id = @AccountId OR Id = @RecipientId";
             var accounts = await _unitOfWork.SqlConnection.QueryAsync<AccountsViewEntity>(sql, new { _unitOfWork.AccountId, request.RecipientId });
-            response.Sender = _unitOfWork.Mapper.Map<AccountsViewDto>(accounts.FirstOrDefault(x => x.Id == _unitOfWork.AccountId));
-            response.Recipient = _unitOfWork.Mapper.Map<AccountsViewDto>(accounts.FirstOrDefault(x => x.Id == request.RecipientId));
+
+            response.Accounts = accounts.Select(x => new KeyValuePair<int, AccountsViewDto>(x.Id, _unitOfWork.Mapper.Map<AccountsViewDto>(x))).ToDictionary();
 
             // Будем отмечать сообщения, как прочитанные?
             if (request.MarkAsRead)
@@ -198,16 +199,7 @@ namespace WebAPI.Controllers
             sql = $"INSERT INTO Messages ({nameof(MessagesEntity.SenderId)}, {nameof(MessagesEntity.RecipientId)}, {nameof(MessagesEntity.Text)}) " +
                 $"OUTPUT INSERTED.Id " +
                 $"VALUES (@senderId, @recipientId, @Text)";
-            var newId = await _unitOfWork.SqlConnection.QuerySingleAsync<int>(sql, new { senderId, recipientId, request.Text });
-
-            response.Message = new MessagesDto
-            {
-                Id = newId,
-                SenderId = _unitOfWork.AccountId!.Value,
-                RecipientId = request.RecipientId,
-                CreateDate = DateTime.Now,
-                Text = request.Text
-            };
+            response.NewId = await _unitOfWork.SqlConnection.QuerySingleAsync<int>(sql, new { senderId, recipientId, request.Text });
 
             return response;
         }

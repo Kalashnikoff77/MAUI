@@ -41,8 +41,8 @@ namespace SignalR
                 await OnAvatarChangedAsync(request.OnAvatarChanged);
 
             // Пользователь отправил сообщение другому пользователю
-            if (request.OnMessageAdded != null)
-                await OnMessageAddedAsync(request.OnMessageAdded);
+            if (request.OnMessagesReload != null)
+                await OnMessageAddedAsync(request.OnMessagesReload);
         }
 
 
@@ -72,13 +72,13 @@ namespace SignalR
         /// <summary>
         /// Пользователь отправил сообщение другому пользователю
         /// </summary>
-        async Task OnMessageAddedAsync(OnMessageAdded request)
+        async Task OnMessageAddedAsync(OnMessagesReload request)
         {
             if (GetAccountDetails(out AccountDetails accountDetails, Context.UserIdentifier))
             {
-                var response = new OnMessageAddedResponse { Message = request.Message };
+                var response = new OnMessagesReloadResponse();
                 await Clients
-                    .Users([Context.UserIdentifier!, request.Message.RecipientId.ToString()])
+                    .Users([Context.UserIdentifier!, request.RecipientId?.ToString()!])
                     .SendAsync(response.EnumSignalRHandlersClient.ToString(), response);
             }
         }

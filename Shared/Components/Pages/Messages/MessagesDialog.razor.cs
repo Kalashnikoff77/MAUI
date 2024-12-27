@@ -1,4 +1,5 @@
-﻿using Data.Dto.Requests;
+﻿using Data.Dto;
+using Data.Dto.Requests;
 using Data.Dto.Responses;
 using Data.Dto.Views;
 using Data.Models.SignalR;
@@ -17,38 +18,51 @@ namespace Shared.Components.Pages.Messages
         [Parameter, Required] public AccountsViewDto Account { get; set; } = null!;
 
         [Inject] IRepository<AddMessageRequestDto, AddMessageResponseDto> _repoAddMessage { get; set; } = null!;
+        [Inject] IRepository<GetMessagesRequestDto, GetMessagesResponseDto> _repoGetMessages { get; set; } = null!;
 
         IDisposable? OnMessageAddedHandler;
 
-        string? _text { get; set; } = null!;
+        List<MessagesDto>? Messages { get; set; }
+        Dictionary<int, AccountsViewDto> Accounts { get; set; } = null!;
 
-        protected override void OnAfterRender(bool firstRender)
+        string? Text;
+
+        protected override async Task OnParametersSetAsync()
         {
-            OnMessageAddedHandler = OnMessageAddedHandler.SignalRClient<OnMessageAddedResponse>(CurrentState, async (response) =>
+            OnMessageAddedHandler = OnMessageAddedHandler.SignalRClient<OnMessagesReloadResponse>(CurrentState, async (response) =>
             {
+                var request = new GetMessagesRequestDto
+                {
+                    RecipientId = Account.Id,
+                    MarkAsRead = true,
+                    Token = CurrentState.Account?.Token,
+                    GetNextAfterId = Messages?.Max(x => x.Id)
+                };
+
+                var apiResponse = await _repoGetMessages.HttpPostAsync(request);
+                Messages = apiResponse.Response.Messages;
+                Accounts = apiResponse.Response.Accounts;
 
                 await InvokeAsync(StateHasChanged);
             });
+
+            var request = new SignalGlobalRequest { OnMessagesReload = new OnMessagesReload() };
+            await CurrentState.SignalRServerAsync(request);
         }
 
         async Task SubmitMessageAsync()
         {
-            _text = "Супер пупер - 22";
-
             var response = await _repoAddMessage.HttpPostAsync(new AddMessageRequestDto 
             {
                 RecipientId = Account.Id,
-                Text = _text,
+                Text = Text,
                 Token = CurrentState.Account?.Token
             });
 
-            var request = new SignalGlobalRequest
-            {
-                OnMessageAdded = new OnMessageAdded { Message = response.Response.Message }
-            };
+            var request = new SignalGlobalRequest { OnMessagesReload = new OnMessagesReload { RecipientId = Account.Id } };
             await CurrentState.SignalRServerAsync(request);
 
-            _text = null;
+            Text = null;
         }
 
 
