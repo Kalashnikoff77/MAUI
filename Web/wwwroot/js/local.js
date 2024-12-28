@@ -1,13 +1,25 @@
-﻿function FreezeScrollBar(tag) {
-    var element = $('#' + tag);
-    element.addClass('freezeScrollBar');
-    //$('body').addClass('freezeScrollBar');
+﻿// scrollTop - текущая позиция верхней части прокрутки от начала div
+// scrollHeight - высота окна прокрутки
+// scrollTo (ш, в) - установить позицию прокрутки
+function FreezeScrollBar(tag) {
+    var top = document.getElementById(tag).scrollTop;
+    var height = document.getElementById(tag).scrollHeight;
+    document.getElementById(tag).scrollTo(0, height);
+    console.log(top + ' - ' + height);
+
+//    $('#' + tag).scroll(function () {
+//        var top = document.getElementById(tag).scrollTop;
+//        var height = document.getElementById(tag).scrollHeight;
+//        console.log(top + ' - ' + height)
+//        document.getElementById(tag).scrollTo(0, top);
+//    }); 
 }
 
 function UnFreezeScrollBar(tag) {
     var element = $('#' + tag);
-    element.removeClass('freezeScrollBar');
-    //$('body').removeClass('freezeScrollBar');
+    document.ontouchmove = function (e) {
+        return true;
+    }
 }
 
 

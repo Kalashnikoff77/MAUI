@@ -67,8 +67,9 @@ namespace Shared.Components.Pages.Messages
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            if (!firstRender)
-                await _JSProcessor.ScrollToElementWithinDiv($"id_{currentElementId}", "DivMessagesFrame");
+            await _JSProcessor.FreezeScrollBar("DivMessagesFrame");
+            //if (!firstRender)
+            //    await _JSProcessor.ScrollToElementWithinDiv($"id_{currentElementId}", "DivMessagesFrame");
         }
 
         async Task SubmitMessageAsync()
@@ -96,7 +97,7 @@ namespace Shared.Components.Pages.Messages
 
         async Task GetPreviousMessagesAsync()
         {
-            await _JSProcessor.FreezeScrollBar("DivMessagesFrame");
+            //await _JSProcessor.FreezeScrollBar("DivMessagesFrame");
             var request = new GetMessagesRequestDto
             {
                 RecipientId = Account.Id,
@@ -112,7 +113,10 @@ namespace Shared.Components.Pages.Messages
             moreMessagesButton = messages.Count < response.Response.Count;
             
             StateHasChanged();
-            await _JSProcessor.UnFreezeScrollBar("DivMessagesFrame");
+
+            await Task.Delay(1000);
+
+            //await _JSProcessor.UnFreezeScrollBar("DivMessagesFrame");
         }
 
         public void Dispose() =>
