@@ -31,8 +31,5 @@
         Task ScrollToElementWithinDiv(string elementWithiDivId, string divElement);
 
         Task UpdateOnlineAccountsClient(HashSet<string> ConnectedAccounts);
-
-        Task FreezeScrollBar(string element);
-        Task UnFreezeScrollBar(string element);
     }
 }

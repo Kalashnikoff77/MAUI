@@ -1,26 +1,30 @@
-﻿// scrollTop - текущая позиция верхней части прокрутки от начала div
-// scrollHeight - высота окна прокрутки
-// scrollTo (ш, в) - установить позицию прокрутки
-function FreezeScrollBar(tag) {
-    var top = document.getElementById(tag).scrollTop;
-    var height = document.getElementById(tag).scrollHeight;
-    document.getElementById(tag).scrollTo(0, height);
-    console.log(top + ' - ' + height);
+﻿//// scrollTop - текущая позиция верхней части прокрутки от начала div
+//// scrollHeight - высота окна прокрутки
+//// scrollTo (ш, в) - установить позицию прокрутки
+//firstTime = true;
+//function FreezeScrollBar(tag) {
+//    var top = document.getElementById(tag).scrollTop;
+//    var height = document.getElementById(tag).scrollHeight;
+//    document.getElementById(tag).scrollTo(0, height);
+//    console.log(top + ' - ' + height);
 
-//    $('#' + tag).scroll(function () {
-//        var top = document.getElementById(tag).scrollTop;
-//        var height = document.getElementById(tag).scrollHeight;
-//        console.log(top + ' - ' + height)
-//        document.getElementById(tag).scrollTo(0, top);
-//    }); 
-}
+//    if (firstTime == true) {
+//        $('#' + tag).scroll(function () {
+//            var top = document.getElementById(tag).scrollTop;
+//            var height = document.getElementById(tag).scrollHeight;
+//            console.log('EVENT: Top - ' + top + ', ' + 'Height - ' + height)
+//            //document.getElementById(tag).scrollTo(0, top);
+//        });
+//        firstTime = false;
+//    }
+//}
 
-function UnFreezeScrollBar(tag) {
-    var element = $('#' + tag);
-    document.ontouchmove = function (e) {
-        return true;
-    }
-}
+//function UnFreezeScrollBar(tag) {
+//    var element = $('#' + tag);
+//    document.ontouchmove = function (e) {
+//        return true;
+//    }
+//}
 
 
 // Затухание и появление числа (напр.: изменилось кол-во непрочитанных сообщений в чате)

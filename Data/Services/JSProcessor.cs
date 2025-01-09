@@ -40,11 +40,5 @@ namespace Data.Services
                 throw new Exception(ex.Message);
             }
         }
-
-        public async Task FreezeScrollBar(string element) =>
-            await RunJSAsync(nameof(FreezeScrollBar), element);
-
-        public async Task UnFreezeScrollBar(string element) =>
-            await RunJSAsync(nameof(UnFreezeScrollBar), element);
     }
 }

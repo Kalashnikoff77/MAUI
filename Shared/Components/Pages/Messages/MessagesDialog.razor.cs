@@ -67,7 +67,6 @@ namespace Shared.Components.Pages.Messages
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            await _JSProcessor.FreezeScrollBar("DivMessagesFrame");
             //if (!firstRender)
             //    await _JSProcessor.ScrollToElementWithinDiv($"id_{currentElementId}", "DivMessagesFrame");
         }
@@ -109,15 +108,14 @@ namespace Shared.Components.Pages.Messages
             var response = await _repoGetMessages.HttpPostAsync(request);
             messages.InsertRange(0, response.Response.Messages);
 
-            currentElementId = response.Response.Messages.Any() ? response.Response.Messages.Max(m => m.Id) : 0;
-            moreMessagesButton = messages.Count < response.Response.Count;
-            
             StateHasChanged();
 
-            await Task.Delay(1000);
+            currentElementId = response.Response.Messages.Any() ? response.Response.Messages.Max(m => m.Id) : 0;
+            moreMessagesButton = messages.Count < response.Response.Count;
 
-            //await _JSProcessor.UnFreezeScrollBar("DivMessagesFrame");
+            //await _JSProcessor.ScrollToElementWithinDiv($"id_{currentElementId}", "DivMessagesFrame");
         }
+
 
         public void Dispose() =>
             OnMessagesReloadHandler?.Dispose();
