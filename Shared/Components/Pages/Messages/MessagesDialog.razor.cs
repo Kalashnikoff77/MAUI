@@ -7,6 +7,7 @@ using Data.Models.SignalR;
 using Data.Services;
 using Data.State;
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using MudBlazor;
 using System.ComponentModel.DataAnnotations;
 
@@ -21,6 +22,7 @@ namespace Shared.Components.Pages.Messages
         [Inject] IRepository<AddMessageRequestDto, AddMessageResponseDto> _repoAddMessage { get; set; } = null!;
         [Inject] IRepository<GetMessagesRequestDto, GetMessagesResponseDto> _repoGetMessages { get; set; } = null!;
         [Inject] IJSProcessor _JSProcessor { get; set; } = null!;
+        [Inject] IJSRuntime _JSRuntime { get; set; } = null!;
 
         IDisposable? OnMessagesReloadHandler;
 
@@ -31,6 +33,8 @@ namespace Shared.Components.Pages.Messages
         bool sending;
         bool moreMessagesButton = false;
         int currentElementId = 0;
+
+        DotNetObjectReference<MessagesDialog> dotNetReference = null!;
 
         protected override async Task OnParametersSetAsync()
         {
@@ -67,8 +71,19 @@ namespace Shared.Components.Pages.Messages
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            //if (!firstRender)
-            //    await _JSProcessor.ScrollToElementWithinDiv($"id_{currentElementId}", "DivMessagesFrame");
+            if (!firstRender)
+                await _JSProcessor.SetScrollEvent("DivMessagesFrame");
+            else
+            {
+                dotNetReference = DotNetObjectReference.Create(this);
+                await _JSRuntime.InvokeVoidAsync("BlazorUniversity.startRandomGenerator", dotNetReference);
+            }
+        }
+
+        [JSInvokable]
+        public string Method(string text)
+        {
+            return "123";
         }
 
         async Task SubmitMessageAsync()
@@ -96,6 +111,8 @@ namespace Shared.Components.Pages.Messages
 
         async Task GetPreviousMessagesAsync()
         {
+            //await _JSProcessor.SetScrollEvent("DivMessagesFrame");
+
             //await _JSProcessor.FreezeScrollBar("DivMessagesFrame");
             var request = new GetMessagesRequestDto
             {

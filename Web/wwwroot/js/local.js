@@ -1,4 +1,51 @@
-﻿//// scrollTop - текущая позиция верхней части прокрутки от начала div
+﻿
+var BlazorUniversity = BlazorUniversity || {};
+BlazorUniversity.startRandomGenerator = function (dotNetObject) {
+    setInterval(async function () {
+        console.log("JS: Generated text");
+        var result = await dotNetObject.invokeMethodAsync('Method', 'text');
+        console.log(result);
+
+        var height = document.getElementById('DivMessagesFrame').scrollHeight;
+        document.getElementById('DivMessagesFrame').scrollTo(100, height);
+
+        $('#' + 'DivMessagesFrame').prepend('<p>test</p>')
+    }, 3000);
+};
+
+
+
+
+function SetScrollEvent(tag) {
+    var height = document.getElementById(tag).scrollHeight;
+    document.getElementById(tag).scrollTo(0, height);
+    $('#' + tag).on('scroll', TagScroller);
+}
+
+function TagScroller(event) {
+    // Получим id блока (тега)
+    var tag = event.target.id;
+
+    var top = document.getElementById(tag).scrollTop;
+    var height = document.getElementById(tag).scrollHeight;
+
+    console.log(top + ' - ' + height);
+
+    if (top < 100) {
+        // Временно отключаем обработку события
+        $('#' + tag).off('scroll');
+
+        //dotNetObject.invokeMethodAsync('Method', 'test string');
+
+        // Восстанавливаем обработку события
+        setTimeout(function () {
+            $('#' + tag).on('scroll', TagScroller);
+        }, 1500);
+    }
+}
+
+
+//// scrollTop - текущая позиция верхней части прокрутки от начала div
 //// scrollHeight - высота окна прокрутки
 //// scrollTo (ш, в) - установить позицию прокрутки
 //firstTime = true;

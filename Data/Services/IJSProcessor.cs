@@ -30,6 +30,8 @@
         /// <param name="divElement">Div элемент, в котором производить прокрутку</param>
         Task ScrollToElementWithinDiv(string elementWithiDivId, string divElement);
 
+        Task SetScrollEvent(string tag);
+
         Task UpdateOnlineAccountsClient(HashSet<string> ConnectedAccounts);
     }
 }
