@@ -7,9 +7,13 @@ using Data.Models.SignalR;
 using Data.Services;
 using Data.State;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
 using MudBlazor;
 using System.ComponentModel.DataAnnotations;
+using System.Text;
 
 namespace Shared.Components.Pages.Messages
 {
@@ -23,63 +27,62 @@ namespace Shared.Components.Pages.Messages
         [Inject] IRepository<GetMessagesRequestDto, GetMessagesResponseDto> _repoGetMessages { get; set; } = null!;
         [Inject] IJSProcessor _JSProcessor { get; set; } = null!;
 
+        [Inject] IServiceProvider serviceProvider { get; set; } = null!;
+
         IDisposable? OnMessagesReloadHandler;
 
         List<MessagesDto> messages = new List<MessagesDto>();
-        Dictionary<int, AccountsViewDto> accounts { get; set; } = null!;
 
         string? text;
         bool sending;
-        bool moreMessagesButton = false;
-        int currentElementId = 0;
-        bool isInitialized = false;
+        int lastElementId = 0;
 
-        protected override async Task OnParametersSetAsync()
+        protected override void OnParametersSet()
         {
             OnMessagesReloadHandler = OnMessagesReloadHandler.SignalRClient<OnMessagesReloadResponse>(CurrentState, async (response) =>
             {
-                //await _JSProcessor.FreezeScrollBar("DivMessagesFrame");
-
-                var request = new GetMessagesRequestDto
-                {
-                    RecipientId = Account.Id,
-                    GetNextAfterId = messages.Count > 0 ? messages.Max(m => m.Id) : null,
-                    MarkAsRead = true,
-                    Take = StaticData.MESSAGES_PER_BLOCK,
-                    Token = CurrentState.Account?.Token
-                };
-                var apiResponse = await _repoGetMessages.HttpPostAsync(request);
-
-                messages.AddRange(apiResponse.Response.Messages);
-                accounts = apiResponse.Response.Accounts;
-
-                moreMessagesButton = messages.Count < apiResponse.Response.Count;
-                currentElementId = messages.Any() ? messages.Max(m => m.Id) : 0;
-
-                await InvokeAsync(StateHasChanged);
-                
-                //await _JSProcessor.ScrollToElementWithinDiv($"id_{currentElementId}", "DivMessagesFrame");
-                //await _JSProcessor.UnFreezeScrollBar("DivMessagesFrame");
+                await GetMessages();
+                //await InvokeAsync(StateHasChanged);
             });
-
-            var request = new SignalGlobalRequest { OnMessagesReload = new OnMessagesReload() };
-            await CurrentState.SignalRServerAsync(request);
         }
-
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            if (!firstRender && !isInitialized)
-            {
+            if (firstRender)
                 await _JSProcessor.SetScrollEvent("DivMessagesFrame", DotNetObjectReference.Create(this));
-                isInitialized = true;
-            }
         }
 
         [JSInvokable]
-        public string Method(string text)
+        public async Task<string> GetMessages()
         {
-            return $"<p style=\"height:150px\">{text}</p>";
+            var request = new GetMessagesRequestDto
+            {
+                RecipientId = Account.Id,
+                GetPreviousFromId = messages.Count > 0 ? messages.Min(m => m.Id) : null,
+                MarkAsRead = true,
+                Take = StaticData.MESSAGES_PER_BLOCK,
+                Token = CurrentState.Account?.Token
+            };
+            var apiResponse = await _repoGetMessages.HttpPostAsync(request);
+            messages.InsertRange(0, apiResponse.Response.Messages);
+
+            // Ручная генерация компонентов сообщений
+            await using var htmlRenderer = new HtmlRenderer(serviceProvider, serviceProvider.GetRequiredService<ILoggerFactory>());
+            var html = new StringBuilder(5000);
+            foreach (var message in apiResponse.Response.Messages) 
+            {
+                html.Append(await htmlRenderer.Dispatcher.InvokeAsync(async () =>
+                {
+                    var dictionary = new Dictionary<string, object?>
+                    {
+                        { "CurrentState", CurrentState },
+                        { "message", message }
+                    };
+                    var output = await htmlRenderer.RenderComponentAsync<Message>(ParameterView.FromDictionary(dictionary));
+                    return output.ToHtmlString();
+                }));
+            }
+            return html.ToString();
         }
 
         async Task SubmitMessageAsync()
@@ -94,8 +97,7 @@ namespace Shared.Components.Pages.Messages
                     Token = CurrentState.Account?.Token
                 });
 
-                moreMessagesButton = messages.Count < response.Response.Count;
-                currentElementId = response.Response.NewId;
+                lastElementId = response.Response.NewId;
 
                 var request = new SignalGlobalRequest { OnMessagesReload = new OnMessagesReload { RecipientId = Account.Id } };
                 await CurrentState.SignalRServerAsync(request);
@@ -107,9 +109,6 @@ namespace Shared.Components.Pages.Messages
 
         async Task GetPreviousMessagesAsync()
         {
-            //await _JSProcessor.SetScrollEvent("DivMessagesFrame");
-
-            //await _JSProcessor.FreezeScrollBar("DivMessagesFrame");
             var request = new GetMessagesRequestDto
             {
                 RecipientId = Account.Id,
@@ -123,10 +122,7 @@ namespace Shared.Components.Pages.Messages
 
             StateHasChanged();
 
-            currentElementId = response.Response.Messages.Any() ? response.Response.Messages.Max(m => m.Id) : 0;
-            moreMessagesButton = messages.Count < response.Response.Count;
-
-            //await _JSProcessor.ScrollToElementWithinDiv($"id_{currentElementId}", "DivMessagesFrame");
+            lastElementId = response.Response.Messages.Any() ? response.Response.Messages.Max(m => m.Id) : 0;
         }
 
 

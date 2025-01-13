@@ -1,0 +1,26 @@
+﻿@if (CurrentState.Account != null) 
+{
+    @if (CurrentState.Account.Id == message.SenderId)
+    {
+        <div id="@("id_" + message.Id)" class="d-flex justify-end pa-2">
+            <div class="pa-2 ml-12" style="background-color:#d9f4ff; border-radius:7px">
+                <MudText Typo="Typo.body2">@message.Text</MudText>
+                <MudText Style="text-align:left; font-size:12px; color:#85c3de">@message.CreateDate.ToMyString()</MudText>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div id="@("id_" + message.Id)" class="d-flex pa-2">
+            <div class="pa-2 mr-12" style="background-color:#e8f7df; border-radius:7px">
+                <MudText Typo="Typo.body2">@message.Text</MudText>
+                <MudText Style="text-align:left; font-size:12px; color:#90d665">@message.CreateDate.ToMyString()</MudText>
+            </div>
+        </div>
+    }
+}
+
+@code {
+    [Parameter, EditorRequired] public CurrentState CurrentState { get; set; } = null!;
+    [Parameter, EditorRequired] public MessagesDto message { get; set; } = null!;
+}

@@ -63,7 +63,7 @@ namespace Data.Models
         /// <summary>
         /// Кол-во сообщений в чате
         /// </summary>
-        public const short MESSAGES_PER_BLOCK = 10;
+        public const short MESSAGES_PER_BLOCK = 20;
 
 
         // Константы полей БД

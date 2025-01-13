@@ -1,17 +1,25 @@
-﻿function SetScrollEvent(div, dotNetObject) {
-    var height = document.getElementById(div).scrollHeight;
-    document.getElementById(div).scrollTo(0, height);
+﻿var _dotNetObject;
 
-    $('#' + div).on('scroll', async function (event)
-    {
-        var div = event.target.id; // Получим id блока
+async function SetScrollEvent(div, dotNetObject) {
+    _dotNetObject = dotNetObject;
+    var result = await dotNetObject.invokeMethodAsync('GetMessages');
+    $('#' + div).prepend(result);
 
-        if (document.getElementById(div).scrollTop < 250)
-        {
-            var result = await dotNetObject.invokeMethodAsync('Method', 'test string from JS');
+    document.getElementById(div).scrollTo(0, document.getElementById(div).scrollHeight);
+
+    $('#' + div).on('scroll', DivScroller);
+}
+
+async function DivScroller(event) {
+    var div = event.target.id; // Получим id блока
+    if (document.getElementById(div).scrollTop < 250) {
+        $('#' + div).off('scroll');
+        var result = await _dotNetObject.invokeMethodAsync('GetMessages');
+        if (result != '') {
             $('#' + div).prepend(result);
+            $('#' + div).on('scroll', DivScroller);
         }
-    });
+    }
 }
 
 
