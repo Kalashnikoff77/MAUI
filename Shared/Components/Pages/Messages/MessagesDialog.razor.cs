@@ -35,13 +35,12 @@ namespace Shared.Components.Pages.Messages
 
         string? text;
         bool sending;
-        int lastElementId = 0;
 
         protected override void OnParametersSet()
         {
             OnMessagesReloadHandler = OnMessagesReloadHandler.SignalRClient<OnMessagesReloadResponse>(CurrentState, async (response) =>
             {
-                await GetMessages();
+                await GetPreviousMessages();
                 //await InvokeAsync(StateHasChanged);
             });
         }
@@ -53,7 +52,7 @@ namespace Shared.Components.Pages.Messages
         }
 
         [JSInvokable]
-        public async Task<string> GetMessages()
+        public async Task<string> GetPreviousMessages()
         {
             var request = new GetMessagesRequestDto
             {
@@ -97,8 +96,6 @@ namespace Shared.Components.Pages.Messages
                     Token = CurrentState.Account?.Token
                 });
 
-                lastElementId = response.Response.NewId;
-
                 var request = new SignalGlobalRequest { OnMessagesReload = new OnMessagesReload { RecipientId = Account.Id } };
                 await CurrentState.SignalRServerAsync(request);
 
@@ -106,25 +103,6 @@ namespace Shared.Components.Pages.Messages
                 sending = false;
             }
         }
-
-        async Task GetPreviousMessagesAsync()
-        {
-            var request = new GetMessagesRequestDto
-            {
-                RecipientId = Account.Id,
-                GetPreviousFromId = messages.Count > 0 ? messages.Min(m => m.Id) : null,
-                MarkAsRead = true,
-                Take = StaticData.MESSAGES_PER_BLOCK,
-                Token = CurrentState.Account?.Token
-            };
-            var response = await _repoGetMessages.HttpPostAsync(request);
-            messages.InsertRange(0, response.Response.Messages);
-
-            StateHasChanged();
-
-            lastElementId = response.Response.Messages.Any() ? response.Response.Messages.Max(m => m.Id) : 0;
-        }
-
 
         public void Dispose() =>
             OnMessagesReloadHandler?.Dispose();

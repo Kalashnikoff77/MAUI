@@ -1,23 +1,22 @@
 ﻿var _dotNetObject;
 
+// Бесконечная лента прокрутки в сообщениях
 async function SetScrollEvent(div, dotNetObject) {
-    _dotNetObject = dotNetObject;
-    var result = await dotNetObject.invokeMethodAsync('GetMessages');
-    $('#' + div).prepend(result);
-
-    document.getElementById(div).scrollTo(0, document.getElementById(div).scrollHeight);
-
-    $('#' + div).on('scroll', DivScroller);
+    _dotNetObject = dotNetObject; // Сохраним ссылку на C#
+    var result = await _dotNetObject.invokeMethodAsync('GetPreviousMessages'); // Получим сообщения
+    $('#' + div).prepend(result); // Добавим полученные сообщения в окно
+    document.getElementById(div).scrollTo(0, document.getElementById(div).scrollHeight); // Прокрутим окно в самый низ
+    $('#' + div).on('scroll', DivScroller); // Установим обработчик события прокрутки
 }
 
+// Обработчик события прокрутки
 async function DivScroller(event) {
     var div = event.target.id; // Получим id блока
     if (document.getElementById(div).scrollTop < 250) {
-        $('#' + div).off('scroll');
-        var result = await _dotNetObject.invokeMethodAsync('GetMessages');
-        if (result != '') {
-            $('#' + div).prepend(result);
-            $('#' + div).on('scroll', DivScroller);
+        $('#' + div).off('scroll'); // Временно отключим обработчик
+        var result = await _dotNetObject.invokeMethodAsync('GetPreviousMessages'); // Получим новые сообщения
+        if (result != '') { // Если ещё есть сообщения, то добавляем их и включаем обработчик снова
+            $('#' + div).prepend(result).on('scroll', DivScroller);
         }
     }
 }
