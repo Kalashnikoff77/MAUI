@@ -22,7 +22,6 @@ namespace Shared.Components.Pages.Messages
         [Inject] IRepository<AddMessageRequestDto, AddMessageResponseDto> _repoAddMessage { get; set; } = null!;
         [Inject] IRepository<GetMessagesRequestDto, GetMessagesResponseDto> _repoGetMessages { get; set; } = null!;
         [Inject] IJSProcessor _JSProcessor { get; set; } = null!;
-        [Inject] IJSRuntime _JSRuntime { get; set; } = null!;
 
         IDisposable? OnMessagesReloadHandler;
 
@@ -33,8 +32,7 @@ namespace Shared.Components.Pages.Messages
         bool sending;
         bool moreMessagesButton = false;
         int currentElementId = 0;
-
-        DotNetObjectReference<MessagesDialog> dotNetReference = null!;
+        bool isInitialized = false;
 
         protected override async Task OnParametersSetAsync()
         {
@@ -71,19 +69,17 @@ namespace Shared.Components.Pages.Messages
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            if (!firstRender)
-                await _JSProcessor.SetScrollEvent("DivMessagesFrame");
-            else
+            if (!firstRender && !isInitialized)
             {
-                dotNetReference = DotNetObjectReference.Create(this);
-                await _JSRuntime.InvokeVoidAsync("BlazorUniversity.startRandomGenerator", dotNetReference);
+                await _JSProcessor.SetScrollEvent("DivMessagesFrame", DotNetObjectReference.Create(this));
+                isInitialized = true;
             }
         }
 
         [JSInvokable]
         public string Method(string text)
         {
-            return "123";
+            return $"<p style=\"height:150px\">{text}</p>";
         }
 
         async Task SubmitMessageAsync()

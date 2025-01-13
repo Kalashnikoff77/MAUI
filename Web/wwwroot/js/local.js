@@ -1,77 +1,18 @@
-﻿
-var BlazorUniversity = BlazorUniversity || {};
-BlazorUniversity.startRandomGenerator = function (dotNetObject) {
-    setInterval(async function () {
-        console.log("JS: Generated text");
-        var result = await dotNetObject.invokeMethodAsync('Method', 'text');
-        console.log(result);
+﻿function SetScrollEvent(div, dotNetObject) {
+    var height = document.getElementById(div).scrollHeight;
+    document.getElementById(div).scrollTo(0, height);
 
-        var height = document.getElementById('DivMessagesFrame').scrollHeight;
-        document.getElementById('DivMessagesFrame').scrollTo(100, height);
+    $('#' + div).on('scroll', async function (event)
+    {
+        var div = event.target.id; // Получим id блока
 
-        $('#' + 'DivMessagesFrame').prepend('<p>test</p>')
-    }, 3000);
-};
-
-
-
-
-function SetScrollEvent(tag) {
-    var height = document.getElementById(tag).scrollHeight;
-    document.getElementById(tag).scrollTo(0, height);
-    $('#' + tag).on('scroll', TagScroller);
+        if (document.getElementById(div).scrollTop < 250)
+        {
+            var result = await dotNetObject.invokeMethodAsync('Method', 'test string from JS');
+            $('#' + div).prepend(result);
+        }
+    });
 }
-
-function TagScroller(event) {
-    // Получим id блока (тега)
-    var tag = event.target.id;
-
-    var top = document.getElementById(tag).scrollTop;
-    var height = document.getElementById(tag).scrollHeight;
-
-    console.log(top + ' - ' + height);
-
-    if (top < 100) {
-        // Временно отключаем обработку события
-        $('#' + tag).off('scroll');
-
-        //dotNetObject.invokeMethodAsync('Method', 'test string');
-
-        // Восстанавливаем обработку события
-        setTimeout(function () {
-            $('#' + tag).on('scroll', TagScroller);
-        }, 1500);
-    }
-}
-
-
-//// scrollTop - текущая позиция верхней части прокрутки от начала div
-//// scrollHeight - высота окна прокрутки
-//// scrollTo (ш, в) - установить позицию прокрутки
-//firstTime = true;
-//function FreezeScrollBar(tag) {
-//    var top = document.getElementById(tag).scrollTop;
-//    var height = document.getElementById(tag).scrollHeight;
-//    document.getElementById(tag).scrollTo(0, height);
-//    console.log(top + ' - ' + height);
-
-//    if (firstTime == true) {
-//        $('#' + tag).scroll(function () {
-//            var top = document.getElementById(tag).scrollTop;
-//            var height = document.getElementById(tag).scrollHeight;
-//            console.log('EVENT: Top - ' + top + ', ' + 'Height - ' + height)
-//            //document.getElementById(tag).scrollTo(0, top);
-//        });
-//        firstTime = false;
-//    }
-//}
-
-//function UnFreezeScrollBar(tag) {
-//    var element = $('#' + tag);
-//    document.ontouchmove = function (e) {
-//        return true;
-//    }
-//}
 
 
 // Затухание и появление числа (напр.: изменилось кол-во непрочитанных сообщений в чате)

@@ -29,8 +29,8 @@ namespace Data.Services
         public async Task UpdateOnlineAccountsClient(HashSet<string> ConnectedAccounts) =>
             await RunJSAsync(nameof(UpdateOnlineAccountsClient), ConnectedAccounts);
 
-        public async Task SetScrollEvent(string tag) =>
-            await RunJSAsync(nameof(SetScrollEvent), tag);
+        public async Task SetScrollEvent<T>(string tag, DotNetObjectReference<T> dotNetReference) where T : class =>
+            await RunJSAsync(nameof(SetScrollEvent), tag, dotNetReference);
 
         async Task RunJSAsync(string identifier, params object?[] args)
         {

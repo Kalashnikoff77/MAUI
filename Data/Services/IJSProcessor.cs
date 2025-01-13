@@ -1,4 +1,6 @@
-﻿namespace Data.Services
+﻿using Microsoft.JSInterop;
+
+namespace Data.Services
 {
     public interface IJSProcessor
     {
@@ -30,7 +32,7 @@
         /// <param name="divElement">Div элемент, в котором производить прокрутку</param>
         Task ScrollToElementWithinDiv(string elementWithiDivId, string divElement);
 
-        Task SetScrollEvent(string tag);
+        Task SetScrollEvent<T>(string tag, DotNetObjectReference<T> dotNetReference) where T : class;
 
         Task UpdateOnlineAccountsClient(HashSet<string> ConnectedAccounts);
     }
