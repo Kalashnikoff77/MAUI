@@ -31,7 +31,8 @@ namespace SignalR
                 var token = StaticData.GenerateToken(accountId, accountGuid, _configuration);
 
                 // Добавим пользователя в список онлайн пользователей
-                Accounts.ConnectedAccounts.Add(Context.UserIdentifier, new AccountDetails { Id = accountId, Token = token });
+                if (!Accounts.ConnectedAccounts.ContainsKey(Context.UserIdentifier))
+                    Accounts.ConnectedAccounts.Add(Context.UserIdentifier, new AccountDetails { Id = accountId, Token = token });
 
                 // В БД отметим текущую дату и время входа на сайт текущего пользователя
                 var service = _serviceProvider.GetService<IRepository<VisitsForAccountsUpdateRequestDto, ResponseDtoBase>>()!;
