@@ -9,7 +9,6 @@ namespace Shared.Components.Pages.Events
         #region Поиск текста
         async Task OnSearch(string text)
         {
-            IsButtonMoreVisible = false;
             request.FilterFreeText = text;
             SchedulesList.Clear();
             await LoadSchedulesAsync();
@@ -22,7 +21,6 @@ namespace Shared.Components.Pages.Events
 
         async Task FeaturesChanged(IEnumerable<string> values)
         {
-            IsButtonMoreVisible = false;
             Filters.SelectedFeatures = values;
 
             filteredAdmins.Clear();
@@ -75,7 +73,6 @@ namespace Shared.Components.Pages.Events
 
         async Task AdminsChanged(IEnumerable<string> values)
         {
-            IsButtonMoreVisible = false;
             Filters.SelectedAdmins = values;
 
             filteredFeatures.Clear();
@@ -128,7 +125,6 @@ namespace Shared.Components.Pages.Events
 
         async Task RegionsChanged(IEnumerable<string> values)
         {
-            IsButtonMoreVisible = false;
             Filters.SelectedRegions = values;
 
             filteredFeatures.Clear();
@@ -182,7 +178,6 @@ namespace Shared.Components.Pages.Events
 
         async Task ActualEventsChanged(bool value)
         {
-            IsButtonMoreVisible = false;
             isActualEvents = value;
 
             request.IsActualEvents = value;

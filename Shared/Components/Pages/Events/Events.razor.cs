@@ -5,7 +5,7 @@ using Data.Models.SignalR;
 using Data.Services;
 using Data.State;
 using Microsoft.AspNetCore.Components;
-using Shared.Components.Dialogs;
+using Microsoft.JSInterop;
 
 namespace Shared.Components.Pages.Events
 {
@@ -16,7 +16,7 @@ namespace Shared.Components.Pages.Events
         [Inject] IRepository<GetFeaturesForEventsRequestDto, GetFeaturesForEventsResponseDto> _repoGetFeatures { get; set; } = null!;
         [Inject] IRepository<GetRegionsForEventsRequestDto, GetRegionsForEventsResponseDto> _repoGetRegions { get; set; } = null!;
         [Inject] IRepository<GetAdminsForEventsRequestDto, GetAdminsForEventsResponseDto> _repoGetAdmins { get; set; } = null!;
-        [Inject] ShowDialogs ShowDialogs { get; set; } = null!;
+        [Inject] IJSProcessor _JSProcessor { get; set; } = null!;
 
         GetSchedulesRequestDto request = new GetSchedulesRequestDto { IsPhotosIncluded = true };
         List<SchedulesForEventsViewDto> SchedulesList = new List<SchedulesForEventsViewDto>();
@@ -30,8 +30,6 @@ namespace Shared.Components.Pages.Events
         int currentPage = 0;
         // Текущее кол-во отображаемых мероприятий на странице
         const int currentPageSize = 10;
-
-        bool IsButtonMoreVisible = false;
         bool IsNotFoundVisible = false;
 
         IDisposable? OnScheduleChangedHandler;
@@ -50,20 +48,25 @@ namespace Shared.Components.Pages.Events
             await LoadSchedulesAsync();
         }
 
-        protected override void OnAfterRender(bool firstRender)
+        protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            OnScheduleChangedHandler = OnScheduleChangedHandler.SignalRClient(CurrentState, (Func<OnScheduleChangedResponse, Task>)(async (response) =>
+            if (firstRender)
             {
-                if (response.UpdatedSchedule != null)
-                {
-                    // Есть ли в области видимости браузера такое расписание?
-                    var index = SchedulesList.FindIndex(i => i.Id == response.UpdatedSchedule.Id);
-                    if (index >= 0)
-                        SchedulesList[index] = response.UpdatedSchedule;
+                await _JSProcessor.SetScrollEvent("Body", DotNetObjectReference.Create(this));
 
-                    await InvokeAsync(StateHasChanged);
-                }
-            }));
+                OnScheduleChangedHandler = OnScheduleChangedHandler.SignalRClient(CurrentState, (Func<OnScheduleChangedResponse, Task>)(async (response) =>
+                {
+                    if (response.UpdatedSchedule != null)
+                    {
+                        // Есть ли в области видимости браузера такое расписание?
+                        var index = SchedulesList.FindIndex(i => i.Id == response.UpdatedSchedule.Id);
+                        if (index >= 0)
+                            SchedulesList[index] = response.UpdatedSchedule;
+
+                        await InvokeAsync(StateHasChanged);
+                    }
+                }));
+            }
         }
 
 
@@ -86,7 +89,6 @@ namespace Shared.Components.Pages.Events
 
             var apiResponse = await _repoGetSchedules.HttpPostAsync(request);
             SchedulesList.AddRange(apiResponse.Response.Schedules ?? new List<SchedulesForEventsViewDto>());
-            IsButtonMoreVisible = apiResponse.Response.Count <= SchedulesList.Count ? false : true;
             IsNotFoundVisible = SchedulesList.Count == 0 ? true : false;
         }
 
