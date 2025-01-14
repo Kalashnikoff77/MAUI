@@ -34,6 +34,8 @@ namespace Data.Services
 
         Task SetScrollEvent<T>(string tag, DotNetObjectReference<T> dotNetReference) where T : class;
 
+        Task AppendNewMessages(string tag, string messages);
+
         Task UpdateOnlineAccountsClient(HashSet<string> ConnectedAccounts);
     }
 }

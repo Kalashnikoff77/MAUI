@@ -39,16 +39,31 @@ namespace Shared.Components.Pages.Messages
         protected override void OnParametersSet()
         {
             OnMessagesReloadHandler = OnMessagesReloadHandler.SignalRClient<OnMessagesReloadResponse>(CurrentState, async (response) =>
-            {
-                await GetPreviousMessages();
-                //await InvokeAsync(StateHasChanged);
-            });
+                await _JSProcessor.AppendNewMessages("DivMessagesFrame", await GetNextMessages()));
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             if (firstRender)
                 await _JSProcessor.SetScrollEvent("DivMessagesFrame", DotNetObjectReference.Create(this));
+        }
+
+        [JSInvokable]
+        public async Task<string> GetNextMessages()
+        {
+            var request = new GetMessagesRequestDto
+            {
+                RecipientId = Account.Id,
+                GetNextAfterId = messages.Count > 0 ? messages.Max(m => m.Id) : null,
+                MarkAsRead = true,
+                Take = StaticData.MESSAGES_PER_BLOCK,
+                Token = CurrentState.Account?.Token
+            };
+            var apiResponse = await _repoGetMessages.HttpPostAsync(request);
+            messages.AddRange(apiResponse.Response.Messages);
+
+            // Ручная генерация компонентов сообщений
+            return await RenderMessages(apiResponse.Response.Messages);
         }
 
         [JSInvokable]
@@ -66,24 +81,12 @@ namespace Shared.Components.Pages.Messages
             messages.InsertRange(0, apiResponse.Response.Messages);
 
             // Ручная генерация компонентов сообщений
-            await using var htmlRenderer = new HtmlRenderer(serviceProvider, serviceProvider.GetRequiredService<ILoggerFactory>());
-            var html = new StringBuilder(5000);
-            foreach (var message in apiResponse.Response.Messages) 
-            {
-                html.Append(await htmlRenderer.Dispatcher.InvokeAsync(async () =>
-                {
-                    var dictionary = new Dictionary<string, object?>
-                    {
-                        { "CurrentState", CurrentState },
-                        { "message", message }
-                    };
-                    var output = await htmlRenderer.RenderComponentAsync<Message>(ParameterView.FromDictionary(dictionary));
-                    return output.ToHtmlString();
-                }));
-            }
-            return html.ToString();
+            return await RenderMessages(apiResponse.Response.Messages);
         }
 
+        /// <summary>
+        /// Отправка сообщения
+        /// </summary>
         async Task SubmitMessageAsync()
         {
             if (!string.IsNullOrWhiteSpace(text))
@@ -102,6 +105,30 @@ namespace Shared.Components.Pages.Messages
                 text = null;
                 sending = false;
             }
+        }
+
+
+        /// <summary>
+        /// Ручная генерация компонента Message (сообщения пользователя)
+        /// </summary>
+        async Task<string> RenderMessages(List<MessagesDto> messages)
+        {
+            await using var htmlRenderer = new HtmlRenderer(serviceProvider, serviceProvider.GetRequiredService<ILoggerFactory>());
+            var html = new StringBuilder(5000);
+            foreach (var message in messages)
+            {
+                html.Append(await htmlRenderer.Dispatcher.InvokeAsync(async () =>
+                {
+                    var dictionary = new Dictionary<string, object?>
+                    {
+                        { "CurrentState", CurrentState },
+                        { "message", message }
+                    };
+                    var output = await htmlRenderer.RenderComponentAsync<Message>(ParameterView.FromDictionary(dictionary));
+                    return output.ToHtmlString();
+                }));
+            }
+            return html.ToString();
         }
 
         public void Dispose() =>

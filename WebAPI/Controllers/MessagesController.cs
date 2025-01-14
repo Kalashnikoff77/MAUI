@@ -1,19 +1,18 @@
 ﻿using AutoMapper;
+using Dapper;
 using Data.Dto;
 using Data.Dto.Requests;
 using Data.Dto.Responses;
 using Data.Dto.Sp;
 using Data.Dto.Views;
-using Data.Models;
-using Dapper;
 using Data.Entities;
 using Data.Entities.Sp;
 using Data.Entities.Views;
+using Data.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using WebAPI.Exceptions;
-using System.Linq;
 
 namespace WebAPI.Controllers
 {

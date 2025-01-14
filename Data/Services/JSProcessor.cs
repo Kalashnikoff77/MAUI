@@ -32,6 +32,9 @@ namespace Data.Services
         public async Task SetScrollEvent<T>(string tag, DotNetObjectReference<T> dotNetReference) where T : class =>
             await RunJSAsync(nameof(SetScrollEvent), tag, dotNetReference);
 
+        public async Task AppendNewMessages(string tag, string messages) =>
+            await RunJSAsync(nameof(AppendNewMessages), tag, messages);
+
         async Task RunJSAsync(string identifier, params object?[] args)
         {
             try

@@ -5,7 +5,7 @@ async function SetScrollEvent(div, dotNetObject) {
     _dotNetObject = dotNetObject; // Сохраним ссылку на C#
     var result = await _dotNetObject.invokeMethodAsync('GetPreviousMessages'); // Получим сообщения
     $('#' + div).prepend(result); // Добавим полученные сообщения в окно
-    document.getElementById(div).scrollTo(0, document.getElementById(div).scrollHeight); // Прокрутим окно в самый низ
+    ScrollDivToBottom(div); // Прокрутим окно в самый низ
     $('#' + div).on('scroll', DivScroller); // Установим обработчик события прокрутки
 }
 
@@ -18,6 +18,14 @@ async function DivScroller(event) {
         if (result != '') { // Если ещё есть сообщения, то добавляем их и включаем обработчик снова
             $('#' + div).prepend(result).on('scroll', DivScroller);
         }
+    }
+}
+
+// Добавление новых сообщений
+async function AppendNewMessages(div, messages) {
+    if (messages != '' && messages != null) { // Если есть сообщения, то добавляем их
+        $('#' + div).append(messages);
+        ScrollDivToBottom(div); // Прокрутим окно в самый низ
     }
 }
 
