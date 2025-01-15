@@ -1,12 +1,17 @@
-﻿using Data.Dto.Requests;
+﻿using Data.Dto;
+using Data.Dto.Requests;
 using Data.Dto.Responses;
 using Data.Dto.Views;
 using Data.Models.SignalR;
 using Data.Services;
 using Data.State;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
 using Shared.Components.Pages.Messages;
+using System.Text;
 
 namespace Shared.Components.Pages.Events
 {
@@ -18,9 +23,10 @@ namespace Shared.Components.Pages.Events
         [Inject] IRepository<GetRegionsForEventsRequestDto, GetRegionsForEventsResponseDto> _repoGetRegions { get; set; } = null!;
         [Inject] IRepository<GetAdminsForEventsRequestDto, GetAdminsForEventsResponseDto> _repoGetAdmins { get; set; } = null!;
         [Inject] IJSProcessor _JSProcessor { get; set; } = null!;
+        [Inject] IServiceProvider _serviceProvider { get; set; } = null!;
 
         GetSchedulesRequestDto request = new GetSchedulesRequestDto { IsPhotosIncluded = true };
-        List<SchedulesForEventsViewDto> SchedulesList = new List<SchedulesForEventsViewDto>();
+        List<SchedulesForEventsViewDto> schedules = new List<SchedulesForEventsViewDto>();
 
         /// <summary>
         /// Для предотвращения повторного выполнения OnParametersSet (выполняется при переходе на другую ссылку)
@@ -59,16 +65,16 @@ namespace Shared.Components.Pages.Events
             {
                 _dotNetReference = DotNetObjectReference.Create(this);
                 jsModule = await _JSRuntime.InvokeAsync<IJSObjectReference>("import", $"{CurrentState.WebUrl}/js/Pages/Events/EventsScroll.js");
-                await jsModule.InvokeVoidAsync("SetScrollEvent", "Body", _dotNetReference);
+                await jsModule.InvokeVoidAsync("SetScrollEvent", "Scroll", _dotNetReference);
 
                 OnScheduleChangedHandler = OnScheduleChangedHandler.SignalRClient(CurrentState, (Func<OnScheduleChangedResponse, Task>)(async (response) =>
                 {
                     if (response.UpdatedSchedule != null)
                     {
                         // Есть ли в области видимости браузера такое расписание?
-                        var index = SchedulesList.FindIndex(i => i.Id == response.UpdatedSchedule.Id);
+                        var index = schedules.FindIndex(i => i.Id == response.UpdatedSchedule.Id);
                         if (index >= 0)
-                            SchedulesList[index] = response.UpdatedSchedule;
+                            schedules[index] = response.UpdatedSchedule;
 
                         await InvokeAsync(StateHasChanged);
                     }
@@ -77,11 +83,44 @@ namespace Shared.Components.Pages.Events
         }
 
 
-        async Task MoreSchedulesAsync()
+        [JSInvokable]
+        public async Task<string> GetNextSchedules()
         {
-            request.Skip = ++currentPage * currentPageSize;
-            await LoadSchedulesAsync(false);
+            var apiResponse = await _repoGetSchedules.HttpPostAsync(request);
+            schedules.AddRange(apiResponse.Response.Schedules ?? new List<SchedulesForEventsViewDto>());
+
+            // Ручная генерация компонентов событий
+            return await RenderSchedules(apiResponse.Response.Schedules);
+
+            //IsNotFoundVisible = SchedulesList.Count == 0 ? true : false;
+            //request.Skip = ++currentPage * currentPageSize;
+            //await LoadSchedulesAsync(false);
         }
+
+
+        /// <summary>
+        /// Ручная генерация компонента Schedule
+        /// </summary>
+        async Task<string> RenderSchedules(List<SchedulesForEventsViewDto> schedules)
+        {
+            await using var htmlRenderer = new HtmlRenderer(_serviceProvider, _serviceProvider.GetRequiredService<ILoggerFactory>());
+            var html = new StringBuilder(5000);
+            foreach (var schedule in schedules)
+            {
+                html.Append(await htmlRenderer.Dispatcher.InvokeAsync(async () =>
+                {
+                    var dictionary = new Dictionary<string, object?>
+                    {
+                        { "CurrentState", CurrentState },
+                        { "schedule", schedule }
+                    };
+                    var output = await htmlRenderer.RenderComponentAsync<OneSchedule>(ParameterView.FromDictionary(dictionary));
+                    return output.ToHtmlString();
+                }));
+            }
+            return html.ToString();
+        }
+
 
         async Task LoadSchedulesAsync(bool toResetOffset = true)
         {
@@ -95,8 +134,8 @@ namespace Shared.Components.Pages.Events
             }
 
             var apiResponse = await _repoGetSchedules.HttpPostAsync(request);
-            SchedulesList.AddRange(apiResponse.Response.Schedules ?? new List<SchedulesForEventsViewDto>());
-            IsNotFoundVisible = SchedulesList.Count == 0 ? true : false;
+            schedules.AddRange(apiResponse.Response.Schedules ?? new List<SchedulesForEventsViewDto>());
+            IsNotFoundVisible = schedules.Count == 0 ? true : false;
         }
 
         public void Dispose()

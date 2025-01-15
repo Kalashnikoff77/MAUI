@@ -10,7 +10,7 @@ namespace Shared.Components.Pages.Events
         async Task OnSearch(string text)
         {
             request.FilterFreeText = text;
-            SchedulesList.Clear();
+            schedules.Clear();
             await LoadSchedulesAsync();
         }
         #endregion
@@ -31,7 +31,7 @@ namespace Shared.Components.Pages.Events
                 .Select(s => s.Id)
                 .Distinct();
 
-            SchedulesList.Clear();
+            schedules.Clear();
             await LoadSchedulesAsync();
         }
 
@@ -83,7 +83,7 @@ namespace Shared.Components.Pages.Events
                 .Select(s => s.Id)
                 .Distinct();
 
-            SchedulesList.Clear();
+            schedules.Clear();
             await LoadSchedulesAsync();
         }
 
@@ -135,7 +135,7 @@ namespace Shared.Components.Pages.Events
                 .Select(s => s.Id)
                 .Distinct();
 
-            SchedulesList.Clear();
+            schedules.Clear();
             await LoadSchedulesAsync();
         }
 
@@ -195,7 +195,7 @@ namespace Shared.Components.Pages.Events
             Filters.SelectedRegions = null;
             request.RegionsIds = null;
 
-            SchedulesList.Clear();
+            schedules.Clear();
             await LoadSchedulesAsync();
         }
         #endregion
