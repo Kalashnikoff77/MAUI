@@ -26,7 +26,9 @@ namespace Shared.Components.Pages.Messages
         [CascadingParameter] public CurrentState CurrentState { get; set; } = null!;
         [Inject] IJSProcessor _JSProcessor { get; set; } = null!;
         [Inject] IRepository<GetMessagesRequestDto, GetMessagesResponseDto> _repoGetMessages { get; set; } = null!;
-        [Inject] IServiceProvider serviceProvider { get; set; } = null!;
+        [Inject] IServiceProvider _serviceProvider { get; set; } = null!;
+
+        DotNetObjectReference<DivMessagesFrame> _objectReference { get; set; } = null!;
 
         IDisposable? OnMessagesReloadHandler;
 
@@ -41,7 +43,10 @@ namespace Shared.Components.Pages.Messages
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             if (firstRender)
-                await _JSProcessor.SetScrollEvent("DivMessagesFrame", DotNetObjectReference.Create(this));
+            {
+                _objectReference = DotNetObjectReference.Create(this);
+                await _JSProcessor.SetScrollEvent("DivMessagesFrame", _objectReference);
+            }
         }
 
 
@@ -87,7 +92,7 @@ namespace Shared.Components.Pages.Messages
         /// </summary>
         async Task<string> RenderMessages(List<MessagesDto> messages)
         {
-            await using var htmlRenderer = new HtmlRenderer(serviceProvider, serviceProvider.GetRequiredService<ILoggerFactory>());
+            await using var htmlRenderer = new HtmlRenderer(_serviceProvider, _serviceProvider.GetRequiredService<ILoggerFactory>());
             var html = new StringBuilder(5000);
             foreach (var message in messages)
             {
@@ -105,7 +110,10 @@ namespace Shared.Components.Pages.Messages
             return html.ToString();
         }
 
-        public void Dispose() =>
+        public void Dispose()
+        {
             OnMessagesReloadHandler?.Dispose();
+            _objectReference.Dispose();
+        }
     }
 }
