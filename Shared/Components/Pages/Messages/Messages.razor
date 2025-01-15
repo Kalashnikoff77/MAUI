@@ -4,12 +4,15 @@
 
 @if (CurrentState.Account != null) 
 {
-    <div id="top" class="d-flex flex-column ml-sx-0 ml-sm-3" Style="min-width:300px; max-width:750px">
+    <div class="scroll d-flex flex-column justify-start ml-sx-0 ml-sm-3 pr-sx-0 pr-sm-2" Style="min-width:300px; height:100%">
 
         <MudText Align="Align.Left" Typo="Typo.h6" Class="mb-3">Общение</MudText>
 
-        <MudTextField Placeholder="Поиск" T="string" ValueChanged="@(s => OnSearch(s))" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Clearable Class="mb-4" />
-
+        @* Блок div закрывает косяк MudTextField *@
+        <div>
+            <MudTextField Placeholder="Поиск" T="string" ValueChanged="@(s => OnSearch(s))" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Clearable Class="mb-4" />
+        </div>
+        
         <MudSimpleTable Hover Striped Elevation="0">
             <tbody>
                 @foreach (var message in LastMessagesList)

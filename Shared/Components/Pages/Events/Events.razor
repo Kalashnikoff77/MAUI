@@ -2,7 +2,7 @@
 
 <PageTitle>Клубы и мероприятия</PageTitle>
 
-<div id="top" class="d-flex flex-column ml-sx-0 ml-sm-3" style="min-width:300px; max-width:750px; overflow:auto">
+<div class="scroll d-flex flex-column ml-sx-0 ml-sm-3 pr-sx-0 pr-sm-2" style="min-width:300px; height:100%">
 
     <div class="d-flex gap-0 align-center justify-space-between mb-5">
         <MudText Typo="Typo.h6" Class="mr-2">Клубы и мероприятия</MudText>
@@ -13,7 +13,7 @@
     </div>
 
     @* Фильтры запроса *@
-    <MudGrid Style="min-width:300px" Class="mb-4">
+    <MudGrid Class="mb-4">
         <MudItem xs="12">
             <MudTextField Placeholder="Поиск" T="string" ValueChanged="@(s => OnSearch(s))" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Clearable />
         </MudItem>
@@ -70,31 +70,5 @@
             </tbody>
         </MudSimpleTable>
     }
+
 </div>
-
-@* <script>
-    var _dotNetObject;
-
-    // Бесконечная лента прокрутки
-    async function SetScrollEvent(div, dotNetObject) {
-        _dotNetObject = dotNetObject; // Сохраним ссылку на C#
-        //var result = await _dotNetObject.invokeMethodAsync('GetPreviousMessages'); // Получим сообщения
-        // $('#' + div).prepend(result); // Добавим полученные сообщения в окно
-        console.log($('#' + div));
-        $('#' + div).on('scroll', DivScroller); // Установим обработчик события прокрутки
-    }
-
-    // Обработчик события прокрутки
-    async function DivScroller(event) {
-        console.log(event);
-        var div = event.target.id; // Получим id блока
-        if (document.getElementById(div).scrollTop < 250) {
-            // $('#' + div).off('scroll'); // Временно отключим обработчик
-            // var result = await _dotNetObject.invokeMethodAsync('GetPreviousMessages'); // Получим новые сообщения
-            // if (result != '') { // Если ещё есть сообщения, то добавляем их и включаем обработчик снова
-            //     $('#' + div).prepend(result).on('scroll', DivScroller);
-            // }
-        }
-    }
-</script> *@
-

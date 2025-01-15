@@ -1,4 +1,10 @@
-﻿.IsHidden {
+﻿.scroll {
+    overflow-y: scroll;
+    overflow-x: hidden;
+    scrollbar-color: #f2f2f2 transparent;
+}
+
+.IsHidden {
     display: none;
 }
 
