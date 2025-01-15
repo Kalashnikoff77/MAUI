@@ -6,6 +6,7 @@ using Data.Services;
 using Data.State;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using Shared.Components.Pages.Messages;
 
 namespace Shared.Components.Pages.Events
 {
@@ -32,6 +33,10 @@ namespace Shared.Components.Pages.Events
         const int currentPageSize = 10;
         bool IsNotFoundVisible = false;
 
+        [Inject] IJSRuntime _JSRuntime { get; set; } = null!;
+        DotNetObjectReference<Events> _dotNetReference { get; set; } = null!;
+        IJSObjectReference jsModule { get; set; } = null!;
+
         IDisposable? OnScheduleChangedHandler;
 
         protected override async Task OnInitializedAsync()
@@ -52,7 +57,9 @@ namespace Shared.Components.Pages.Events
         {
             if (firstRender)
             {
-                await _JSProcessor.SetScrollEvent("Body", DotNetObjectReference.Create(this));
+                _dotNetReference = DotNetObjectReference.Create(this);
+                jsModule = await _JSRuntime.InvokeAsync<IJSObjectReference>("import", "./js/Pages/Events/EventsScroll.js");
+                await jsModule.InvokeVoidAsync("SetScrollEvent", "Body", _dotNetReference);
 
                 OnScheduleChangedHandler = OnScheduleChangedHandler.SignalRClient(CurrentState, (Func<OnScheduleChangedResponse, Task>)(async (response) =>
                 {
@@ -92,7 +99,10 @@ namespace Shared.Components.Pages.Events
             IsNotFoundVisible = SchedulesList.Count == 0 ? true : false;
         }
 
-        public void Dispose() =>
+        public void Dispose()
+        {
             OnScheduleChangedHandler?.Dispose();
+            _dotNetReference?.Dispose();
+        }
     }
 }

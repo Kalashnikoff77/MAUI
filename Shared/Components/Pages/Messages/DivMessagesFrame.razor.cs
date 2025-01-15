@@ -24,11 +24,13 @@ namespace Shared.Components.Pages.Messages
         [Parameter, Required] public AccountsViewDto Account { get; set; } = null!;
 
         [CascadingParameter] public CurrentState CurrentState { get; set; } = null!;
-        [Inject] IJSProcessor _JSProcessor { get; set; } = null!;
+        
         [Inject] IRepository<GetMessagesRequestDto, GetMessagesResponseDto> _repoGetMessages { get; set; } = null!;
         [Inject] IServiceProvider _serviceProvider { get; set; } = null!;
 
-        DotNetObjectReference<DivMessagesFrame> _objectReference { get; set; } = null!;
+        [Inject] IJSRuntime _JSRuntime { get; set; } = null!;
+        DotNetObjectReference<DivMessagesFrame> _dotNetReference { get; set; } = null!;
+        IJSObjectReference jsModule { get; set; } = null!;
 
         IDisposable? OnMessagesReloadHandler;
 
@@ -37,15 +39,16 @@ namespace Shared.Components.Pages.Messages
         protected override void OnParametersSet()
         {
             OnMessagesReloadHandler = OnMessagesReloadHandler.SignalRClient<OnMessagesReloadResponse>(CurrentState, async (response) =>
-                await _JSProcessor.AppendNewMessages("DivMessagesFrame", await GetNextMessages()));
+                await jsModule.InvokeVoidAsync("AppendNewMessages", "DivMessagesFrame", await GetNextMessages()));
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             if (firstRender)
             {
-                _objectReference = DotNetObjectReference.Create(this);
-                await _JSProcessor.SetScrollEvent("DivMessagesFrame", _objectReference);
+                _dotNetReference = DotNetObjectReference.Create(this);
+                jsModule = await _JSRuntime.InvokeAsync<IJSObjectReference>("import", "./js/Pages/Messages/MessagesScroll.js");
+                await jsModule.InvokeVoidAsync("SetScrollEvent", "DivMessagesFrame", _dotNetReference);
             }
         }
 
@@ -113,7 +116,7 @@ namespace Shared.Components.Pages.Messages
         public void Dispose()
         {
             OnMessagesReloadHandler?.Dispose();
-            _objectReference.Dispose();
+            _dotNetReference?.Dispose();
         }
     }
 }

@@ -7,12 +7,23 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Data\Data.csproj" />
-    <ProjectReference Include="..\Shared\Shared.csproj" />
+    <Content Remove="wwwroot\js\DivMessagesFrame.js" />
+    <Content Remove="wwwroot\js\Pages\Events\EventsScroll.js" />
+    <Content Remove="wwwroot\js\Pages\Messages\MessagesScroll.js" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\" />
+    <None Include="wwwroot\js\Pages\Events\EventsScroll.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\js\Pages\Messages\MessagesScroll.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Data\Data.csproj" />
+    <ProjectReference Include="..\Shared\Shared.csproj" />
   </ItemGroup>
 
 </Project>
