@@ -7,7 +7,3 @@
 .IsHidden {
     display: none;
 }
-
-.dataGridHideTHead {
-    display: none !important;
-}
