@@ -1,4 +1,5 @@
-﻿using Microsoft.JSInterop;
+﻿using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 
 namespace Data.Services
 {
@@ -19,6 +20,11 @@ namespace Data.Services
         /// <param name="number">Выводимое число</param>
         /// <param name="isShowZero">Показывать ли ноль</param>
         Task ChangeNumberInButtonsFadeInOut(string tagClass, int? number);
+
+        /// <summary>
+        /// Сохранение dotNetObjectReference (ссылки на экземпляр класса в C#) в переменной JS
+        /// </summary>
+        Task SetDotNetReference<T>(DotNetObjectReference<T> dotNetObjectReference) where T : class, IComponent;
 
         Task Redirect(string url);
 

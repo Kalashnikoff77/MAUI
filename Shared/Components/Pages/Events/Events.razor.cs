@@ -11,7 +11,7 @@ using System.Text;
 
 namespace Shared.Components.Pages.Events
 {
-    public partial class Events : IAsyncDisposable
+    public partial class Events : IDisposable
     {
         [CascadingParameter] public CurrentState CurrentState { get; set; } = null!;
         [Inject] IRepository<GetSchedulesRequestDto, GetSchedulesResponseDto> _repoGetSchedules { get; set; } = null!;
@@ -19,25 +19,17 @@ namespace Shared.Components.Pages.Events
         [Inject] IRepository<GetRegionsForEventsRequestDto, GetRegionsForEventsResponseDto> _repoGetRegions { get; set; } = null!;
         [Inject] IRepository<GetAdminsForEventsRequestDto, GetAdminsForEventsResponseDto> _repoGetAdmins { get; set; } = null!;
         [Inject] ShowDialogs ShowDialogs { get; set; } = null!;
+        [Inject] IJSProcessor _JSProcessor { get; set; } = null!;
         [Inject] IJSRuntime _JSRuntime { get; set; } = null!;
         [Inject] IComponentRenderer<OneSchedule> _renderer { get; set; } = null!;
 
         GetSchedulesRequestDto request = new GetSchedulesRequestDto { IsPhotosIncluded = true };
         List<SchedulesForEventsViewDto> schedules = new List<SchedulesForEventsViewDto>();
 
-        /// <summary>
-        /// Для предотвращения повторного выполнения OnParametersSet (выполняется при переходе на другую ссылку)
-        /// </summary>
-        protected bool isFirstSetParameters = true;
-
-        // Текущая отображаемая страница с мероприятиями
-        int currentPage = 0;
-        // Текущее кол-во отображаемых мероприятий на странице
-        const int currentPageSize = 10;
         bool IsNotFoundVisible = false;
 
         DotNetObjectReference<Events> _dotNetReference { get; set; } = null!;
-        IJSObjectReference _jsModule { get; set; } = null!;
+        IJSObjectReference _JSModule { get; set; } = null!;
 
         IDisposable? OnScheduleChangedHandler;
 
@@ -60,9 +52,9 @@ namespace Shared.Components.Pages.Events
             if (firstRender)
             {
                 _dotNetReference = DotNetObjectReference.Create(this);
-                _jsModule = await _JSRuntime.InvokeAsync<IJSObjectReference>("import", $"{CurrentState.WebUrl}/js/Pages/Events/EventsScroll.js");
-                await _jsModule.InvokeVoidAsync("SetScrollEvent", "Scroll", _dotNetReference);
-                await _JSRuntime.InvokeVoidAsync("SetDotNetReference", _dotNetReference);
+                _JSModule = await _JSRuntime.InvokeAsync<IJSObjectReference>("import", $"{CurrentState.WebUrl}/js/Pages/Events/EventsScroll.js");
+                await _JSModule.InvokeVoidAsync("SetScrollEvent", "Scroll", _dotNetReference);
+                await _JSProcessor.SetDotNetReference(_dotNetReference);
 
                 OnScheduleChangedHandler = OnScheduleChangedHandler.SignalRClient(CurrentState, (Func<OnScheduleChangedResponse, Task>)(async (response) =>
                 {
@@ -127,9 +119,9 @@ namespace Shared.Components.Pages.Events
 
             if (toResetOffset)
             {
-                currentPage = 0;
-                request.Skip = currentPage * currentPageSize;
-                request.Take = currentPageSize;
+                //currentPage = 0;
+                //request.Skip = currentPage * currentPageSize;
+                //request.Take = currentPageSize;
             }
 
             var apiResponse = await _repoGetSchedules.HttpPostAsync(request);
@@ -137,12 +129,12 @@ namespace Shared.Components.Pages.Events
             IsNotFoundVisible = schedules.Count == 0 ? true : false;
         }
 
-        public async ValueTask DisposeAsync()
+        public void Dispose()
         {
             OnScheduleChangedHandler?.Dispose();
+            //if (_jsModule != null)
+            //    await _jsModule.DisposeAsync();
             _dotNetReference?.Dispose();
-            if (_jsModule != null)
-                await _jsModule.DisposeAsync();
         }
     }
 }

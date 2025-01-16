@@ -23,11 +23,12 @@ namespace Shared.Components.Pages.Messages
         [CascadingParameter] public CurrentState CurrentState { get; set; } = null!;
         
         [Inject] IRepository<GetMessagesRequestDto, GetMessagesResponseDto> _repoGetMessages { get; set; } = null!;
+        [Inject] IJSProcessor _JSProcessor { get; set; } = null!;
         [Inject] IJSRuntime _JSRuntime { get; set; } = null!;
         [Inject] IComponentRenderer<OneMessage> _renderer { get; set; } = null!;
 
         DotNetObjectReference<DivMessagesFrame> _dotNetReference { get; set; } = null!;
-        IJSObjectReference jsModule { get; set; } = null!;
+        IJSObjectReference _JSModule { get; set; } = null!;
 
         IDisposable? OnMessagesReloadHandler;
 
@@ -36,7 +37,7 @@ namespace Shared.Components.Pages.Messages
         protected override void OnParametersSet()
         {
             OnMessagesReloadHandler = OnMessagesReloadHandler.SignalRClient<OnMessagesReloadResponse>(CurrentState, async (response) =>
-                await jsModule.InvokeVoidAsync("AppendNewMessages", "DivMessagesFrame", await GetNextMessages()));
+                await _JSModule.InvokeVoidAsync("AppendNewMessages", "DivMessagesFrame", await GetNextMessages()));
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -44,8 +45,9 @@ namespace Shared.Components.Pages.Messages
             if (firstRender)
             {
                 _dotNetReference = DotNetObjectReference.Create(this);
-                jsModule = await _JSRuntime.InvokeAsync<IJSObjectReference>("import", "./js/Pages/Messages/MessagesScroll.js");
-                await jsModule.InvokeVoidAsync("SetScrollEvent", "DivMessagesFrame", _dotNetReference);
+                _JSModule = await _JSRuntime.InvokeAsync<IJSObjectReference>("import", "./js/Pages/Messages/MessagesScroll.js");
+                await _JSModule.InvokeVoidAsync("SetScrollEvent", "DivMessagesFrame", _dotNetReference);
+                await _JSProcessor.SetDotNetReference(_dotNetReference);
             }
         }
 
