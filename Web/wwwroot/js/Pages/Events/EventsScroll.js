@@ -1,9 +1,8 @@
-var _dotNetObject;
+var _dotNetReference;
 
-export async function SetScrollEvent(div, dotNetObject) {
-    _dotNetObject = dotNetObject; // Сохраним ссылку на C#
-    var result = await _dotNetObject.invokeMethodAsync('GetNextSchedules'); // Получим сообщения
-    console.log(result);
+export async function SetScrollEvent(div, dotNetReference) {
+    _dotNetReference = dotNetReference; // Сохраним ссылку на C#
+    var result = await _dotNetReference.invokeMethodAsync('GetNextSchedules'); // Получим сообщения
     $('#' + div).append(result); // Добавим полученные сообщения в окно
     $('#' + div).on('scroll', ScrollEvent); // Установим обработчик события прокрутки
 }

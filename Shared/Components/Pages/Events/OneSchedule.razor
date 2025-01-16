@@ -1,5 +1,6 @@
 ﻿<tr>
-    <td style="cursor:pointer" @onclick="() => ShowDialogs.ScheduleInfoCardDialogAsync(Schedule)">
+    <td style="cursor:pointer" onclick="DotNet.invokeMethodAsync('Shared', 'SuperTest', parseInt(@Schedule.Id))">
+    @* <td style="cursor:pointer" @onclick="() => ShowDialogs.ScheduleInfoCardDialogAsync(Schedule)"> *@
         <MudStack Wrap="Wrap.NoWrap" Class="flex-sm-row" StretchItems="StretchItems.Middle" Spacing="1" AlignItems="AlignItems.Center">
             <ImageEvent Event="Schedule.Event" Size="EnumImageSize.s150x150" Title="@Schedule.Event!.Name" Class="d-none d-sm-block mr-2" Style="border-radius:3%; border:solid; border-width:1px; border-color:lightgray; width:140px; height:140px" />
             <ImageEvent Event="Schedule.Event" Size="EnumImageSize.s150x150" Title="@Schedule.Event.Name" Class="d-xs-block d-sm-none" Style="border-radius:4%; border:solid; border-width:1px; border-color:lightgray; width:210px; height:210px" />

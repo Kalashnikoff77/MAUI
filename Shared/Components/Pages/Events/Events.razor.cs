@@ -1,5 +1,4 @@
-﻿using Data.Dto;
-using Data.Dto.Requests;
+﻿using Data.Dto.Requests;
 using Data.Dto.Responses;
 using Data.Dto.Views;
 using Data.Models.SignalR;
@@ -10,7 +9,7 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
-using Shared.Components.Pages.Messages;
+using Shared.Components.Dialogs;
 using System.Text;
 
 namespace Shared.Components.Pages.Events
@@ -82,7 +81,6 @@ namespace Shared.Components.Pages.Events
             }
         }
 
-
         [JSInvokable]
         public async Task<string> GetNextSchedules()
         {
@@ -95,6 +93,16 @@ namespace Shared.Components.Pages.Events
             //IsNotFoundVisible = SchedulesList.Count == 0 ? true : false;
             //request.Skip = ++currentPage * currentPageSize;
             //await LoadSchedulesAsync(false);
+        }
+
+
+        [JSInvokable]
+        public static Task SuperTest(int scheduleId)
+        {
+            //var schedule = schedules.Find(x => x.Id == scheduleId);
+            //ShowDialogs.ScheduleInfoCardDialogAsync(schedule);
+
+            return Task.CompletedTask;
         }
 
 
@@ -111,8 +119,7 @@ namespace Shared.Components.Pages.Events
                 {
                     var dictionary = new Dictionary<string, object?>
                     {
-                        { "CurrentState", CurrentState },
-                        { "schedule", schedule }
+                        { "Schedule", schedule }
                     };
                     var output = await htmlRenderer.RenderComponentAsync<OneSchedule>(ParameterView.FromDictionary(dictionary));
                     return output.ToHtmlString();

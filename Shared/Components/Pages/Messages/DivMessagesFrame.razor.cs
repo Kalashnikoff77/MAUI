@@ -104,7 +104,7 @@ namespace Shared.Components.Pages.Messages
                     var dictionary = new Dictionary<string, object?>
                     {
                         { "CurrentState", CurrentState },
-                        { "message", message }
+                        { "Message", message }
                     };
                     var output = await htmlRenderer.RenderComponentAsync<OneMessage>(ParameterView.FromDictionary(dictionary));
                     return output.ToHtmlString();
