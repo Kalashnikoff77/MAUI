@@ -13,6 +13,7 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
 builder.Services.AddScoped(typeof(IRepository<,>), typeof(Repository<,>));
+builder.Services.AddScoped(typeof(IComponentRenderer<>), typeof(ComponentRenderer<>));
 builder.Services.AddScoped<IJSProcessor, JSProcessor>();
 builder.Services.AddScoped<IFormFactor, FormFactor>();
 builder.Services.AddScoped<ShowDialogs>();

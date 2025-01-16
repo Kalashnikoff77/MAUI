@@ -5,24 +5,22 @@ using Data.Models.SignalR;
 using Data.Services;
 using Data.State;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
 using Shared.Components.Dialogs;
 using System.Text;
 
 namespace Shared.Components.Pages.Events
 {
-    public partial class Events : IDisposable
+    public partial class Events : IAsyncDisposable
     {
         [CascadingParameter] public CurrentState CurrentState { get; set; } = null!;
         [Inject] IRepository<GetSchedulesRequestDto, GetSchedulesResponseDto> _repoGetSchedules { get; set; } = null!;
         [Inject] IRepository<GetFeaturesForEventsRequestDto, GetFeaturesForEventsResponseDto> _repoGetFeatures { get; set; } = null!;
         [Inject] IRepository<GetRegionsForEventsRequestDto, GetRegionsForEventsResponseDto> _repoGetRegions { get; set; } = null!;
         [Inject] IRepository<GetAdminsForEventsRequestDto, GetAdminsForEventsResponseDto> _repoGetAdmins { get; set; } = null!;
-        [Inject] IJSProcessor _JSProcessor { get; set; } = null!;
-        [Inject] IServiceProvider _serviceProvider { get; set; } = null!;
+        [Inject] ShowDialogs ShowDialogs { get; set; } = null!;
+        [Inject] IJSRuntime _JSRuntime { get; set; } = null!;
+        [Inject] IComponentRenderer<OneSchedule> _renderer { get; set; } = null!;
 
         GetSchedulesRequestDto request = new GetSchedulesRequestDto { IsPhotosIncluded = true };
         List<SchedulesForEventsViewDto> schedules = new List<SchedulesForEventsViewDto>();
@@ -38,9 +36,8 @@ namespace Shared.Components.Pages.Events
         const int currentPageSize = 10;
         bool IsNotFoundVisible = false;
 
-        [Inject] IJSRuntime _JSRuntime { get; set; } = null!;
         DotNetObjectReference<Events> _dotNetReference { get; set; } = null!;
-        IJSObjectReference jsModule { get; set; } = null!;
+        IJSObjectReference _jsModule { get; set; } = null!;
 
         IDisposable? OnScheduleChangedHandler;
 
@@ -63,8 +60,9 @@ namespace Shared.Components.Pages.Events
             if (firstRender)
             {
                 _dotNetReference = DotNetObjectReference.Create(this);
-                jsModule = await _JSRuntime.InvokeAsync<IJSObjectReference>("import", $"{CurrentState.WebUrl}/js/Pages/Events/EventsScroll.js");
-                await jsModule.InvokeVoidAsync("SetScrollEvent", "Scroll", _dotNetReference);
+                _jsModule = await _JSRuntime.InvokeAsync<IJSObjectReference>("import", $"{CurrentState.WebUrl}/js/Pages/Events/EventsScroll.js");
+                await _jsModule.InvokeVoidAsync("SetScrollEvent", "Scroll", _dotNetReference);
+                await _JSRuntime.InvokeVoidAsync("SetDotNetReference", _dotNetReference);
 
                 OnScheduleChangedHandler = OnScheduleChangedHandler.SignalRClient(CurrentState, (Func<OnScheduleChangedResponse, Task>)(async (response) =>
                 {
@@ -88,44 +86,38 @@ namespace Shared.Components.Pages.Events
             schedules.AddRange(apiResponse.Response.Schedules ?? new List<SchedulesForEventsViewDto>());
 
             // Ручная генерация компонентов событий
-            return await RenderSchedules(apiResponse.Response.Schedules);
+            return await RenderSchedules(apiResponse.Response.Schedules!);
+        }
 
-            //IsNotFoundVisible = SchedulesList.Count == 0 ? true : false;
-            //request.Skip = ++currentPage * currentPageSize;
-            //await LoadSchedulesAsync(false);
+        /// <summary>
+        /// Ручная генерация компонентов Schedules
+        /// </summary>
+        async Task<string> RenderSchedules(List<SchedulesForEventsViewDto> schedules)
+        {
+            var html = new StringBuilder(5000);
+
+            foreach (var schedule in schedules)
+                html.Append(await _renderer.RenderAsync(new Dictionary<string, object?> { { "Schedule", schedule } }));
+
+            return html.ToString();
         }
 
 
         [JSInvokable]
-        public static Task SuperTest(int scheduleId)
+        public async Task ScheduleInfoCardDialog(int scheduleId)
         {
-            //var schedule = schedules.Find(x => x.Id == scheduleId);
-            //ShowDialogs.ScheduleInfoCardDialogAsync(schedule);
-
-            return Task.CompletedTask;
+            var schedule = schedules.Find(x => x.Id == scheduleId);
+            if (schedule != null)
+                await ShowDialogs.ScheduleInfoCardDialogAsync(schedule);
         }
 
 
-        /// <summary>
-        /// Ручная генерация компонента Schedule
-        /// </summary>
-        async Task<string> RenderSchedules(List<SchedulesForEventsViewDto> schedules)
+        [JSInvokable]
+        public async Task AccountInfoCardDialog(int scheduleId)
         {
-            await using var htmlRenderer = new HtmlRenderer(_serviceProvider, _serviceProvider.GetRequiredService<ILoggerFactory>());
-            var html = new StringBuilder(5000);
-            foreach (var schedule in schedules)
-            {
-                html.Append(await htmlRenderer.Dispatcher.InvokeAsync(async () =>
-                {
-                    var dictionary = new Dictionary<string, object?>
-                    {
-                        { "Schedule", schedule }
-                    };
-                    var output = await htmlRenderer.RenderComponentAsync<OneSchedule>(ParameterView.FromDictionary(dictionary));
-                    return output.ToHtmlString();
-                }));
-            }
-            return html.ToString();
+            var admin = schedules.Find(x => x.Id == scheduleId)?.Event?.Admin;
+            if (admin != null)
+                await ShowDialogs.AccountInfoCardDialogAsync(admin);
         }
 
 
@@ -145,10 +137,12 @@ namespace Shared.Components.Pages.Events
             IsNotFoundVisible = schedules.Count == 0 ? true : false;
         }
 
-        public void Dispose()
+        public async ValueTask DisposeAsync()
         {
             OnScheduleChangedHandler?.Dispose();
             _dotNetReference?.Dispose();
+            if (_jsModule != null)
+                await _jsModule.DisposeAsync();
         }
     }
 }

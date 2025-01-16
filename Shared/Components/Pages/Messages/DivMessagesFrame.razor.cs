@@ -7,9 +7,6 @@ using Data.Models.SignalR;
 using Data.Services;
 using Data.State;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
@@ -26,9 +23,9 @@ namespace Shared.Components.Pages.Messages
         [CascadingParameter] public CurrentState CurrentState { get; set; } = null!;
         
         [Inject] IRepository<GetMessagesRequestDto, GetMessagesResponseDto> _repoGetMessages { get; set; } = null!;
-        [Inject] IServiceProvider _serviceProvider { get; set; } = null!;
-
         [Inject] IJSRuntime _JSRuntime { get; set; } = null!;
+        [Inject] IComponentRenderer<OneMessage> _renderer { get; set; } = null!;
+
         DotNetObjectReference<DivMessagesFrame> _dotNetReference { get; set; } = null!;
         IJSObjectReference jsModule { get; set; } = null!;
 
@@ -95,21 +92,11 @@ namespace Shared.Components.Pages.Messages
         /// </summary>
         async Task<string> RenderMessages(List<MessagesDto> messages)
         {
-            await using var htmlRenderer = new HtmlRenderer(_serviceProvider, _serviceProvider.GetRequiredService<ILoggerFactory>());
             var html = new StringBuilder(5000);
+
             foreach (var message in messages)
-            {
-                html.Append(await htmlRenderer.Dispatcher.InvokeAsync(async () =>
-                {
-                    var dictionary = new Dictionary<string, object?>
-                    {
-                        { "CurrentState", CurrentState },
-                        { "Message", message }
-                    };
-                    var output = await htmlRenderer.RenderComponentAsync<OneMessage>(ParameterView.FromDictionary(dictionary));
-                    return output.ToHtmlString();
-                }));
-            }
+                html.Append(await _renderer.RenderAsync(new Dictionary<string, object?> { { "CurrentState", CurrentState }, { "Message", message } }));
+
             return html.ToString();
         }
 
