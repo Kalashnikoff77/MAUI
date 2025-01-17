@@ -11,7 +11,7 @@ using System.Text;
 
 namespace Shared.Components.Pages.Events
 {
-    public partial class Events : IDisposable
+    public partial class Events : IAsyncDisposable
     {
         [CascadingParameter] public CurrentState CurrentState { get; set; } = null!;
         [Inject] IRepository<GetSchedulesRequestDto, GetSchedulesResponseDto> _repoGetSchedules { get; set; } = null!;
@@ -129,12 +129,19 @@ namespace Shared.Components.Pages.Events
             IsNotFoundVisible = schedules.Count == 0 ? true : false;
         }
 
-        public void Dispose()
+        public async ValueTask DisposeAsync()
         {
-            OnScheduleChangedHandler?.Dispose();
-            //if (_jsModule != null)
-            //    await _jsModule.DisposeAsync();
-            _dotNetReference?.Dispose();
+            try
+            {
+                OnScheduleChangedHandler?.Dispose();
+                if (_JSModule != null)
+                    await _JSModule.DisposeAsync();
+                _dotNetReference?.Dispose();
+            }
+            // Отлов ошибки, когда соединение SignalR разорвано, но производится попытка вызвать JS. Возникает при перезагрузке страницы (F5)
+            catch(JSDisconnectedException ex)
+            {
+            }
         }
     }
 }
