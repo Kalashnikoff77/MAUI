@@ -6,7 +6,7 @@
 {
     <PageTitle>Настройки профиля: @CurrentState.Account.Name</PageTitle>
 
-    <div class="d-flex flex-column ml-sx-0 ml-sm-3" Style="min-width:300px; max-width:750px">
+    <div class="d-flex flex-column pa-6" style="min-width:300px">
     
         <MudText Align="Align.Left" Typo="Typo.h6" Class="mb-3">Настройки профиля: @CurrentState.Account.Name</MudText>
         <MudDivider DividerType="DividerType.FullWidth" Light="false" Class="mb-5" />
@@ -28,29 +28,31 @@
         </MudExpansionPanels>
 
         @* КНОПКА СОХРАНЕНИЯ *@
-        @if (!string.IsNullOrEmpty(AccountRequestDto.ErrorMessage))
-        {
-            <MudAlert Severity="Severity.Error">@AccountRequestDto.ErrorMessage</MudAlert>
-        }
-
-        @if (_formFactor.GetFormFactor() == "Web") 
-        {
-            <MudCheckBox @bind-Value="AccountRequestDto.Remember" Disabled="!(IsPanel1Valid && IsPanel2Valid && IsPanel3Valid && IsPanel4Valid)" Color="Color.Primary">
-                <MudText Typo="Typo.body2">Запомнить меня</MudText>
-            </MudCheckBox>
-        }
-
-        <MudButton OnClick="SubmitAsync" StartIcon="@Icons.Material.Outlined.Save" Disabled="!(IsPanel1Valid && IsPanel2Valid && IsPanel3Valid && IsPanel4Valid && !ProcessingAccount)" Variant="Variant.Filled" Size="Size.Large" Color="Color.Primary" Style="margin:auto">
-            @if (ProcessingAccount)
+        <div class="d-flex flex-column align-center mt-5">
+            @if (!string.IsNullOrEmpty(AccountRequestDto.ErrorMessage))
             {
-                <MudProgressCircular Size="Size.Small" Style="margin:auto" Indeterminate="true" />
-                <MudText Class="ms-2">Сохраняем...</MudText>
+                <MudAlert Severity="Severity.Error">@AccountRequestDto.ErrorMessage</MudAlert>
             }
-            else
+
+            @if (_formFactor.GetFormFactor() == "Web") 
             {
-                <MudText>@(IsDataSaved ? "Изменения сохранены" : "Сохранить изменения")</MudText>
+                <MudCheckBox @bind-Value="AccountRequestDto.Remember" Disabled="!(IsPanel1Valid && IsPanel2Valid && IsPanel3Valid && IsPanel4Valid)" Color="Color.Primary">
+                    <MudText Typo="Typo.body2">Запомнить меня</MudText>
+                </MudCheckBox>
             }
-        </MudButton>
+
+            <MudButton OnClick="SubmitAsync" StartIcon="@Icons.Material.Outlined.Save" Disabled="!(IsPanel1Valid && IsPanel2Valid && IsPanel3Valid && IsPanel4Valid && !ProcessingAccount)" Variant="Variant.Filled" Size="Size.Large" Color="Color.Primary" Style="margin:auto">
+                @if (ProcessingAccount)
+                {
+                    <MudProgressCircular Size="Size.Small" Style="margin:auto" Indeterminate="true" />
+                    <MudText Class="ms-2">Сохраняем...</MudText>
+                }
+                else
+                {
+                    <MudText>@(IsDataSaved ? "Изменения сохранены" : "Сохранить изменения")</MudText>
+                }
+            </MudButton>
+        </div>
 
     </div>
 }

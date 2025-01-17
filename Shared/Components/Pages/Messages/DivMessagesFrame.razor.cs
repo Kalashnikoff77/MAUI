@@ -37,7 +37,7 @@ namespace Shared.Components.Pages.Messages
         protected override void OnParametersSet()
         {
             OnMessagesReloadHandler = OnMessagesReloadHandler.SignalRClient<OnMessagesReloadResponse>(CurrentState, async (response) =>
-                await _JSModule.InvokeVoidAsync("AppendNewMessages", "DivMessagesFrame", await GetNextMessages()));
+                await _JSModule.InvokeVoidAsync("AppendNewMessages", await GetNextMessages()));
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -46,7 +46,7 @@ namespace Shared.Components.Pages.Messages
             {
                 _dotNetReference = DotNetObjectReference.Create(this);
                 _JSModule = await _JSRuntime.InvokeAsync<IJSObjectReference>("import", "./js/Pages/Messages/MessagesScroll.js");
-                await _JSModule.InvokeVoidAsync("SetScrollEvent", "DivMessagesFrame", _dotNetReference);
+                await _JSModule.InvokeVoidAsync("SetScrollEvent", _dotNetReference);
                 await _JSProcessor.SetDotNetReference(_dotNetReference);
             }
         }
