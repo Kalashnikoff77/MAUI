@@ -95,24 +95,6 @@ namespace Shared.Components.Pages.Events
         }
 
 
-        [JSInvokable]
-        public async Task ScheduleInfoCardDialog(int scheduleId)
-        {
-            var schedule = schedules.Find(x => x.Id == scheduleId);
-            if (schedule != null)
-                await ShowDialogs.ScheduleInfoCardDialogAsync(schedule);
-        }
-
-
-        [JSInvokable]
-        public async Task AccountInfoCardDialog(int scheduleId)
-        {
-            var admin = schedules.Find(x => x.Id == scheduleId)?.Event?.Admin;
-            if (admin != null)
-                await ShowDialogs.AccountInfoCardDialogAsync(admin);
-        }
-
-
         async Task LoadSchedulesAsync(bool toResetOffset = true)
         {
             StateHasChanged();
@@ -127,6 +109,23 @@ namespace Shared.Components.Pages.Events
             var apiResponse = await _repoGetSchedules.HttpPostAsync(request);
             schedules.AddRange(apiResponse.Response.Schedules ?? new List<SchedulesForEventsViewDto>());
             IsNotFoundVisible = schedules.Count == 0 ? true : false;
+        }
+
+
+        [JSInvokable]
+        public async Task ScheduleInfoCardDialog(int scheduleId)
+        {
+            var schedule = schedules.Find(x => x.Id == scheduleId);
+            if (schedule != null)
+                await ShowDialogs.ScheduleInfoCardDialogAsync(schedule);
+        }
+
+        [JSInvokable]
+        public async Task AccountInfoCardDialog(int scheduleId)
+        {
+            var admin = schedules.Find(x => x.Id == scheduleId)?.Event?.Admin;
+            if (admin != null)
+                await ShowDialogs.AccountInfoCardDialogAsync(admin);
         }
 
         public async ValueTask DisposeAsync()
