@@ -1,6 +1,4 @@
-﻿using System.Text.Json;
-
-namespace Data.Dto.Requests
+﻿namespace Data.Dto.Requests
 {
     public class GetSchedulesRequestDto : RequestDtoBase
     {

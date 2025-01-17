@@ -1,6 +1,7 @@
 ﻿using Data.Dto.Requests;
 using Data.Dto.Responses;
 using Data.Dto.Views;
+using Data.Models;
 using Data.Models.SignalR;
 using Data.Services;
 using Data.State;
@@ -23,7 +24,7 @@ namespace Shared.Components.Pages.Events
         [Inject] IJSRuntime _JSRuntime { get; set; } = null!;
         [Inject] IComponentRenderer<OneSchedule> _renderer { get; set; } = null!;
 
-        GetSchedulesRequestDto request = new GetSchedulesRequestDto { IsPhotosIncluded = true };
+        GetSchedulesRequestDto request = new GetSchedulesRequestDto { IsPhotosIncluded = true, Take = StaticData.SCHEDULES_PER_BLOCK };
         List<SchedulesForEventsViewDto> schedules = new List<SchedulesForEventsViewDto>();
 
         bool IsNotFoundVisible = false;
@@ -75,22 +76,16 @@ namespace Shared.Components.Pages.Events
         public async Task<string> GetNextSchedules()
         {
             var apiResponse = await _repoGetSchedules.HttpPostAsync(request);
-            schedules.AddRange(apiResponse.Response.Schedules ?? new List<SchedulesForEventsViewDto>());
+            request.Skip = request.Skip + StaticData.SCHEDULES_PER_BLOCK;
 
-            // Ручная генерация компонентов событий
-            return await RenderSchedules(apiResponse.Response.Schedules!);
-        }
-
-        /// <summary>
-        /// Ручная генерация компонентов Schedules
-        /// </summary>
-        async Task<string> RenderSchedules(List<SchedulesForEventsViewDto> schedules)
-        {
             var html = new StringBuilder(5000);
-
-            foreach (var schedule in schedules)
-                html.Append(await _renderer.RenderAsync(new Dictionary<string, object?> { { "Schedule", schedule } }));
-
+            if (apiResponse.Response.Schedules != null)
+            {
+                schedules.AddRange(apiResponse.Response.Schedules);
+                // Ручная генерация компонентов мероприятий
+                foreach (var schedule in apiResponse.Response.Schedules)
+                    html.Append(await _renderer.RenderAsync(new Dictionary<string, object?> { { "Schedule", schedule } }));
+            }
             return html.ToString();
         }
 

@@ -46,9 +46,6 @@ namespace WebAPI.Controllers
         {
             var response = new GetSchedulesResponseDto();
 
-            var data = _unitOfWork.CacheTryGet(request, response, StaticData.CachePrefixEvents);
-            if (data == null)
-            {
                 var columns = GetRequiredColumns<SchedulesForEventsViewEntity>();
 
                 // Получить одно расписание определённого мероприятия
@@ -61,10 +58,28 @@ namespace WebAPI.Controllers
                 else
                     await request.GetFilteredSchedulesForEventAsync(_unitOfWork, columns, response);
 
-                _unitOfWork.CacheSet(request, response, StaticData.CachePrefixEvents);
-            }
-            else
-                response = data;
+                return response;
+
+
+            //var data = _unitOfWork.CacheTryGet(request, response, StaticData.CachePrefixEvents);
+            //if (data == null)
+            //{
+            //    var columns = GetRequiredColumns<SchedulesForEventsViewEntity>();
+
+            //    // Получить одно расписание определённого мероприятия
+            //    if (request.ScheduleId.HasValue && request.ScheduleId > 0)
+            //        await request.GetOneScheduleForEventAsync(_unitOfWork, columns, response);
+            //    // Получить все расписания определённого мероприятия
+            //    else if (request.EventId.HasValue && request.EventId > 0)
+            //        await request.GetAllSchedulesForEventAsync(_unitOfWork, columns, response);
+            //    // Получить несколько расписаний разных мероприятий (по фильтрам) (кэшируется)
+            //    else
+            //        await request.GetFilteredSchedulesForEventAsync(_unitOfWork, columns, response);
+
+            //    _unitOfWork.CacheSet(request, response, StaticData.CachePrefixEvents);
+            //}
+            //else
+            //    response = data;
 
             return response;
         }

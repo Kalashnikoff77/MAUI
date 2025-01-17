@@ -37,8 +37,8 @@ namespace WebAPI.Extensions
             var jsonRequest = JsonSerializer.Serialize(request);
             // Сперва получим Id записей, которые нужно вытянуть + кол-во этих записей.
             var p = new DynamicParameters();
-            p.Add("@GetEventsRequestDto", jsonRequest);
-            var ids = await unitOfWork.SqlConnection.QueryAsync<int>("EventsFilter_sp", p, commandType: System.Data.CommandType.StoredProcedure);
+            p.Add("@GetSchedulesRequestDto", jsonRequest);
+            var ids = await unitOfWork.SqlConnection.QueryAsync<int>("SchedulesFilter_sp", p, commandType: System.Data.CommandType.StoredProcedure);
             response.Count = ids.Count();
 
             if (response.Count > 0)
