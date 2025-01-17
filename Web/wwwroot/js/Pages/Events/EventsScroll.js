@@ -1,6 +1,6 @@
 var _dotNetReference;
 
-export async function SetScrollEvent(div, dotNetReference) {
+export async function SetScrollEvent(dotNetReference) {
     _dotNetReference = dotNetReference; // Сохраним ссылку на C#
     var result = await _dotNetReference.invokeMethodAsync('GetNextSchedules'); // Получим сообщения
     $('#ScrollItems').append(result); // Добавим полученные сообщения в окно
@@ -9,7 +9,7 @@ export async function SetScrollEvent(div, dotNetReference) {
 
 // Обработчик события прокрутки
 async function ScrollEvent(event) {
-    var div = event.target.id; // Получим id блока
+    //var div = event.target.id; // Получим id блока
 
     var winHeight = $(window).height();
     var scrollHeight = $('#Scroll').height();

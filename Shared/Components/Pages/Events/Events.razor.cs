@@ -53,7 +53,7 @@ namespace Shared.Components.Pages.Events
             {
                 _dotNetReference = DotNetObjectReference.Create(this);
                 _JSModule = await _JSRuntime.InvokeAsync<IJSObjectReference>("import", $"{CurrentState.WebUrl}/js/Pages/Events/EventsScroll.js");
-                await _JSModule.InvokeVoidAsync("SetScrollEvent", "Scroll", _dotNetReference);
+                await _JSModule.InvokeVoidAsync("SetScrollEvent", _dotNetReference);
                 await _JSProcessor.SetDotNetReference(_dotNetReference);
 
                 OnScheduleChangedHandler = OnScheduleChangedHandler.SignalRClient(CurrentState, (Func<OnScheduleChangedResponse, Task>)(async (response) =>
