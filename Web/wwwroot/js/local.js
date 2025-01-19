@@ -1,8 +1,7 @@
 ﻿var _dotNetReference;
 function SetDotNetReference(dotNetReference) {
-    _dotNetReference = dotNetReference;
+    _dotNetReference = dotNetReference; // Сохраним ссылку на C#
 }
-
 
 // Затухание и появление числа (напр.: изменилось кол-во непрочитанных сообщений в чате)
 function ChangeNumberFadeInOut(tagClass, number, isShowZero) {

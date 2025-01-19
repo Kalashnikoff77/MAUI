@@ -195,6 +195,8 @@ namespace Shared.Components.Pages.Events
             Filters.SelectedRegions = null;
             request.RegionsIds = null;
 
+            request.Skip = 0;
+
             schedules.Clear();
             await LoadSchedulesAsync();
         }

@@ -46,8 +46,10 @@ namespace Shared.Components.Pages.Messages
             {
                 _dotNetReference = DotNetObjectReference.Create(this);
                 _JSModule = await _JSRuntime.InvokeAsync<IJSObjectReference>("import", "./js/Pages/Messages/MessagesScroll.js");
-                await _JSModule.InvokeVoidAsync("SetScrollEvent", _dotNetReference);
-                await _JSProcessor.SetDotNetReference(_dotNetReference);
+
+                await _JSModule.InvokeVoidAsync("SetDotNetReference", _dotNetReference);
+                await _JSModule.InvokeVoidAsync("LoadData");
+                await _JSModule.InvokeVoidAsync("SetScrollEvent");
             }
         }
 

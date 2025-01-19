@@ -1,11 +1,17 @@
 var _dotNetReference;
 
-export async function SetScrollEvent(dotNetReference) {
+export function SetDotNetReference(dotNetReference) {
     _dotNetReference = dotNetReference; // Сохраним ссылку на C#
+}
+
+export async function LoadData() {
     var result = await _dotNetReference.invokeMethodAsync('GetPreviousMessages'); // Получим сообщения
     $('#ScrollItems').prepend(result); // Добавим полученные сообщения в окно
     window.ScrollDivToBottom('ScrollItems'); // Прокрутим окно в самый низ
-    $('#ScrollItems').on('scroll', ScrollEvent); // Установим обработчик события прокрутки
+}
+
+export async function SetScrollEvent() {
+    $(window).on('scroll', ScrollEvent); // Установим обработчик события прокрутки
 }
 
 // Обработчик события прокрутки

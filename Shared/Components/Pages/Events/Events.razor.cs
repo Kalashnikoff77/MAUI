@@ -45,7 +45,7 @@ namespace Shared.Components.Pages.Events
             var regionsResponse = await _repoGetRegions.HttpPostAsync(new GetRegionsForEventsRequestDto());
             RegionsList = regionsResponse.Response.RegionsForEvents;
 
-            await LoadSchedulesAsync();
+            //await LoadSchedulesAsync();
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -53,9 +53,11 @@ namespace Shared.Components.Pages.Events
             if (firstRender)
             {
                 _dotNetReference = DotNetObjectReference.Create(this);
-                _JSModule = await _JSRuntime.InvokeAsync<IJSObjectReference>("import", $"{CurrentState.WebUrl}/js/Pages/Events/EventsScroll.js");
-                await _JSModule.InvokeVoidAsync("SetScrollEvent", _dotNetReference);
                 await _JSProcessor.SetDotNetReference(_dotNetReference);
+
+                _JSModule = await _JSRuntime.InvokeAsync<IJSObjectReference>("import", $"{CurrentState.WebUrl}/js/Pages/Events/EventsScroll.js");
+                await _JSModule.InvokeVoidAsync("LoadItems");
+                await _JSModule.InvokeVoidAsync("SetScrollEvent");
 
                 OnScheduleChangedHandler = OnScheduleChangedHandler.SignalRClient(CurrentState, (Func<OnScheduleChangedResponse, Task>)(async (response) =>
                 {
@@ -73,7 +75,7 @@ namespace Shared.Components.Pages.Events
         }
 
         [JSInvokable]
-        public async Task<string> GetNextSchedules()
+        public async Task<string> LoadItems()
         {
             var apiResponse = await _repoGetSchedules.HttpPostAsync(request);
             request.Skip = request.Skip + StaticData.SCHEDULES_PER_BLOCK;
@@ -92,17 +94,21 @@ namespace Shared.Components.Pages.Events
 
         async Task LoadSchedulesAsync(bool toResetOffset = true)
         {
-            StateHasChanged();
+            //StateHasChanged();
 
-            if (toResetOffset)
-            {
-                //currentPage = 0;
-                //request.Skip = currentPage * currentPageSize;
-                //request.Take = currentPageSize;
-            }
+            //if (toResetOffset)
+            //{
+            //    //currentPage = 0;
+            //    //request.Skip = currentPage * currentPageSize;
+            //    //request.Take = currentPageSize;
+            //}
 
-            var apiResponse = await _repoGetSchedules.HttpPostAsync(request);
-            schedules.AddRange(apiResponse.Response.Schedules ?? new List<SchedulesForEventsViewDto>());
+            //var apiResponse = await _repoGetSchedules.HttpPostAsync(request);
+            //schedules.AddRange(apiResponse.Response.Schedules ?? new List<SchedulesForEventsViewDto>());
+            await _JSModule.InvokeVoidAsync("LoadItems");
+
+            //await GetNextSchedules();
+
             IsNotFoundVisible = schedules.Count == 0 ? true : false;
         }
 
