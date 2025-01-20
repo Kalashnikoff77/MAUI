@@ -1,13 +1,10 @@
 export async function LoadItems() {
+    $(window).off('scroll');
     var result = await _dotNetReference.invokeMethodAsync('LoadItems'); // Получим сообщения
     if (result != '') { // Если ещё есть сообщения, то добавляем их и включаем обработчик снова
         $('#ScrollItems').append(result); // Добавим полученные сообщения в окно
+        $(window).on('scroll', ScrollEvent);
     };
-}
-
-export async function SetScrollEvent() {
-    $(window).off('scroll'); // Выключим обработчик на случай, если он включён
-    $(window).on('scroll', ScrollEvent); // Установим обработчик события прокрутки заново
 }
 
 export function ClearItems() {
@@ -22,12 +19,5 @@ async function ScrollEvent(event) {
     var scrollTop = $(window).scrollTop();
     var scrollBottom = winHeight - (scrollHeight - scrollTop) - 64 - 48;
 
-    if (scrollBottom > -500) {
-        $(window).off('scroll'); // Временно отключим обработчик
-        var result = await _dotNetReference.invokeMethodAsync('LoadItems'); // Получим новые сообщения
-        if (result != '') { // Если ещё есть сообщения, то добавляем их и включаем обработчик снова
-            $('#ScrollItems').append(result);
-            $(window).on('scroll', ScrollEvent);
-        }
-    }
+    if (scrollBottom > -500) { LoadItems(); }
 }
