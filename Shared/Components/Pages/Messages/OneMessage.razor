@@ -1,26 +1,56 @@
-﻿@if (CurrentState.Account != null) 
+﻿@if (accountsViewDto != null && CurrentState.Account != null)
 {
-    @if (CurrentState.Account.Id == Message.SenderId)
-    {
-        <div id="@("id_" + Message.Id)" class="d-flex justify-end pa-2">
-            <div class="pa-2 ml-12" style="background-color:#d9f4ff; border-radius:7px">
-                <MudText Typo="Typo.body2">@Message.Text</MudText>
-                <MudText Style="text-align:left; font-size:12px; color:#85c3de">@Message.CreateDate.ToMyString()</MudText>
-            </div>
-        </div>
-    }
-    else
-    {
-        <div id="@("id_" + Message.Id)" class="d-flex pa-2">
-            <div class="pa-2 mr-12" style="background-color:#e8f7df; border-radius:7px">
-                <MudText Typo="Typo.body2">@Message.Text</MudText>
-                <MudText Style="text-align:left; font-size:12px; color:#90d665">@Message.CreateDate.ToMyString()</MudText>
-            </div>
-        </div>
-    }
-}
+    <tr id="id_@Message.Id">
+        <td>
+            <div class="d-flex align-center gap-3">
+                <div @onclick="@(() => ShowDialogs.AccountInfoCardDialogAsync(accountsViewDto))" style="cursor:pointer">
+                    <ImageAvatar Account="@accountsViewDto" Class="d-none d-sm-block avatar" Size="EnumImageSize.s64x64" />
+                    <ImageAvatar Account="@accountsViewDto" Class="d-xs-block d-sm-none avatar" Style="width:45px; height:45px" Size="EnumImageSize.s64x64" />
+                </div>
 
-@code {
-    [Parameter, EditorRequired] public CurrentState CurrentState { get; set; } = null!;
-    [Parameter, EditorRequired] public MessagesDto Message { get; set; } = null!;
+                <div class="d-flex flex-column gap-0" @onclick="@(() => ShowDialogs.MessagesDialogAsync(accountsViewDto))" style="cursor:pointer; width:100%">
+                    <div style="text-align:end">
+                        <MudMenu Dense Icon="@Icons.Material.Filled.MoreVert" Size="Size.Small" AnchorOrigin="Origin.TopLeft" TransformOrigin="Origin.TopRight">
+                            <MudMenuItem Icon="@Icons.Material.Filled.Check" IconColor="Color.Primary" Disabled="@(!(Message.ReadDate == null && CurrentState.Account.Id == Message.Recipient?.Id))" OnClick="() => MarkAsReadCallbackAsync.InvokeAsync(Message.Id)">Пометить сообщение прочитанными</MudMenuItem>
+                            <MudMenuItem Icon="@Icons.Material.Filled.ChecklistRtl" IconColor="Color.Primary" Disabled="@(Message.UnreadMessages == 0)" OnClick="() => MarkAllAsReadAsync.InvokeAsync(Message.Id)">Пометить все прочитанными</MudMenuItem>
+                            <MudMenuItem Icon="@Icons.Material.Filled.Block" IconColor="Color.Error" OnClick="BlockAccountAsync">Заблокировать отправителя</MudMenuItem>
+                        </MudMenu>
+                    </div>
+
+                    <div class="d-flex align-center">
+                        <div class="d-none d-sm-block flex-grow-1">
+                            <MessageTextComponent CurrentState="CurrentState" Message="Message" MaxTextLength="120" MarkAsReadCallback="MarkAsReadCallbackAsync" MarkAsReadId="@Message.Id" />
+                        </div>
+                        <div class="d-xs-block d-sm-none flex-grow-1">
+                            <MessageTextComponent CurrentState="CurrentState" Message="Message" MaxTextLength="50" MarkAsReadCallback="MarkAsReadCallbackAsync" MarkAsReadId="@Message.Id" />
+                        </div>
+
+                        @if (Message.UnreadMessages > 0)
+                        {
+                            <div class="flex-grow-0" title="Непрочитанные сообщения"><MudAvatar Size="Size.Small" Color="Color.Primary">@Message.UnreadMessages</MudAvatar></div>
+                        }
+                    </div>
+
+                    <div class="d-flex justify-end align-center" style="font-size:12px; height:29px">
+                        <p class="d-none d-sm-block" style="color:darkgrey">@Message.CreateDate.ToMyString()</p>
+                        <p class="d-sx-block d-sm-none" style="color:darkgrey" title="Отправлено: @Message.CreateDate.ToMyString()">@Message.CreateDate.ToMyPastShortString()</p>
+
+                        <p class="ml-2 mr-1"><MudIcon Icon="@(CurrentState.Account.Id == Message.Sender?.Id ? @Icons.Material.Filled.ArrowForward : @Icons.Material.Filled.ArrowBack)" Style="font-size:11px; margin-top:3px" /></p>
+
+                        <p @onclick="@(() => ShowDialogs.AccountInfoCardDialogAsync(accountsViewDto))" @onclick:stopPropagation="true" class="mud-primary-text" style="cursor:pointer; font-weight:500">@accountsViewDto.Name</p>
+                        <p>
+                            @if (Message.ReadDate == null)
+                            {
+                                <MudIcon Icon="@Icons.Material.Filled.Done" Color="Color.Default" Style="font-size:15px; margin: 3px 0 0 5px" />
+                            }
+                            else
+                            {
+                                <MudIcon Icon="@Icons.Material.Filled.DoneAll" Color="Color.Primary" Style="font-size:15px; margin: 3px 0 0 5px" />
+                            }
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </td>
+    </tr>
 }

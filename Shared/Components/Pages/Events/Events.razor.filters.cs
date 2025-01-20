@@ -9,7 +9,7 @@ namespace Shared.Components.Pages.Events
         #region Поиск текста
         async Task OnSearch(string text)
         {
-            request.FilterFreeText = text;
+            _request.FilterFreeText = text;
             await ReloadItemsAsync();
         }
         #endregion
@@ -25,7 +25,7 @@ namespace Shared.Components.Pages.Events
             filteredAdmins.Clear();
             filteredRegions.Clear();
 
-            request.FeaturesIds = FeaturesList
+            _request.FeaturesIds = FeaturesList
                 .Where(x => values.Contains(x.Name))
                 .Select(s => s.Id)
                 .Distinct();
@@ -43,16 +43,16 @@ namespace Shared.Components.Pages.Events
 
                 IEnumerable<FeaturesForEventsViewDto> linq = FeaturesList;
 
-                if (request.IsActualEvents)
+                if (_request.IsActualEvents)
                     linq = FeaturesList.Where(w => w.EndDate > DateTime.Now);
                 else
                     linq = FeaturesList.Where(w => w.EndDate < DateTime.Now);
 
-                if (request.RegionsIds?.Count() > 0)
-                    linq = linq.Where(x => request.RegionsIds.Contains(x.RegionId));
+                if (_request.RegionsIds?.Count() > 0)
+                    linq = linq.Where(x => _request.RegionsIds.Contains(x.RegionId));
 
-                if (request.AdminsIds?.Count() > 0)
-                    linq = linq.Where(x => request.AdminsIds.Contains(x.AdminId));
+                if (_request.AdminsIds?.Count() > 0)
+                    linq = linq.Where(x => _request.AdminsIds.Contains(x.AdminId));
 
                 _filteredFeatures = linq
                     .Select(s => s.Name)
@@ -76,7 +76,7 @@ namespace Shared.Components.Pages.Events
             filteredFeatures.Clear();
             filteredRegions.Clear();
 
-            request.AdminsIds = AdminsList
+            _request.AdminsIds = AdminsList
                 .Where(x => values.Contains(x.Name))
                 .Select(s => s.Id)
                 .Distinct();
@@ -94,16 +94,16 @@ namespace Shared.Components.Pages.Events
 
                 IEnumerable<AdminsForEventsViewDto> linq = AdminsList;
 
-                if (request.IsActualEvents)
+                if (_request.IsActualEvents)
                     linq = AdminsList.Where(w => w.EndDate > DateTime.Now);
                 else
                     linq = AdminsList.Where(w => w.EndDate < DateTime.Now);
 
-                if (request.RegionsIds?.Count() > 0)
-                    linq = linq.Where(x => request.RegionsIds.Contains(x.RegionId));
+                if (_request.RegionsIds?.Count() > 0)
+                    linq = linq.Where(x => _request.RegionsIds.Contains(x.RegionId));
 
-                if (request.FeaturesIds?.Count() > 0)
-                    linq = linq.Where(x => request.FeaturesIds.Contains(x.FeatureId));
+                if (_request.FeaturesIds?.Count() > 0)
+                    linq = linq.Where(x => _request.FeaturesIds.Contains(x.FeatureId));
 
                 _filteredAdmins = linq
                     .Select(s => s.Name)
@@ -127,7 +127,7 @@ namespace Shared.Components.Pages.Events
             filteredFeatures.Clear();
             filteredAdmins.Clear();
 
-            request.RegionsIds = RegionsList
+            _request.RegionsIds = RegionsList
                 .Where(x => values.Contains(x.Name))
                 .Select(s => s.Id)
                 .Distinct();
@@ -145,16 +145,16 @@ namespace Shared.Components.Pages.Events
 
                 IEnumerable<RegionsForEventsViewDto> linq = RegionsList;
 
-                if (request.IsActualEvents)
+                if (_request.IsActualEvents)
                     linq = RegionsList.Where(w => w.EndDate > DateTime.Now);
                 else
                     linq = RegionsList.Where(w => w.EndDate < DateTime.Now);
 
-                if (request.AdminsIds?.Count() > 0)
-                    linq = linq.Where(x => request.AdminsIds.Contains(x.AdminId));
+                if (_request.AdminsIds?.Count() > 0)
+                    linq = linq.Where(x => _request.AdminsIds.Contains(x.AdminId));
 
-                if (request.FeaturesIds?.Count() > 0)
-                    linq = linq.Where(x => request.FeaturesIds.Contains(x.FeatureId));
+                if (_request.FeaturesIds?.Count() > 0)
+                    linq = linq.Where(x => _request.FeaturesIds.Contains(x.FeatureId));
 
                 _filteredRegions = linq
                     .OrderBy(o => o.Order)
@@ -173,20 +173,20 @@ namespace Shared.Components.Pages.Events
 
         async Task ActualEventsChanged(bool value)
         {
-            request.IsActualEvents = value;
+            _request.IsActualEvents = value;
             actualEventsLabel = value ? "Актуальные мероприятия" : "Завершённые мероприятия";
 
             filteredFeatures.Clear();
             Filters.SelectedFeatures = null;
-            request.FeaturesIds = null;
+            _request.FeaturesIds = null;
 
             filteredAdmins.Clear();
             Filters.SelectedAdmins = null;
-            request.AdminsIds = null;
+            _request.AdminsIds = null;
 
             filteredRegions.Clear();
             Filters.SelectedRegions = null;
-            request.RegionsIds = null;
+            _request.RegionsIds = null;
 
             await ReloadItemsAsync();
         }

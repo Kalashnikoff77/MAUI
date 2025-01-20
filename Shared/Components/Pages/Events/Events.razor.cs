@@ -24,7 +24,7 @@ namespace Shared.Components.Pages.Events
         [Inject] IJSRuntime _JSRuntime { get; set; } = null!;
         [Inject] IComponentRenderer<OneSchedule> _renderer { get; set; } = null!;
 
-        GetSchedulesRequestDto request = new GetSchedulesRequestDto { Take = StaticData.SCHEDULES_PER_BLOCK };
+        GetSchedulesRequestDto _request = new GetSchedulesRequestDto { Take = StaticData.SCHEDULES_PER_BLOCK };
         List<SchedulesForEventsViewDto> schedules = new List<SchedulesForEventsViewDto>();
 
         bool IsNotFoundVisible = false;
@@ -52,10 +52,11 @@ namespace Shared.Components.Pages.Events
             {
                 _dotNetReference = DotNetObjectReference.Create(this);
                 await _JSProcessor.SetDotNetReference(_dotNetReference);
-
                 _JSModule = await _JSRuntime.InvokeAsync<IJSObjectReference>("import", $"{CurrentState.WebUrl}/js/Pages/Events/EventsScroll.js");
                 await ReloadItemsAsync();
-
+            }
+            else
+            {
                 OnScheduleChangedHandler = OnScheduleChangedHandler.SignalRClient(CurrentState, (Func<OnScheduleChangedResponse, Task>)(async (response) =>
                 {
                     if (response.UpdatedSchedule != null)
@@ -76,8 +77,8 @@ namespace Shared.Components.Pages.Events
         [JSInvokable]
         public async Task<string> LoadItems()
         {
-            var apiResponse = await _repoGetSchedules.HttpPostAsync(request);
-            request.Skip = request.Skip + StaticData.SCHEDULES_PER_BLOCK;
+            var apiResponse = await _repoGetSchedules.HttpPostAsync(_request);
+            _request.Skip = _request.Skip + StaticData.SCHEDULES_PER_BLOCK;
 
             var htmlItems = new StringBuilder(5000);
             if (apiResponse.Response.Schedules != null)
@@ -95,7 +96,7 @@ namespace Shared.Components.Pages.Events
 
         async Task ReloadItemsAsync()
         {
-            request.Skip = 0;
+            _request.Skip = 0;
             schedules.Clear();
             await _JSModule.InvokeVoidAsync("ClearItems");
             await _JSModule.InvokeVoidAsync("LoadItems");

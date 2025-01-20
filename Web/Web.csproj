@@ -9,11 +9,15 @@
   <ItemGroup>
     <Content Remove="wwwroot\js\DivMessagesFrame.js" />
     <Content Remove="wwwroot\js\Pages\Events\EventsScroll.js" />
+    <Content Remove="wwwroot\js\Pages\Messages\DivMessagesFrameScroll.js" />
     <Content Remove="wwwroot\js\Pages\Messages\MessagesScroll.js" />
   </ItemGroup>
 
   <ItemGroup>
     <None Include="wwwroot\js\Pages\Events\EventsScroll.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\js\Pages\Messages\DivMessagesFrameScroll.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="wwwroot\js\Pages\Messages\MessagesScroll.js">

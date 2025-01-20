@@ -17,11 +17,6 @@ async function ScrollEvent(event) {
     if (scrollBottom > -500) { LoadItems(); }
 }
 
-export function ClearItems() {
-    $('#ScrollItems').empty();
-}
+export function ClearItems() { $('#ScrollItems').empty(); }
 
-export function ReplaceItem(id, htmlItem) {
-    console.log('ReplaceItem');
-    $('#id_' + id).replaceWith(htmlItem);
-}
+export function ReplaceItem(id, htmlItem) { $('#id_' + id).replaceWith(htmlItem); }

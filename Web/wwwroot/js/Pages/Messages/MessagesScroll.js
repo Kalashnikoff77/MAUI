@@ -1,34 +1,22 @@
-var _dotNetReference;
-
-export function SetDotNetReference(dotNetReference) {
-    _dotNetReference = dotNetReference; // Сохраним ссылку на C#
-}
-
-export async function LoadData() {
-    var result = await _dotNetReference.invokeMethodAsync('GetPreviousMessages'); // Получим сообщения
-    $('#ScrollItems').prepend(result); // Добавим полученные сообщения в окно
-    window.ScrollDivToBottom('ScrollItems'); // Прокрутим окно в самый низ
-}
-
-export async function SetScrollEvent() {
-    $(window).on('scroll', ScrollEvent); // Установим обработчик события прокрутки
+export async function LoadItems() {
+    $(window).off('scroll');
+    var result = await _dotNetReference.invokeMethodAsync('LoadItems'); // Получим сообщения
+    if (result != '') { // Если ещё есть сообщения, то добавляем их и включаем обработчик снова
+        $('#ScrollItems').append(result); // Добавим полученные сообщения в окно
+        $(window).on('scroll', ScrollEvent);
+    };
 }
 
 // Обработчик события прокрутки
 async function ScrollEvent(event) {
-    if (document.getElementById('ScrollItems').scrollTop < 250) {
-        $('#ScrollItems').off('scroll'); // Временно отключим обработчик
-        var result = await _dotNetReference.invokeMethodAsync('GetPreviousMessages'); // Получим новые сообщения
-        if (result != '') { // Если ещё есть сообщения, то добавляем их и включаем обработчик снова
-            $('#ScrollItems').prepend(result).on('scroll', ScrollEvent);
-        }
-    }
+    var winHeight = $(window).height();
+    var scrollHeight = $('#Scroll').height();
+    var scrollTop = $(window).scrollTop();
+    var scrollBottom = winHeight - (scrollHeight - scrollTop) - 64 - 48;
+
+    if (scrollBottom > -500) { LoadItems(); }
 }
 
-// Добавление новых сообщений
-export async function AppendNewMessages(messages) {
-    if (messages != '' && messages != null) { // Если есть сообщения, то добавляем их
-        $('#ScrollItems').append(messages);
-        window.ScrollDivToBottom('ScrollItems'); // Прокрутим окно в самый низ
-    }
-}
+export function ClearItems() { $('#ScrollItems').empty(); }
+
+export function ReplaceItem(id, htmlItem) { $('#id_' + id).replaceWith(htmlItem); }

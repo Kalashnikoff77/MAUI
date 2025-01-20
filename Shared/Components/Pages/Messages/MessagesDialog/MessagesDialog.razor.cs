@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using System.ComponentModel.DataAnnotations;
 
-namespace Shared.Components.Pages.Messages
+namespace Shared.Components.Pages.Messages.MessagesDialog
 {
     public partial class MessagesDialog
     {

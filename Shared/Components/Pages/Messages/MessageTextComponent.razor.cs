@@ -8,8 +8,7 @@ namespace Shared.Components.Pages.Messages
 {
     public partial class MessageTextComponent
     {
-        [CascadingParameter] public CurrentState CurrentState { get; set; } = null!;
-
+        [Parameter, EditorRequired] public CurrentState CurrentState { get; set; } = null!;
         [Parameter, EditorRequired] public LastMessagesForAccountSpDto Message { get; set; } = null!;
         [Parameter] public int MaxTextLength { get; set; } = 260;
         [Parameter] public EventCallback<int> MarkAsReadCallback { get; set; }

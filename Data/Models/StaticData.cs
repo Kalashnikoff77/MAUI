@@ -70,6 +70,10 @@ namespace Data.Models
         /// </summary>
         public const short SCHEDULES_PER_BLOCK = 10;
 
+        /// <summary>
+        /// Кол-во сообщений в разделе "Сообщения" - /messages
+        /// </summary>
+        public const short LAST_MESSAGES_PER_BLOCK = 10;
 
         // Константы полей БД
         public const short DB_ACCOUNTS_EMAIL_MIN = 5;

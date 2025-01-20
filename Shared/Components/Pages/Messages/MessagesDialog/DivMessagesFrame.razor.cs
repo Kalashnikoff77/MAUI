@@ -11,12 +11,12 @@ using Microsoft.JSInterop;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 
-namespace Shared.Components.Pages.Messages
+namespace Shared.Components.Pages.Messages.MessagesDialog
 {
     /// <summary>
     /// Фрейм с сообщениями двух пользователей
     /// </summary>
-    public partial class DivMessagesFrame : IDisposable
+    public partial class DivMessagesFrame : IAsyncDisposable
     {
         [Parameter, Required] public AccountsViewDto Account { get; set; } = null!;
 
@@ -25,7 +25,7 @@ namespace Shared.Components.Pages.Messages
         [Inject] IRepository<GetMessagesRequestDto, GetMessagesResponseDto> _repoGetMessages { get; set; } = null!;
         [Inject] IJSProcessor _JSProcessor { get; set; } = null!;
         [Inject] IJSRuntime _JSRuntime { get; set; } = null!;
-        [Inject] IComponentRenderer<OneMessage> _renderer { get; set; } = null!;
+        [Inject] IComponentRenderer<OneDivMessage> _renderer { get; set; } = null!;
 
         DotNetObjectReference<DivMessagesFrame> _dotNetReference { get; set; } = null!;
         IJSObjectReference _JSModule { get; set; } = null!;
@@ -36,19 +36,19 @@ namespace Shared.Components.Pages.Messages
 
         protected override void OnParametersSet()
         {
-            OnMessagesReloadHandler = OnMessagesReloadHandler.SignalRClient<OnMessagesReloadResponse>(CurrentState, async (response) =>
-                await _JSModule.InvokeVoidAsync("AppendNewMessages", await GetNextMessages()));
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             if (firstRender)
             {
-                _dotNetReference = DotNetObjectReference.Create(this);
-                _JSModule = await _JSRuntime.InvokeAsync<IJSObjectReference>("import", "./js/Pages/Messages/MessagesScroll.js");
+                OnMessagesReloadHandler = OnMessagesReloadHandler.SignalRClient<OnMessagesReloadResponse>(CurrentState, async (response) =>
+                    await _JSModule.InvokeVoidAsync("AppendNewMessages", await GetNextMessages()));
 
-                await _JSModule.InvokeVoidAsync("SetDotNetReference", _dotNetReference);
-                await _JSModule.InvokeVoidAsync("LoadData");
+                _dotNetReference = DotNetObjectReference.Create(this);
+                await _JSProcessor.SetDotNetReference(_dotNetReference);
+                _JSModule = await _JSRuntime.InvokeAsync<IJSObjectReference>("import", "./js/Pages/Messages/DivMessagesFrameScroll.js");
+                await _JSModule.InvokeVoidAsync("LoadItems");
                 await _JSModule.InvokeVoidAsync("SetScrollEvent");
             }
         }
@@ -104,10 +104,19 @@ namespace Shared.Components.Pages.Messages
             return html.ToString();
         }
 
-        public void Dispose()
+        public async ValueTask DisposeAsync()
         {
-            OnMessagesReloadHandler?.Dispose();
-            _dotNetReference?.Dispose();
+            try
+            {
+                OnMessagesReloadHandler?.Dispose();
+                if (_JSModule != null)
+                    await _JSModule.DisposeAsync();
+                _dotNetReference?.Dispose();
+            }
+            // Отлов ошибки, когда соединение SignalR разорвано, но производится попытка вызвать JS. Возникает при перезагрузке страницы (F5)
+            catch (JSDisconnectedException ex)
+            {
+            }
         }
     }
 }
