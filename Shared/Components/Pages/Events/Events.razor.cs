@@ -63,9 +63,11 @@ namespace Shared.Components.Pages.Events
                         // Есть ли в области видимости браузера такое расписание?
                         var index = schedules.FindIndex(i => i.Id == response.UpdatedSchedule.Id);
                         if (index >= 0)
+                        {
                             schedules[index] = response.UpdatedSchedule;
-
-                        await InvokeAsync(StateHasChanged);
+                            var htmlItem = await _renderer.RenderAsync(new Dictionary<string, object?> { { "Schedule", response.UpdatedSchedule } });
+                            await _JSModule.InvokeVoidAsync("ReplaceItem", response.UpdatedSchedule.Id, htmlItem);
+                        }
                     }
                 }));
             }
@@ -77,18 +79,18 @@ namespace Shared.Components.Pages.Events
             var apiResponse = await _repoGetSchedules.HttpPostAsync(request);
             request.Skip = request.Skip + StaticData.SCHEDULES_PER_BLOCK;
 
-            var html = new StringBuilder(5000);
+            var htmlItems = new StringBuilder(5000);
             if (apiResponse.Response.Schedules != null)
             {
                 schedules.AddRange(apiResponse.Response.Schedules);
                 // Ручная генерация компонентов мероприятий
                 foreach (var schedule in apiResponse.Response.Schedules)
-                    html.Append(await _renderer.RenderAsync(new Dictionary<string, object?> { { "Schedule", schedule } }));
+                    htmlItems.Append(await _renderer.RenderAsync(new Dictionary<string, object?> { { "Schedule", schedule } }));
             }
 
             IsNotFoundVisible = schedules.Count == 0 ? true : false;
 
-            return html.ToString();
+            return htmlItems.ToString();
         }
 
         async Task ReloadItemsAsync()

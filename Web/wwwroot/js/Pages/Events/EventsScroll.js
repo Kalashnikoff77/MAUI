@@ -7,11 +7,6 @@ export async function LoadItems() {
     };
 }
 
-export function ClearItems() {
-    $('#ScrollItems').empty();
-}
-
-
 // Обработчик события прокрутки
 async function ScrollEvent(event) {
     var winHeight = $(window).height();
@@ -20,4 +15,13 @@ async function ScrollEvent(event) {
     var scrollBottom = winHeight - (scrollHeight - scrollTop) - 64 - 48;
 
     if (scrollBottom > -500) { LoadItems(); }
+}
+
+export function ClearItems() {
+    $('#ScrollItems').empty();
+}
+
+export function ReplaceItem(id, htmlItem) {
+    console.log('ReplaceItem');
+    $('#id_' + id).replaceWith(htmlItem);
 }
