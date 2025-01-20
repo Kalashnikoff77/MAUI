@@ -43,7 +43,7 @@ namespace WebAPI.Extensions
 
             if (response.Count > 0)
             {
-                string order = request.IsActualEvents ? $"ORDER BY {nameof(SchedulesForEventsViewDto.StartDate)} " : $"ORDER BY {nameof(SchedulesForEventsViewDto.EndDate)} DESC ";
+                string order = request.IsActualEvents ? $"ORDER BY {nameof(SchedulesForEventsViewDto.StartDate)} " : $"ORDER BY {nameof(SchedulesForEventsViewDto.StartDate)} DESC ";
 
                 string sql = $"SELECT {columns.Aggregate((a, b) => a + ", " + b)} " +
                     $"FROM SchedulesForEventsView " +

@@ -10,8 +10,7 @@ namespace Shared.Components.Pages.Events
         async Task OnSearch(string text)
         {
             request.FilterFreeText = text;
-            schedules.Clear();
-            await LoadSchedulesAsync();
+            await ReloadItemsAsync();
         }
         #endregion
 
@@ -31,8 +30,7 @@ namespace Shared.Components.Pages.Events
                 .Select(s => s.Id)
                 .Distinct();
 
-            schedules.Clear();
-            await LoadSchedulesAsync();
+            await ReloadItemsAsync();
         }
 
         List<string> _filteredFeatures = new List<string>();
@@ -45,7 +43,7 @@ namespace Shared.Components.Pages.Events
 
                 IEnumerable<FeaturesForEventsViewDto> linq = FeaturesList;
 
-                if (isActualEvents)
+                if (request.IsActualEvents)
                     linq = FeaturesList.Where(w => w.EndDate > DateTime.Now);
                 else
                     linq = FeaturesList.Where(w => w.EndDate < DateTime.Now);
@@ -83,8 +81,7 @@ namespace Shared.Components.Pages.Events
                 .Select(s => s.Id)
                 .Distinct();
 
-            schedules.Clear();
-            await LoadSchedulesAsync();
+            await ReloadItemsAsync();
         }
 
         List<string> _filteredAdmins = new List<string>();
@@ -97,7 +94,7 @@ namespace Shared.Components.Pages.Events
 
                 IEnumerable<AdminsForEventsViewDto> linq = AdminsList;
 
-                if (isActualEvents)
+                if (request.IsActualEvents)
                     linq = AdminsList.Where(w => w.EndDate > DateTime.Now);
                 else
                     linq = AdminsList.Where(w => w.EndDate < DateTime.Now);
@@ -135,8 +132,7 @@ namespace Shared.Components.Pages.Events
                 .Select(s => s.Id)
                 .Distinct();
 
-            schedules.Clear();
-            await LoadSchedulesAsync();
+            await ReloadItemsAsync();
         }
 
         List<string> _filteredRegions = new List<string>();
@@ -149,7 +145,7 @@ namespace Shared.Components.Pages.Events
 
                 IEnumerable<RegionsForEventsViewDto> linq = RegionsList;
 
-                if (isActualEvents)
+                if (request.IsActualEvents)
                     linq = RegionsList.Where(w => w.EndDate > DateTime.Now);
                 else
                     linq = RegionsList.Where(w => w.EndDate < DateTime.Now);
@@ -174,12 +170,9 @@ namespace Shared.Components.Pages.Events
 
         #region Фильтр актуальных мероприятий
         string actualEventsLabel = "Актуальные мероприятия";
-        bool isActualEvents = true;
 
         async Task ActualEventsChanged(bool value)
         {
-            isActualEvents = value;
-
             request.IsActualEvents = value;
             actualEventsLabel = value ? "Актуальные мероприятия" : "Завершённые мероприятия";
 
@@ -195,10 +188,7 @@ namespace Shared.Components.Pages.Events
             Filters.SelectedRegions = null;
             request.RegionsIds = null;
 
-            request.Skip = 0;
-
-            schedules.Clear();
-            await LoadSchedulesAsync();
+            await ReloadItemsAsync();
         }
         #endregion
     }

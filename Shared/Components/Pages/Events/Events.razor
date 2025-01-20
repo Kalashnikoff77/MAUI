@@ -47,23 +47,21 @@
 
         <MudItem xs="12" Style="padding-top:10px">
             <div class="d-flex gap-0 justify-end">
-                <MudSwitch Size="Size.Small" Value="isActualEvents" ValueChanged="ActualEventsChanged" T="bool" Label="@actualEventsLabel" Color="Color.Primary" />
+                <MudSwitch Size="Size.Small" Value="request.IsActualEvents" ValueChanged="ActualEventsChanged" T="bool" Label="@actualEventsLabel" Color="Color.Primary" />
             </div>
         </MudItem>
     </MudGrid>
+
+    @* Список мероприятий *@
+    <MudSimpleTable Hover Striped Elevation="0">
+        <tbody id="ScrollItems" />
+    </MudSimpleTable>
 
     @if (IsNotFoundVisible)
     {
         <MudAlert ContentAlignment="HorizontalAlignment.Center" Severity="Severity.Info" Variant="Variant.Outlined" Class="mb-5">
             По Вашему запросу ничего не найдено...
         </MudAlert>
-    }
-    else
-    {
-        @* Список мероприятий *@
-        <MudSimpleTable Hover Striped Elevation="0">
-            <tbody id="ScrollItems" />
-        </MudSimpleTable>
     }
 
 </div>

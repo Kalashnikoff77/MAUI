@@ -24,7 +24,7 @@ namespace Shared.Components.Pages.Events
         [Inject] IJSRuntime _JSRuntime { get; set; } = null!;
         [Inject] IComponentRenderer<OneSchedule> _renderer { get; set; } = null!;
 
-        GetSchedulesRequestDto request = new GetSchedulesRequestDto { IsPhotosIncluded = true, Take = StaticData.SCHEDULES_PER_BLOCK };
+        GetSchedulesRequestDto request = new GetSchedulesRequestDto { Take = StaticData.SCHEDULES_PER_BLOCK };
         List<SchedulesForEventsViewDto> schedules = new List<SchedulesForEventsViewDto>();
 
         bool IsNotFoundVisible = false;
@@ -44,8 +44,6 @@ namespace Shared.Components.Pages.Events
 
             var regionsResponse = await _repoGetRegions.HttpPostAsync(new GetRegionsForEventsRequestDto());
             RegionsList = regionsResponse.Response.RegionsForEvents;
-
-            //await LoadSchedulesAsync();
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -88,30 +86,20 @@ namespace Shared.Components.Pages.Events
                 foreach (var schedule in apiResponse.Response.Schedules)
                     html.Append(await _renderer.RenderAsync(new Dictionary<string, object?> { { "Schedule", schedule } }));
             }
+
+            IsNotFoundVisible = schedules.Count == 0 ? true : false;
+
             return html.ToString();
         }
 
-
-        async Task LoadSchedulesAsync(bool toResetOffset = true)
+        async Task ReloadItemsAsync()
         {
-            //StateHasChanged();
-
-            //if (toResetOffset)
-            //{
-            //    //currentPage = 0;
-            //    //request.Skip = currentPage * currentPageSize;
-            //    //request.Take = currentPageSize;
-            //}
-
-            //var apiResponse = await _repoGetSchedules.HttpPostAsync(request);
-            //schedules.AddRange(apiResponse.Response.Schedules ?? new List<SchedulesForEventsViewDto>());
+            request.Skip = 0;
+            schedules.Clear();
+            await _JSModule.InvokeVoidAsync("ClearItems");
             await _JSModule.InvokeVoidAsync("LoadItems");
-
-            //await GetNextSchedules();
-
-            IsNotFoundVisible = schedules.Count == 0 ? true : false;
+            await _JSModule.InvokeVoidAsync("SetScrollEvent");
         }
-
 
         [JSInvokable]
         public async Task ScheduleInfoCardDialog(int scheduleId)

@@ -34,6 +34,6 @@
         /// </summary>
         public bool IsActualEvents { get; set; } = true;
 
-        public bool IsPhotosIncluded { get; set; }
+        public bool IsPhotosIncluded { get; set; } = true;
     }
 }
