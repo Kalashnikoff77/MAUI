@@ -1,8 +1,10 @@
-﻿namespace SignalR.Models
+﻿using System.Collections.Concurrent;
+
+namespace SignalR.Models
 {
     public class Accounts
     {
-        public Dictionary<string, AccountDetails> ConnectedAccounts { get; set; } = new();
+        public ConcurrentDictionary<string, AccountDetails> ConnectedAccounts { get; set; } = new();
     }
 
     public class AccountDetails

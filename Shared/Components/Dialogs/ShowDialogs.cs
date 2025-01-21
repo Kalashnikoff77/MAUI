@@ -2,7 +2,7 @@
 using MudBlazor;
 using Shared.Components.Pages.Account;
 using Shared.Components.Pages.Events;
-using Shared.Components.Pages.Messages.MessagesDialog;
+using Shared.Components.Pages.Messages;
 
 namespace Shared.Components.Dialogs
 {

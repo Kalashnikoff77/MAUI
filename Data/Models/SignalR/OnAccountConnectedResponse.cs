@@ -14,8 +14,14 @@ namespace Data.Models.SignalR
         {
             return async (response) =>
             {
-                currentState.ConnectedAccounts = response.ConnectedAccounts.ToHashSet();
-                await currentState.JS.InvokeVoidAsync(EnumSignalRHandlersClient.ToString(), response.ConnectedAccounts);
+                try
+                {
+                    currentState.ConnectedAccounts = response.ConnectedAccounts.ToHashSet();
+                    await currentState.JS.InvokeVoidAsync(EnumSignalRHandlersClient.ToString(), response.ConnectedAccounts);
+                }
+                catch(Exception ex)
+                {
+                }
             };
         }
     }

@@ -8,7 +8,8 @@ namespace Shared.Components.Pages.Messages
 {
     public partial class MessageTextComponent
     {
-        [Parameter, EditorRequired] public CurrentState CurrentState { get; set; } = null!;
+        [CascadingParameter] public CurrentState CurrentState { get; set; } = null!;
+
         [Parameter, EditorRequired] public LastMessagesForAccountSpDto Message { get; set; } = null!;
         [Parameter] public int MaxTextLength { get; set; } = 260;
         [Parameter] public EventCallback<int> MarkAsReadCallback { get; set; }
@@ -18,7 +19,8 @@ namespace Shared.Components.Pages.Messages
         StringBuilder formattedText = null!;
         bool isShortText = true;
 
-        protected override void OnInitialized() => CheckText();
+        // Родительский компоненты вызывает OnInitialized только один раз, поэтому нужно обрабатывать текст в методе OnParametersSet
+        protected override void OnParametersSet() => CheckText();
 
         async Task OnWrap()
         {

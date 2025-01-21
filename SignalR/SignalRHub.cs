@@ -23,7 +23,7 @@ namespace SignalR
 
             if (!string.IsNullOrWhiteSpace(Context.UserIdentifier))
             {
-                Accounts.ConnectedAccounts.Remove(Context.UserIdentifier);
+                Accounts.ConnectedAccounts.TryRemove(Context.UserIdentifier, out AccountDetails? value);
 
                 // Сгенерим токен текущего пользователя
                 int.TryParse(Context.User!.Claims.FirstOrDefault(x => x.Type == "Id")?.Value, out int accountId);
@@ -31,8 +31,7 @@ namespace SignalR
                 var token = StaticData.GenerateToken(accountId, accountGuid, _configuration);
 
                 // Добавим пользователя в список онлайн пользователей
-                if (!Accounts.ConnectedAccounts.ContainsKey(Context.UserIdentifier))
-                    Accounts.ConnectedAccounts.Add(Context.UserIdentifier, new AccountDetails { Id = accountId, Token = token });
+                Accounts.ConnectedAccounts.TryAdd(Context.UserIdentifier, new AccountDetails { Id = accountId, Token = token });
 
                 // В БД отметим текущую дату и время входа на сайт текущего пользователя
                 var service = _serviceProvider.GetService<IRepository<VisitsForAccountsUpdateRequestDto, ResponseDtoBase>>()!;
@@ -64,7 +63,7 @@ namespace SignalR
                 var service = _serviceProvider.GetService<IRepository<VisitsForAccountsUpdateRequestDto, ResponseDtoBase>>()!;
                 await service.HttpPostAsync(new VisitsForAccountsUpdateRequestDto { Token = accountDetails.Token });
                 // Удалим текущего пользователя из списка онлайн пользователей
-                Accounts.ConnectedAccounts.Remove(Context.UserIdentifier!);
+                Accounts.ConnectedAccounts.Remove(Context.UserIdentifier!, out AccountDetails? value);
             }
 
             // Отправим всем остальным пользователям актуальную информацию по залогиненным
