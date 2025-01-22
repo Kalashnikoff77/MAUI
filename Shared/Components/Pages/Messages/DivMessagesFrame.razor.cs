@@ -16,7 +16,7 @@ namespace Shared.Components.Pages.Messages
     /// <summary>
     /// Фрейм с сообщениями двух пользователей
     /// </summary>
-    public partial class DivMessagesFrame : IDisposable
+    public partial class DivMessagesFrame : IAsyncDisposable
     {
         [CascadingParameter] public CurrentState CurrentState { get; set; } = null!;
         [Parameter, Required] public AccountsViewDto Account { get; set; } = null!;
@@ -95,15 +95,24 @@ namespace Shared.Components.Pages.Messages
             var html = new StringBuilder(5000);
 
             foreach (var message in messages)
-                html.Append(await _renderer.RenderAsync(new Dictionary<string, object?> { { "CurrentState", CurrentState }, { "Message", message } }));
+                html.Append(await _renderer.RenderAsync(new Dictionary<string, object?> { { "AccountId", CurrentState.Account?.Id }, { "Message", message } }));
 
             return html.ToString();
         }
 
-        public void Dispose()
+        public async ValueTask DisposeAsync()
         {
-            OnMessagesReloadHandler?.Dispose();
-            _dotNetReference?.Dispose();
+            try
+            {
+                OnMessagesReloadHandler?.Dispose();
+                _dotNetReference?.Dispose();
+                if (_JSModule != null)
+                    await _JSModule.DisposeAsync();
+            }
+            // Отлов ошибки, когда соединение SignalR разорвано, но производится попытка вызвать JS. Возникает при перезагрузке страницы (F5)
+            catch (JSDisconnectedException ex)
+            {
+            }
         }
     }
 }
