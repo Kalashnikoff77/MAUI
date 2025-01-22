@@ -66,7 +66,7 @@ namespace Shared.Components.Dialogs
 
             var dialogParams = new DialogParameters<MessagesDialog>
             {
-                { x => x.Account, account }
+                { x => x.Recipient, account }
             };
             await _dialog.ShowAsync<MessagesDialog>(null, dialogParams, dialogOptions);
         }

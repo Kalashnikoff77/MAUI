@@ -7,6 +7,7 @@ namespace Data.Models.SignalR
         public OnAvatarChanged? OnAvatarChanged { get; set; }
         public OnScheduleChanged? OnScheduleChanged { get; set; }
         public OnMessagesReload? OnMessagesReload { get; set; }
+        public OnLastMessagesReload? OnLastMessagesReload { get; set; }
     }
 
 
@@ -23,20 +24,12 @@ namespace Data.Models.SignalR
 
     public class OnMessagesReload
     {
-        /// <summary>
-        /// Заполнить, если нужно дёрнуть дополнительно получателя. Иначе дёргаем только отправителя
-        /// </summary>
         public int? RecipientId { get; set; }
+    }
 
-        /// <summary>
-        /// Получить новые сообщения?
-        /// </summary>
-        public bool IsGetNextId { get; set; } = false;
-
-        /// <summary>
-        /// Получить предыдущие сообщения?
-        /// </summary>
-        public bool IsGetPreviousId { get; set; } = false;
+    public class OnLastMessagesReload
+    {
+        public int? RecipientId { get; set; }
     }
 }
 

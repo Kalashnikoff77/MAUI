@@ -40,9 +40,13 @@ namespace SignalR
             if (request.OnAvatarChanged != null)
                 await OnAvatarChangedAsync(request.OnAvatarChanged);
 
-            // Пользователь отправил сообщение другому пользователю
+            // Обновить сообщения у двух пользователей (диалоговое окно страницы /messages)
             if (request.OnMessagesReload != null)
-                await OnMessageAddedAsync(request.OnMessagesReload);
+                await OnMessagesReloadAsync(request.OnMessagesReload);
+
+            // Обновить список последних сообщений у двух пользователей (страница /messages)
+            if (request.OnLastMessagesReload != null)
+                await OnLastMessagesReloadAsync(request.OnLastMessagesReload);
         }
 
 
@@ -70,13 +74,27 @@ namespace SignalR
         }
 
         /// <summary>
-        /// Пользователь отправил сообщение другому пользователю
+        /// Обновить сообщения у двух пользователей (диалоговое окно страницы /messages)
         /// </summary>
-        async Task OnMessageAddedAsync(OnMessagesReload request)
+        async Task OnMessagesReloadAsync(OnMessagesReload request)
         {
             if (GetAccountDetails(out AccountDetails accountDetails, Context.UserIdentifier))
             {
                 var response = new OnMessagesReloadResponse();
+                await Clients
+                    .Users([Context.UserIdentifier!, request.RecipientId?.ToString()!])
+                    .SendAsync(response.EnumSignalRHandlersClient.ToString(), response);
+            }
+        }
+
+        /// <summary>
+        /// Обновить список последних сообщений у двух пользователей (страница /messages)
+        /// </summary>
+        async Task OnLastMessagesReloadAsync(OnLastMessagesReload request)
+        {
+            if (GetAccountDetails(out AccountDetails accountDetails, Context.UserIdentifier))
+            {
+                var response = new OnLastMessagesReloadResponse();
                 await Clients
                     .Users([Context.UserIdentifier!, request.RecipientId?.ToString()!])
                     .SendAsync(response.EnumSignalRHandlersClient.ToString(), response);

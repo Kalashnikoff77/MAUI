@@ -14,7 +14,7 @@ namespace Shared.Components.Pages.Messages
     {
         [CascadingParameter] public CurrentState CurrentState { get; set; } = null!;
         [CascadingParameter] protected MudDialogInstance MudDialog { get; set; } = null!;
-        [Parameter, Required] public AccountsViewDto Account { get; set; } = null!;
+        [Parameter, Required] public AccountsViewDto Recipient { get; set; } = null!;
 
         [Inject] IRepository<AddMessageRequestDto, AddMessageResponseDto> _repoAddMessage { get; set; } = null!;
 
@@ -31,13 +31,18 @@ namespace Shared.Components.Pages.Messages
                 sending = true;
                 var response = await _repoAddMessage.HttpPostAsync(new AddMessageRequestDto
                 {
-                    RecipientId = Account.Id,
+                    RecipientId = Recipient.Id,
                     Text = text,
                     Token = CurrentState.Account?.Token
                 });
 
-                var request = new SignalGlobalRequest { OnMessagesReload = new OnMessagesReload { RecipientId = Account.Id } };
-                await CurrentState.SignalRServerAsync(request);
+                // Обновим сообщения в диалоговом окне
+                var messagesRequest = new SignalGlobalRequest { OnMessagesReload = new OnMessagesReload { RecipientId = Recipient.Id } };
+                await CurrentState.SignalRServerAsync(messagesRequest);
+
+                // Обновим список последних сообщений на странице /messages
+                var lastMessagesRequest = new SignalGlobalRequest { OnLastMessagesReload = new OnLastMessagesReload { RecipientId = Recipient.Id } };
+                await CurrentState.SignalRServerAsync(lastMessagesRequest);
 
                 text = null;
                 sending = false;

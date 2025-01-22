@@ -3,6 +3,11 @@
     public enum EnumSignalRHandlers
     {
         /// <summary>
+        /// Пользователь залогинился
+        /// </summary>
+        UpdateOnlineAccountsClient,
+
+        /// <summary>
         /// При добавлении обсуждения в мероприятие
         /// </summary>
         OnScheduleChangedClient,
@@ -13,35 +18,39 @@
         OnAvatarChangedClient,
 
         /// <summary>
-        /// Добавлено новое сообщение в диалогах
+        /// Обновить сообщения у двух пользователей (диалоговое окно страницы /messages)
         /// </summary>
         OnMessagesReloadClient,
 
+        /// <summary>
+        /// Обновить список последних сообщений у двух пользователей (страница /messages)
+        /// </summary>
+        OnLastMessagesReloadClient,
 
 
         // Требуется проверить, используются ли эти перечисления
-        NewMessageAddedServer,
-        NewMessageAddedClient,
+        //NewMessageAddedServer,
+        //NewMessageAddedClient,
 
-        NewEventDiscussionAddedServer,
-        NewEventDiscussionAddedClient,
+        //NewEventDiscussionAddedServer,
+        //NewEventDiscussionAddedClient,
 
-        NewNotificationAddedServer,
-        NewNotificationAddedClient,
+        //NewNotificationAddedServer,
+        //NewNotificationAddedClient,
 
-        UpdateMessagesCountServer,
-        UpdateMessagesCountClient,
+        //UpdateMessagesCountServer,
+        //UpdateMessagesCountClient,
 
-        UpdateNotificationsCountServer,
-        UpdateNotificationsCountClient,
+        //UpdateNotificationsCountServer,
+        //UpdateNotificationsCountClient,
 
-        UpdateOnlineAccountsClient,
+        //UpdateOnlineAccountsClient,
 
-        AvatarChangedServer,
-        AvatarChangedClient,
+        //AvatarChangedServer,
+        //AvatarChangedClient,
 
-        UpdateRelationsServer,
-        GetRelationsClient,
-        GetRelationsServer
+        //UpdateRelationsServer,
+        //GetRelationsClient,
+        //GetRelationsServer
     }
 }

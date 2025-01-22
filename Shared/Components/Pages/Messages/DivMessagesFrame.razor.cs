@@ -18,9 +18,8 @@ namespace Shared.Components.Pages.Messages
     /// </summary>
     public partial class DivMessagesFrame : IDisposable
     {
-        [Parameter, Required] public AccountsViewDto Account { get; set; } = null!;
-
         [CascadingParameter] public CurrentState CurrentState { get; set; } = null!;
+        [Parameter, Required] public AccountsViewDto Account { get; set; } = null!;
         
         [Inject] IRepository<GetMessagesRequestDto, GetMessagesResponseDto> _repoGetMessages { get; set; } = null!;
         [Inject] IJSProcessor _JSProcessor { get; set; } = null!;
@@ -42,27 +41,11 @@ namespace Shared.Components.Pages.Messages
                 await _JSProcessor.SetDotNetReference(_dotNetReference);
 
                 OnMessagesReloadHandler = OnMessagesReloadHandler.SignalRClient<OnMessagesReloadResponse>(CurrentState, async (response) =>
-                    await _JSModule.InvokeVoidAsync("AppendNewMessages", "DivMessagesFrame", await GetNextMessages()));
+                {
+                    var newMessages = await GetNextMessages();
+                    await _JSModule.InvokeVoidAsync("AppendNewMessages", "DivMessagesFrame", newMessages);
+                });
             }
-        }
-
-
-        [JSInvokable]
-        public async Task<string> GetNextMessages()
-        {
-            var request = new GetMessagesRequestDto
-            {
-                RecipientId = Account.Id,
-                GetNextAfterId = messages.Count > 0 ? messages.Max(m => m.Id) : null,
-                MarkAsRead = true,
-                Take = StaticData.MESSAGES_PER_BLOCK,
-                Token = CurrentState.Account?.Token
-            };
-            var apiResponse = await _repoGetMessages.HttpPostAsync(request);
-            messages.AddRange(apiResponse.Response.Messages);
-
-            // Ручная генерация компонентов сообщений
-            return await RenderMessages(apiResponse.Response.Messages);
         }
 
         [JSInvokable]
@@ -79,10 +62,30 @@ namespace Shared.Components.Pages.Messages
             var apiResponse = await _repoGetMessages.HttpPostAsync(request);
             messages.InsertRange(0, apiResponse.Response.Messages);
 
+            // Обновим список последних сообщений на странице /messages
+            var lastMessagesRequest = new SignalGlobalRequest { OnLastMessagesReload = new OnLastMessagesReload { RecipientId = Account.Id } };
+            await CurrentState.SignalRServerAsync(lastMessagesRequest);
+
             // Ручная генерация компонентов сообщений
             return await RenderMessages(apiResponse.Response.Messages);
         }
 
+        public async Task<string> GetNextMessages()
+        {
+            var request = new GetMessagesRequestDto
+            {
+                RecipientId = Account.Id,
+                GetNextAfterId = messages.Count > 0 ? messages.Max(m => m.Id) : null,
+                MarkAsRead = true,
+                Take = StaticData.MESSAGES_PER_BLOCK,
+                Token = CurrentState.Account?.Token
+            };
+            var apiResponse = await _repoGetMessages.HttpPostAsync(request);
+            messages.AddRange(apiResponse.Response.Messages);
+
+            // Ручная генерация компонентов сообщений
+            return await RenderMessages(apiResponse.Response.Messages);
+        }
 
         /// <summary>
         /// Ручная генерация компонента Message (сообщения пользователя)
