@@ -23,6 +23,98 @@ namespace WebAPI.Controllers
         public MessagesController(IMapper mapper, IConfiguration configuration, IMemoryCache cache) : base(configuration, mapper, cache) { }
 
 
+        // Получить одно или все сообщения
+        [Route("Get"), HttpPost, Authorize]
+        public async Task<GetMessagesResponseDto> GetAsync(GetMessagesRequestDto request)
+        {
+            AuthenticateUser();
+
+            var response = new GetMessagesResponseDto();
+
+            if (request.MessageId.HasValue && request.MessageId.Value > 0)
+            {
+                MessagesEntity? result;
+                var sql = $"SELECT * FROM Messages " +
+                    $"WHERE (({nameof(MessagesEntity.SenderId)} = @AccountId AND {nameof(MessagesEntity.RecipientId)} = @RecipientId) " +
+                    $"OR ({nameof(MessagesEntity.SenderId)} = @RecipientId AND {nameof(MessagesEntity.RecipientId)} = @AccountId))";
+                result = await _unitOfWork.SqlConnection.QueryFirstOrDefaultAsync<MessagesEntity>(sql, new { _unitOfWork.AccountId, request.RecipientId });
+                response.Message = _unitOfWork.Mapper.Map<MessagesDto>(result);
+            }
+            else
+            {
+                IEnumerable<MessagesEntity> result;
+
+                // Получим кол-во сообщений
+                var sql = $"SELECT COUNT(*) FROM Messages " +
+                    $"WHERE ({nameof(MessagesEntity.SenderId)} = @AccountId AND {nameof(MessagesEntity.RecipientId)} = @RecipientId) " +
+                    $"OR ({nameof(MessagesEntity.SenderId)} = @RecipientId AND {nameof(MessagesEntity.RecipientId)} = @AccountId)";
+                response.Count = await _unitOfWork.SqlConnection.QueryFirstAsync<int>(sql, new { _unitOfWork.AccountId, request.RecipientId });
+
+                // Запрос на получение предыдущих сообщений
+                if (request.GetPreviousFromId.HasValue)
+                {
+                    sql = $"SELECT TOP (@Take) * FROM Messages " +
+                        $"WHERE (({nameof(MessagesEntity.SenderId)} = @AccountId AND {nameof(MessagesEntity.RecipientId)} = @RecipientId) " +
+                        $"OR ({nameof(MessagesEntity.SenderId)} = @RecipientId AND {nameof(MessagesEntity.RecipientId)} = @AccountId)) " +
+                        $"AND Id < {request.GetPreviousFromId} " +
+                        $"ORDER BY Id DESC";
+                    result = (await _unitOfWork.SqlConnection.QueryAsync<MessagesEntity>(sql, new { _unitOfWork.AccountId, request.RecipientId, request.Take })).Reverse();
+                }
+
+                // Запрос на получение следующих сообщений
+                else if (request.GetNextAfterId.HasValue)
+                {
+                    sql = $"SELECT TOP (@Take) * FROM Messages " +
+                        $"WHERE (({nameof(MessagesEntity.SenderId)} = @AccountId AND {nameof(MessagesEntity.RecipientId)} = @RecipientId) " +
+                        $"OR ({nameof(MessagesEntity.SenderId)} = @RecipientId AND {nameof(MessagesEntity.RecipientId)} = @AccountId)) " +
+                        $"AND Id > {request.GetNextAfterId} " +
+                        $"ORDER BY Id ASC";
+                    result = await _unitOfWork.SqlConnection.QueryAsync<MessagesEntity>(sql, new { _unitOfWork.AccountId, request.RecipientId, request.Take });
+                }
+
+                // Запрос на получение последних сообщений (по умолчанию)
+                else
+                {
+                    int offset = response.Count.Value > StaticData.MESSAGES_PER_BLOCK ? response.Count.Value - StaticData.MESSAGES_PER_BLOCK : 0;
+                    sql = $"SELECT * FROM Messages " +
+                        $"WHERE ({nameof(MessagesEntity.SenderId)} = @AccountId AND {nameof(MessagesEntity.RecipientId)} = @RecipientId) " +
+                        $"OR ({nameof(MessagesEntity.SenderId)} = @RecipientId AND {nameof(MessagesEntity.RecipientId)} = @AccountId) " +
+                        $"ORDER BY Id ASC " +
+                        $"OFFSET {offset} ROWS";
+                    result = await _unitOfWork.SqlConnection.QueryAsync<MessagesEntity>(sql, new { _unitOfWork.AccountId, request.RecipientId });
+                }
+
+                response.Messages = _unitOfWork.Mapper.Map<List<MessagesDto>>(result);
+
+                // Получим отправителя и получателя
+                var columns = GetRequiredColumns<AccountsViewEntity>();
+                sql = $"SELECT TOP 2 {columns.Aggregate((a, b) => a + ", " + b)} FROM AccountsView WHERE Id = @AccountId OR Id = @RecipientId";
+                var accounts = await _unitOfWork.SqlConnection.QueryAsync<AccountsViewEntity>(sql, new { _unitOfWork.AccountId, request.RecipientId });
+
+                response.Accounts = accounts.Select(x => new KeyValuePair<int, AccountsViewDto>(x.Id, _unitOfWork.Mapper.Map<AccountsViewDto>(x))).ToDictionary();
+
+                // Будем отмечать сообщения, как прочитанные?
+                if (request.MarkAsRead)
+                {
+                    var ids = response.Messages
+                        .Where(w => w.RecipientId == _unitOfWork.AccountId && w.ReadDate == null)
+                        .Select(s => s.Id.ToString());
+
+                    if (ids.Any())
+                    {
+                        // Пометим в базе
+                        await _unitOfWork.SqlConnection.ExecuteAsync($"UPDATE Messages SET {nameof(MessagesEntity.ReadDate)} = getdate() " +
+                            $"WHERE Id IN ({ids.Aggregate((a, b) => a + ", " + b)})");
+                        // Пометим в ответе
+                        response.Messages.ForEach(m => m.ReadDate = DateTime.Now);
+                    }
+                }
+            }
+
+            return response;
+        }
+
+
         // Считает кол-во прочитанных и непрочитанных сообщений
         [Route("Count"), HttpPost, Authorize]
         public async Task<GetMessagesCountResponseDto> GetCountAsync(GetMessagesCountRequestDto request)
@@ -43,81 +135,8 @@ namespace WebAPI.Controllers
         }
 
 
-        [Route("Get"), HttpPost, Authorize]
-        public async Task<GetMessagesResponseDto> GetAsync(GetMessagesRequestDto request)
-        {
-            AuthenticateUser();
-
-            var response = new GetMessagesResponseDto();
-            IEnumerable<MessagesEntity> result;
-
-            // Получим кол-во сообщений
-            var sql = $"SELECT COUNT(*) FROM Messages " +
-                $"WHERE ({nameof(MessagesEntity.SenderId)} = @AccountId AND {nameof(MessagesEntity.RecipientId)} = @RecipientId) " +
-                $"OR ({nameof(MessagesEntity.SenderId)} = @RecipientId AND {nameof(MessagesEntity.RecipientId)} = @AccountId)";
-            response.Count = await _unitOfWork.SqlConnection.QueryFirstAsync<int>(sql, new { _unitOfWork.AccountId, request.RecipientId });
-
-            // Запрос на получение предыдущих сообщений
-            if (request.GetPreviousFromId.HasValue)
-            {
-                sql = $"SELECT TOP (@Take) * FROM Messages " +
-                    $"WHERE (({nameof(MessagesEntity.SenderId)} = @AccountId AND {nameof(MessagesEntity.RecipientId)} = @RecipientId) " +
-                    $"OR ({nameof(MessagesEntity.SenderId)} = @RecipientId AND {nameof(MessagesEntity.RecipientId)} = @AccountId)) " +
-                    $"AND Id < {request.GetPreviousFromId} " +
-                    $"ORDER BY Id DESC";
-                result = (await _unitOfWork.SqlConnection.QueryAsync<MessagesEntity>(sql, new { _unitOfWork.AccountId, request.RecipientId, request.Take })).Reverse();
-            }
-
-            // Запрос на получение следующих сообщений
-            else if (request.GetNextAfterId.HasValue)
-            {
-                sql = $"SELECT TOP (@Take) * FROM Messages " +
-                    $"WHERE (({nameof(MessagesEntity.SenderId)} = @AccountId AND {nameof(MessagesEntity.RecipientId)} = @RecipientId) " +
-                    $"OR ({nameof(MessagesEntity.SenderId)} = @RecipientId AND {nameof(MessagesEntity.RecipientId)} = @AccountId)) " +
-                    $"AND Id > {request.GetNextAfterId} " +
-                    $"ORDER BY Id ASC";
-                result = await _unitOfWork.SqlConnection.QueryAsync<MessagesEntity>(sql, new { _unitOfWork.AccountId, request.RecipientId, request.Take });
-            }
-
-            // Запрос на получение последних сообщений (по умолчанию)
-            else
-            {
-                int offset = response.Count.Value > StaticData.MESSAGES_PER_BLOCK ? response.Count.Value - StaticData.MESSAGES_PER_BLOCK : 0;
-                sql = $"SELECT * FROM Messages " +
-                    $"WHERE ({nameof(MessagesEntity.SenderId)} = @AccountId AND {nameof(MessagesEntity.RecipientId)} = @RecipientId) " +
-                    $"OR ({nameof(MessagesEntity.SenderId)} = @RecipientId AND {nameof(MessagesEntity.RecipientId)} = @AccountId) " +
-                    $"ORDER BY Id ASC " +
-                    $"OFFSET {offset} ROWS";
-                result = await _unitOfWork.SqlConnection.QueryAsync<MessagesEntity>(sql, new { _unitOfWork.AccountId, request.RecipientId });
-            }
-
-            response.Messages = _unitOfWork.Mapper.Map<List<MessagesDto>>(result);
-
-            // Получим отправителя и получателя
-            var columns = GetRequiredColumns<AccountsViewEntity>();
-            sql = $"SELECT TOP 2 {columns.Aggregate((a, b) => a + ", " + b)} FROM AccountsView WHERE Id = @AccountId OR Id = @RecipientId";
-            var accounts = await _unitOfWork.SqlConnection.QueryAsync<AccountsViewEntity>(sql, new { _unitOfWork.AccountId, request.RecipientId });
-
-            response.Accounts = accounts.Select(x => new KeyValuePair<int, AccountsViewDto>(x.Id, _unitOfWork.Mapper.Map<AccountsViewDto>(x))).ToDictionary();
-
-            // Будем отмечать сообщения, как прочитанные?
-            if (request.MarkAsRead)
-            {
-                var ids = response.Messages
-                    .Where(w => w.RecipientId == _unitOfWork.AccountId && w.ReadDate == null)
-                    .Select(s => s.Id.ToString());
-
-                if (ids.Any())
-                    await _unitOfWork.SqlConnection.ExecuteAsync($"UPDATE Messages SET {nameof(MessagesEntity.ReadDate)} = getdate() " +
-                        $"WHERE Id IN ({ids.Aggregate((a, b) => a + ", " + b)})");
-            }
-
-            return response;
-        }
-
-
         [Route("MarkAsRead"), HttpPost, Authorize]
-        public async Task<MarkMessageAsReadResponseDto> MarkAsReadAsync(MarkMessageAsReadRequestDto request)
+        public async Task<ResponseDtoBase> MarkAsReadAsync(MarkMessageAsReadRequestDto request)
         {
             AuthenticateUser();
 
@@ -130,8 +149,6 @@ namespace WebAPI.Controllers
 
             // Выберем отправителя
             var senderId = currentMessage.SenderId == _unitOfWork.AccountId ? currentMessage.RecipientId : currentMessage.SenderId;
-
-            var response = new MarkMessageAsReadResponseDto();
 
             // Помечаем все сообщения с этим пользователем как прочитанные
             if (request.MarkAllAsRead)
@@ -152,14 +169,7 @@ namespace WebAPI.Controllers
                 await _unitOfWork.SqlConnection.ExecuteAsync(sql, new { CurrentDate = DateTime.Now, request.MessageId, _unitOfWork.AccountId, senderId });
             }
 
-            // Вернём обновлённое сообщение
-            var p = new DynamicParameters();
-            p.Add("@AccountId", _unitOfWork.AccountId);
-            p.Add("@MessageId", request.MessageId);
-            var result = await _unitOfWork.SqlConnection.QuerySingleAsync<LastMessagesForAccountSpEntity>("GetLastMessagesForAccount_sp", p, commandType: System.Data.CommandType.StoredProcedure);
-            response.UpdatedMessage = _unitOfWork.Mapper.Map<LastMessagesForAccountSpDto>(result);
-
-            return response;
+            return new ResponseDtoBase();
         }
 
 

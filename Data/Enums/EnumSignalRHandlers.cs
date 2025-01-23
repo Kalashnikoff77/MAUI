@@ -18,14 +18,19 @@
         OnAvatarChangedClient,
 
         /// <summary>
-        /// Обновить сообщения у двух пользователей (диалоговое окно страницы /messages)
+        /// Получаем новые сообщения для двух пользователей (диалоговое окно страницы /messages)
         /// </summary>
-        OnMessagesReloadClient,
+        OnGetNewMessagesClient,
 
         /// <summary>
-        /// Обновить список последних сообщений у двух пользователей (страница /messages)
+        /// Обновляем сообщения в диалоговом окне страницы /messages (причины: сообщение отредактировано или прочитано)
         /// </summary>
-        OnLastMessagesReloadClient,
+        OnMarkMessagesAsReadClient,
+
+        /// <summary>
+        /// Обновить список последних сообщений у обоих пользователей на странице /messages
+        /// </summary>
+        OnUpdateLastMessagesClient,
 
 
         // Требуется проверить, используются ли эти перечисления

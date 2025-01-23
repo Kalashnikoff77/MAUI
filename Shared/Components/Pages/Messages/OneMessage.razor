@@ -7,7 +7,7 @@
                 <MudText Style="text-align:left; font-size:12px">@Message.CreateDate.ToMyString()</MudText>
                 @if (Message.ReadDate.HasValue) 
                 {
-                    <MudIcon Icon="@Icons.Material.Filled.DoneAll" Color="Color.Inherit" Style="font-size:15px; margin: 0 0 1px 5px" />
+                    <MudIcon Icon="@Icons.Material.Filled.DoneAll" Color="Color.Inherit" Style="font-size:15px; margin: 0 0 1px 5px" title="@($"Прочитано: {Message.ReadDate.Value.ToMyString()}")" />
                 }
                 else 
                 {

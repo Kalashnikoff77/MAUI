@@ -9,7 +9,7 @@
 
         <DialogContent>
             @* Окно с сообщениями *@
-            <DivMessagesFrame Account="Recipient" />
+            <div id="Scroll" style="max-height:450px; overflow:auto" />
 
             @* Форма отправки сообщения *@
             <div class="d-flex flex-wrap gap-1 justify-end align-center">
@@ -19,5 +19,6 @@
                 <MudButton Disabled="@sending" OnClick="SubmitMessageAsync" Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Send" Size="Size.Small">Отправить</MudButton>
             </div>
         </DialogContent>
+
     </MudDialog>
 }

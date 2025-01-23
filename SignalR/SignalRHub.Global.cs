@@ -40,13 +40,17 @@ namespace SignalR
             if (request.OnAvatarChanged != null)
                 await OnAvatarChangedAsync(request.OnAvatarChanged);
 
-            // Обновить сообщения у двух пользователей (диалоговое окно страницы /messages)
-            if (request.OnMessagesReload != null)
-                await OnMessagesReloadAsync(request.OnMessagesReload);
+            // Обновить сообщения у двух пользователей в диалоговом окне страницы /messages
+            if (request.OnGetNewMessages != null)
+                await OnGetNewMessagesAsync(request.OnGetNewMessages);
+
+            // Обновить сообщения у пользователя в диалоговом окне страницы /messages (например: отметка о прочтении, изменение текста)
+            if (request.OnMarkMessagesAsRead != null)
+                await OnMarkMessagesAsReadAsync(request.OnMarkMessagesAsRead);
 
             // Обновить список последних сообщений у двух пользователей (страница /messages)
-            if (request.OnLastMessagesReload != null)
-                await OnLastMessagesReloadAsync(request.OnLastMessagesReload);
+            if (request.OnUpdateLastMessages != null)
+                await OnUpdateLastMessagesAsync(request.OnUpdateLastMessages);
         }
 
 
@@ -74,13 +78,13 @@ namespace SignalR
         }
 
         /// <summary>
-        /// Обновить сообщения у двух пользователей (диалоговое окно страницы /messages)
+        /// Добавим сообщения в диалог двух пользователей (диалоговое окно страницы /messages)
         /// </summary>
-        async Task OnMessagesReloadAsync(OnMessagesReload request)
+        async Task OnGetNewMessagesAsync(OnGetNewMessages request)
         {
             if (GetAccountDetails(out AccountDetails accountDetails, Context.UserIdentifier))
             {
-                var response = new OnMessagesReloadResponse();
+                var response = new OnGetNewMessagesResponse();
                 await Clients
                     .Users([Context.UserIdentifier!, request.RecipientId?.ToString()!])
                     .SendAsync(response.EnumSignalRHandlersClient.ToString(), response);
@@ -88,15 +92,29 @@ namespace SignalR
         }
 
         /// <summary>
-        /// Обновить список последних сообщений у двух пользователей (страница /messages)
+        /// Пометим сообщения как прочитанные в MessageDialog страницы /messages
         /// </summary>
-        async Task OnLastMessagesReloadAsync(OnLastMessagesReload request)
+        async Task OnMarkMessagesAsReadAsync(OnMarkMessagesAsRead request)
         {
             if (GetAccountDetails(out AccountDetails accountDetails, Context.UserIdentifier))
             {
-                var response = new OnLastMessagesReloadResponse();
+                var response = new OnMarkMessagesAsReadResponse { Messages = request.Messages };
                 await Clients
-                    .Users([Context.UserIdentifier!, request.RecipientId?.ToString()!])
+                    .User(request.RecipientId.ToString())
+                    .SendAsync(response.EnumSignalRHandlersClient.ToString(), response);
+            }
+        }
+
+        /// <summary>
+        /// Обновим список последних сообщений у двух пользователей (страница /messages)
+        /// </summary>
+        async Task OnUpdateLastMessagesAsync(OnUpdateLastMessages request)
+        {
+            if (GetAccountDetails(out AccountDetails accountDetails, Context.UserIdentifier))
+            {
+                var response = new OnUpdateLastMessagesResponse();
+                await Clients
+                    .Users([Context.UserIdentifier!, request.RecipientId.ToString()!])
                     .SendAsync(response.EnumSignalRHandlersClient.ToString(), response);
             }
         }
