@@ -6,6 +6,9 @@ namespace Data.Models.SignalR
     {
         public override EnumSignalRHandlers EnumSignalRHandlersClient => EnumSignalRHandlers.OnMarkMessagesAsReadClient;
 
+        /// <summary>
+        /// Список Id сообщений для отметки (null - помечать все)
+        /// </summary>
         public IEnumerable<int>? MessagesIds { get; set; } = null!;
     }
 }

@@ -25,18 +25,30 @@ namespace Data.Models.SignalR
 
     public class OnGetNewMessages
     {
+        /// <summary>
+        /// Второй участник в диалоге (первый берётся из [Authorize])
+        /// </summary>
         public int? RecipientId { get; set; }
     }
 
     public class OnMarkMessagesAsRead
     {
+        /// <summary>
+        /// Пользователь, у которого отмечаются сообщения как прочитанные
+        /// </summary>
         public int RecipientId { get; set; }
 
+        /// <summary>
+        /// Список Id сообщений для отметки (null - помечать все)
+        /// </summary>
         public IEnumerable<int>? MessagesIds { get; set; } = null!;
     }
 
     public class OnUpdateLastMessages
     {
+        /// <summary>
+        /// Второй участник в диалоге (первый берётся из [Authorize])
+        /// </summary>
         public int RecipientId { get; set; }
     }
 }

@@ -48,7 +48,7 @@ namespace Shared.Components.Pages.Messages
                 // Пометим сообщения как прочитанные в диалоговом окне страницы /messages
                 OnMarkMessagesAsReadHandler = OnMarkMessagesAsReadHandler.SignalRClient<OnMarkMessagesAsReadResponse>(CurrentState, async (response) =>
                 {
-                    // Помечаем прочитанными все сообщения?
+                    // Если MessagesIds = null, то помечаем прочитанными все сообщения
                     if (response.MessagesIds == null)
                         response.MessagesIds = messages.Where(x => x.RecipientId == Recipient.Id).Select(x => x.Id);
 
@@ -147,7 +147,7 @@ namespace Shared.Components.Pages.Messages
                     Token = CurrentState.Account?.Token
                 });
 
-                // Обновим сообщения в диалоговом окне
+                // Обновим сообщения в MessageDialog
                 var messagesRequest = new SignalGlobalRequest { OnGetNewMessages = new OnGetNewMessages { RecipientId = Recipient.Id } };
                 await CurrentState.SignalRServerAsync(messagesRequest);
 
