@@ -9,6 +9,7 @@ using Data.State;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using MudBlazor;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 
@@ -114,6 +115,14 @@ namespace Shared.Components.Pages.Messages
             var apiResponse = await _repoGetMessages.HttpPostAsync(request);
             messages.AddRange(apiResponse.Response.Messages);
 
+            // Пометим сообщение как прочитанное в MessageDialog
+            var messagesIds = apiResponse.Response.Messages.Where(x => x.SenderId == Recipient.Id).Select(s => s.Id);
+            if (messagesIds.Count() > 0)
+            {
+                var markMessagesAsReadRequest = new SignalGlobalRequest { OnMarkMessagesAsRead = new OnMarkMessagesAsRead { RecipientId = Recipient.Id, MessagesIds = messagesIds } };
+                await CurrentState.SignalRServerAsync(markMessagesAsReadRequest);
+            }
+
             // Ручная генерация компонентов сообщений
             return await RenderMessages(apiResponse.Response.Messages);
         }
@@ -147,7 +156,7 @@ namespace Shared.Components.Pages.Messages
                     Token = CurrentState.Account?.Token
                 });
 
-                // Обновим сообщения в MessageDialog
+                // Добавим сообщение в MessageDialog
                 var messagesRequest = new SignalGlobalRequest { OnGetNewMessages = new OnGetNewMessages { RecipientId = Recipient.Id } };
                 await CurrentState.SignalRServerAsync(messagesRequest);
 
