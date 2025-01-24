@@ -9,7 +9,6 @@ using Data.State;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using MudBlazor;
-using System;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 
@@ -23,7 +22,6 @@ namespace Shared.Components.Pages.Messages
 
         [Inject] IRepository<AddMessageRequestDto, AddMessageResponseDto> _repoAddMessage { get; set; } = null!;
         [Inject] IRepository<GetMessagesRequestDto, GetMessagesResponseDto> _repoGetMessages { get; set; } = null!;
-        [Inject] IJSProcessor _JSProcessor { get; set; } = null!;
         [Inject] IJSRuntime _JSRuntime { get; set; } = null!;
         [Inject] IComponentRenderer<OneMessage> _renderer { get; set; } = null!;
 
@@ -36,7 +34,6 @@ namespace Shared.Components.Pages.Messages
 
         string? text;
         bool sending;
-
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
@@ -51,7 +48,7 @@ namespace Shared.Components.Pages.Messages
                 {
                     // Если MessagesIds = null, то помечаем прочитанными все сообщения
                     if (response.MessagesIds == null)
-                        response.MessagesIds = messages.Where(x => x.RecipientId == Recipient.Id).Select(x => x.Id);
+                        response.MessagesIds = messages.Where(x => x.RecipientId == Recipient.Id && x.ReadDate == null).Select(x => x.Id);
 
                     foreach (var messageId in response.MessagesIds)
                     {
@@ -68,12 +65,11 @@ namespace Shared.Components.Pages.Messages
                 _dotNetReference = DotNetObjectReference.Create(this);
                 _JSModule = await _JSRuntime.InvokeAsync<IJSObjectReference>("import", "./js/Pages/Messages/MessagesScroll.js");
                 await _JSModule.InvokeVoidAsync("GetPreviousMessages", _dotNetReference);
-                await _JSProcessor.SetDotNetReference(_dotNetReference);
             }
         }
 
         [JSInvokable]
-        public async Task<string> GetPreviousMessages()
+        public async Task<string> GetPreviousMessagesAsync()
         {
             var request = new GetMessagesRequestDto
             {
@@ -128,7 +124,7 @@ namespace Shared.Components.Pages.Messages
         }
 
         /// <summary>
-        /// Ручная генерация компонента Message (сообщения пользователя)
+        /// Ручная генерация компонента OneMessage (сообщения пользователя)
         /// </summary>
         async Task<string> RenderMessages(List<MessagesDto> messages)
         {

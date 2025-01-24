@@ -1,13 +1,8 @@
-﻿<div class="d-flex flex-column" style="height:250px; overflow:auto" id="DivDiscussionsFrame">
+﻿<div class="d-flex flex-column" style="height:250px; overflow:auto">
+        @* Окно с сообщениями *@
+        <div id="Scroll" style="overflow:auto" />
 
-    @if (discussions.Count > 0)
-    {
-        @if (moreDiscussionsButton)
-        {
-            <MudButton Class="pa-3 mb-3" Variant="Variant.Text" StartIcon="@Icons.Material.Filled.MoreHoriz" EndIcon="@Icons.Material.Filled.MoreHoriz" Color="Color.Primary" OnClick="GetPreviousDiscussionsAsync">Ещё</MudButton>
-        }
-
-        @foreach (var discussion in discussions)
+@*         @foreach (var discussion in discussions)
         {
             <div class="d-flex gap-3 mt-1 mb-2">
                 <ImageAvatar Account="discussion.Sender" Size="EnumImageSize.s64x64" Class="avatar s40" />
@@ -18,7 +13,7 @@
                 </div>
             </div>
         }
-    }
+     }
     else 
     {
         // Если обсуждения загружены, но их нет, значит, выведем заглушку "Пока тихо..."
@@ -29,10 +24,7 @@
             </div>
         }
     }
-
-    @* Метка конца списка обсужений *@
-    <div id="id_0" />
-
+*@
 </div>
 
 

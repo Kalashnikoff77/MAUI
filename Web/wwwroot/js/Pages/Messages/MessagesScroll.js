@@ -1,8 +1,8 @@
 var _dotNetReference;
 
-export async function GetPreviousMessages(dotNetObject) {
-    _dotNetReference = dotNetObject; // Сохраним ссылку на C#
-    var result = await _dotNetReference.invokeMethodAsync('GetPreviousMessages'); // Получим сообщения
+export async function GetPreviousMessages(dotNetReference) {
+    _dotNetReference = dotNetReference;
+    var result = await _dotNetReference.invokeMethodAsync('GetPreviousMessagesAsync'); // Получим сообщения
     $('#Scroll').prepend(result); // Добавим полученные сообщения в окно
     window.ScrollDivToBottom('Scroll'); // Прокрутим окно в самый низ
     $('#Scroll').on('scroll', ScrollEvent); // Установим обработчик события прокрутки
@@ -12,7 +12,7 @@ export async function GetPreviousMessages(dotNetObject) {
 async function ScrollEvent(event) {
     if (document.getElementById('Scroll').scrollTop < 250) {
         $('#Scroll').off('scroll'); // Временно отключим обработчик
-        var result = await _dotNetReference.invokeMethodAsync('GetPreviousMessages'); // Получим новые сообщения
+        var result = await _dotNetReference.invokeMethodAsync('GetPreviousMessagesAsync'); // Получим новые сообщения
         if (result != '') { // Если ещё есть сообщения, то добавляем их и включаем обработчик снова
             $('#Scroll').prepend(result).on('scroll', ScrollEvent);
         }
