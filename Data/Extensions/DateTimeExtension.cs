@@ -14,16 +14,16 @@
             var aftertomorrow = now.AddDays(2);
 
             if (dateTime.Date == yesterday.Date)
-                return dateTime.ToString($"ddd, вчера {time}");
+                return dateTime.ToString($"вчера, {time}");
             if (dateTime.Date == now.Date)
-                return dateTime.ToString($"сегодня {time}");
+                return dateTime.ToString($"сегодня, {time}");
             if (dateTime.Date == tomorrow.Date)
-                return dateTime.ToString($"ddd, завтра {time}");
+                return dateTime.ToString($"завтра, {time}");
             if (dateTime.Date == aftertomorrow.Date)
-                return dateTime.ToString($"ddd, послезавтра {time}");
+                return dateTime.ToString($"ddd, послезавтра, {time}");
 
             if (dateTime.Year == DateTime.Now.Year)
-                return dateTime.ToString("ddd, dd MMM HH:mm");
+                return dateTime.ToString("ddd, dd MMM, HH:mm");
             else
                 return dateTime.ToString("ddd, dd MMM yyyy, HH:mm");
         }

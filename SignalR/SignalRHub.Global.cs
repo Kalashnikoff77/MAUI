@@ -98,7 +98,7 @@ namespace SignalR
         {
             if (GetAccountDetails(out AccountDetails accountDetails, Context.UserIdentifier))
             {
-                var response = new OnMarkMessagesAsReadResponse { Messages = request.Messages };
+                var response = new OnMarkMessagesAsReadResponse { MessagesIds = request.MessagesIds };
                 await Clients
                     .User(request.RecipientId.ToString())
                     .SendAsync(response.EnumSignalRHandlersClient.ToString(), response);

@@ -32,7 +32,7 @@ namespace Data.Models.SignalR
     {
         public int RecipientId { get; set; }
 
-        public IEnumerable<MessagesDto> Messages { get; set; } = null!;
+        public IEnumerable<int>? MessagesIds { get; set; } = null!;
     }
 
     public class OnUpdateLastMessages

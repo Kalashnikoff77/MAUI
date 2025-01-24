@@ -45,13 +45,22 @@ namespace Shared.Components.Pages.Messages
                 OnGetNewMessagesHandler = OnGetNewMessagesHandler.SignalRClient<OnGetNewMessagesResponse>(CurrentState, async (response) =>
                     await _JSModule.InvokeVoidAsync("AppendNewMessages", await GetNewMessages()));
 
-                // Пометим сообщения как прочитанные в диалоговом окне страницы / messages
+                // Пометим сообщения как прочитанные в диалоговом окне страницы /messages
                 OnMarkMessagesAsReadHandler = OnMarkMessagesAsReadHandler.SignalRClient<OnMarkMessagesAsReadResponse>(CurrentState, async (response) =>
                 {
-                    foreach (var message in response.Messages)
+                    // Помечаем прочитанными все сообщения?
+                    if (response.MessagesIds == null)
+                        response.MessagesIds = messages.Where(x => x.RecipientId == Recipient.Id).Select(x => x.Id);
+
+                    foreach (var messageId in response.MessagesIds)
                     {
-                        var html = await _renderer.RenderAsync(new Dictionary<string, object?> { { "AccountId", CurrentState.Account?.Id }, { "Message", message } });
-                        await _JSModule.InvokeVoidAsync("MarkMessageAsRead", message.Id, html);
+                        var index = messages.FindIndex(x => x.Id == messageId && x.ReadDate == null);
+                        if (index >= 0)
+                        {
+                            messages[index].ReadDate = DateTime.Now;
+                            var html = await _renderer.RenderAsync(new Dictionary<string, object?> { { "AccountId", CurrentState.Account?.Id }, { "Message", messages[index] } });
+                            await _JSModule.InvokeVoidAsync("MarkMessageAsRead", messageId, html);
+                        }
                     }
                 });
 
@@ -81,10 +90,10 @@ namespace Shared.Components.Pages.Messages
             await CurrentState.SignalRServerAsync(lastMessagesRequest);
 
             // Пометим сообщения как прочитанные в MessageDialog
-            var selectedMessages = apiResponse.Response.Messages.Where(x => x.SenderId == Recipient.Id);
-            if (selectedMessages.Count() > 0)
+            var messagesIds = apiResponse.Response.Messages.Where(x => x.SenderId == Recipient.Id).Select(s => s.Id);
+            if (messagesIds.Count() > 0)
             {
-                var markMessagesAsReadRequest = new SignalGlobalRequest { OnMarkMessagesAsRead = new OnMarkMessagesAsRead { RecipientId = Recipient.Id, Messages = selectedMessages } };
+                var markMessagesAsReadRequest = new SignalGlobalRequest { OnMarkMessagesAsRead = new OnMarkMessagesAsRead { RecipientId = Recipient.Id, MessagesIds = messagesIds } };
                 await CurrentState.SignalRServerAsync(markMessagesAsReadRequest);
             }
 

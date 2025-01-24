@@ -1,5 +1,4 @@
-﻿using Data.Dto;
-using Data.Enums;
+﻿using Data.Enums;
 
 namespace Data.Models.SignalR
 {
@@ -7,6 +6,6 @@ namespace Data.Models.SignalR
     {
         public override EnumSignalRHandlers EnumSignalRHandlersClient => EnumSignalRHandlers.OnMarkMessagesAsReadClient;
 
-        public IEnumerable<MessagesDto> Messages { get; set; } = null!;
+        public IEnumerable<int>? MessagesIds { get; set; } = null!;
     }
 }

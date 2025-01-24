@@ -47,7 +47,7 @@ namespace Shared.Components.Pages.Messages
         {
             var index = LastMessagesList.FindIndex(x => x.Id == markAsReadMessageId);
             // Проверим, помечено ли сообщение как прочитанное и адресовано ли нам?
-            if (index >= 0 && LastMessagesList[index].Recipient?.Id == CurrentState.Account?.Id && LastMessagesList[index].ReadDate == null)
+            if (index >= 0 && LastMessagesList[index].Recipient?.Id == CurrentState.Account?.Id && LastMessagesList[index].Sender != null && LastMessagesList[index].ReadDate == null)
             {
                 var apiResponse = await _markMessageAsRead.HttpPostAsync(new MarkMessageAsReadRequestDto { MessageId = markAsReadMessageId, MarkAllAsRead = false, Token = CurrentState.Account?.Token });
 
@@ -55,8 +55,10 @@ namespace Shared.Components.Pages.Messages
                 var lastMessagesRequest = new SignalGlobalRequest { OnUpdateLastMessages = new OnUpdateLastMessages { RecipientId = LastMessagesList[index].Sender!.Id } };
                 await CurrentState.SignalRServerAsync(lastMessagesRequest);
 
-                //var markMessagesAsReadRequest = new SignalGlobalRequest { OnMarkMessagesAsRead = new OnMarkMessagesAsRead { RecipientId = LastMessagesList[index].Sender.Id, Messages = LastMessagesList[index] } };
-                //await CurrentState.SignalRServerAsync(markMessagesAsReadRequest);
+                // Пометим сообщения как прочитанные в MessageDialog
+                var messagesIds = new List<int> { LastMessagesList[index].Id };
+                var markMessagesAsReadRequest = new SignalGlobalRequest { OnMarkMessagesAsRead = new OnMarkMessagesAsRead { RecipientId = LastMessagesList[index].Sender!.Id, MessagesIds = messagesIds } };
+                await CurrentState.SignalRServerAsync(markMessagesAsReadRequest);
             }
         }
 
@@ -67,8 +69,13 @@ namespace Shared.Components.Pages.Messages
             {
                 var apiResponse = await _markMessageAsRead.HttpPostAsync(new MarkMessageAsReadRequestDto { MessageId = markAsReadMessageId, MarkAllAsRead = true, Token = CurrentState.Account?.Token });
 
+                // Обновим список последних сообщений на странице /messages
                 var lastMessagesRequest = new SignalGlobalRequest { OnUpdateLastMessages = new OnUpdateLastMessages { RecipientId = LastMessagesList[index].Sender!.Id } };
                 await CurrentState.SignalRServerAsync(lastMessagesRequest);
+
+                // Пометим сообщения как прочитанные в MessageDialog
+                var markMessagesAsReadRequest = new SignalGlobalRequest { OnMarkMessagesAsRead = new OnMarkMessagesAsRead { RecipientId = LastMessagesList[index].Sender!.Id, MessagesIds = null } };
+                await CurrentState.SignalRServerAsync(markMessagesAsReadRequest);
             }
         }
 
