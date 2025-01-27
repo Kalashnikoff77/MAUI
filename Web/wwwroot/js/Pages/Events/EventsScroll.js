@@ -1,14 +1,13 @@
 var _dotNetReference;
 
-
 export async function Initialize(dotNetReference) {
     _dotNetReference = dotNetReference;
-    SetDotNetReference(dotNetReference);
+    SetDotNetReferenceInEventsRazor(dotNetReference);
 }
 
 export async function LoadItems() {
     $(window).off('scroll');
-    var result = await _dotNetReference.invokeMethodAsync('LoadItems'); // Получим сообщения
+    var result = await _dotNetReference.invokeMethodAsync('LoadItemsAsync'); // Получим сообщения
     if (result != '') { // Если ещё есть сообщения, то добавляем их и включаем обработчик снова
         $('#ScrollItems').append(result); // Добавим полученные сообщения в окно
         $(window).on('scroll', ScrollEvent);

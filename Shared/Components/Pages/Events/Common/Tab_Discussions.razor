@@ -1,30 +1,6 @@
 ﻿<div class="d-flex flex-column" style="height:250px; overflow:auto">
-        @* Окно с сообщениями *@
-        <div id="Scroll" style="overflow:auto" />
-
-@*         @foreach (var discussion in discussions)
-        {
-            <div class="d-flex gap-3 mt-1 mb-2">
-                <ImageAvatar Account="discussion.Sender" Size="EnumImageSize.s64x64" Class="avatar s40" />
-                <div class="mr-2" id="@("id_" + discussion.Id)">
-                    <ColorizedAccountName Account="discussion.Sender" Style="font-weight:500" />
-                    <MudText Typo="Typo.body2">@discussion.Text</MudText>
-                    <MudText Style="text-align:left; font-size:12px; color:lightgray">@discussion.CreateDate.ToMyString()</MudText>
-                </div>
-            </div>
-        }
-     }
-    else 
-    {
-        // Если обсуждения загружены, но их нет, значит, выведем заглушку "Пока тихо..."
-        @if (isDiscussionsLoaded) 
-        {
-            <div class="d-flex align-center justify-center" style="height:250px; font-weight:300">
-                <MudIcon Icon="@Icons.Material.Outlined.ChatBubbleOutline" Class="mr-2" Style="font-weight:300" /><i>Здесь пока тихо...</i>
-            </div>
-        }
-    }
-*@
+    @* Окно с сообщениями *@
+    <div id="ScrollDiscussions" style="overflow:auto" />
 </div>
 
 

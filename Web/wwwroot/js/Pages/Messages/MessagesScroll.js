@@ -4,32 +4,32 @@ export async function Initialize(dotNetReference) {
     _dotNetReference = dotNetReference;
 }
 
-export async function GetPreviousMessages() {
-    var result = await _dotNetReference.invokeMethodAsync('GetPreviousMessagesAsync'); // Получим сообщения
-    $('#Scroll').prepend(result); // Добавим полученные сообщения в окно
-    window.ScrollDivToBottom('Scroll'); // Прокрутим окно в самый низ
-    $('#Scroll').on('scroll', ScrollEvent); // Установим обработчик события прокрутки
+export async function ScrollDivToBottom() {
+    window.ScrollDivToBottom('ScrollMessages'); // Прокрутим окно в самый низ
+}
+
+export async function LoadItems() {
+    $('#ScrollMessages').off('scroll'); // Временно отключим обработчик
+    var result = await _dotNetReference.invokeMethodAsync('LoadItemsAsync'); // Получим сообщения
+    if (result != '') { // Если ещё есть сообщения, то добавляем их и включаем обработчик снова
+        $('#ScrollMessages').prepend(result).on('scroll', ScrollEvent);
+    }
 }
 
 // Обработчик события прокрутки
 async function ScrollEvent(event) {
-    if (document.getElementById('Scroll').scrollTop < 250) {
-        $('#Scroll').off('scroll'); // Временно отключим обработчик
-        var result = await _dotNetReference.invokeMethodAsync('GetPreviousMessagesAsync'); // Получим новые сообщения
-        if (result != '') { // Если ещё есть сообщения, то добавляем их и включаем обработчик снова
-            $('#Scroll').prepend(result).on('scroll', ScrollEvent);
-        }
+    if (document.getElementById('ScrollMessages').scrollTop < 250) {
+        LoadItems();
     }
 }
 
 // Добавление новых сообщений
 export async function AppendNewMessages(messages) {
     if (messages != '' && messages != null) { // Если есть сообщения, то добавляем их
-        $('#Scroll').append(messages);
-        window.ScrollDivToBottom('Scroll'); // Прокрутим окно в самый низ
+        $('#ScrollMessages').append(messages);
+        window.ScrollDivToBottom('ScrollMessages'); // Прокрутим окно в самый низ
     }
 }
-
 
 export function MarkMessageAsRead(id, htmlItem) {
     $('#id_' + id).replaceWith(htmlItem);

@@ -25,7 +25,6 @@ namespace Shared.Components.Pages.Events.Common
 
         List<DiscussionsForEventsViewDto> discussions = new List<DiscussionsForEventsViewDto>();
         string? text { get; set; } = null!;
-        bool isDiscussionsLoaded;
         bool sending;
 
         IDisposable? OnScheduleChangedHandler;
@@ -35,26 +34,18 @@ namespace Shared.Components.Pages.Events.Common
             if (firstRender)
             {
                 OnScheduleChangedHandler = OnScheduleChangedHandler.SignalRClient<OnScheduleChangedResponse>(CurrentState, async (response) =>
-                {
-                    var apiResponse = await _repoGetDiscussions.HttpPostAsync(new GetDiscussionsForEventsRequestDto()
-                    {
-                        EventId = ScheduleForEventView.EventId,
-                        GetNextAfterId = discussions.Count > 0 ? discussions.Max(m => m.Id) : null,
-                        Take = StaticData.EVENT_DISCUSSIONS_PER_BLOCK
-                    });
-                    discussions.AddRange(apiResponse.Response.Discussions);
-                    await InvokeAsync(StateHasChanged);
-                });
+                    await _JSModule.InvokeVoidAsync("AppendNewDiscussions", await GetNewDiscussions()));
 
                 _dotNetReference = DotNetObjectReference.Create(this);
                 _JSModule = await _JSRuntime.InvokeAsync<IJSObjectReference>("import", "./js/Pages/Events/TabDiscussionsScroll.js");
                 await _JSModule.InvokeVoidAsync("Initialize", _dotNetReference);
-                await _JSModule.InvokeVoidAsync("GetPreviousDiscussions");
+                await _JSModule.InvokeVoidAsync("LoadDiscussions");
+                await _JSModule.InvokeVoidAsync("ScrollDivToBottom");
             }
         }
 
         [JSInvokable]
-        public async Task<string> GetPreviousDiscussionsAsync()
+        public async Task<string> LoadDiscussionsAsync()
         {
             var response = await _repoGetDiscussions.HttpPostAsync(new GetDiscussionsForEventsRequestDto()
             {
@@ -72,6 +63,20 @@ namespace Shared.Components.Pages.Events.Common
             return await RenderDiscussions(response.Response.Discussions);
         }
 
+
+        async Task<string> GetNewDiscussions()
+        {
+            var apiResponse = await _repoGetDiscussions.HttpPostAsync(new GetDiscussionsForEventsRequestDto()
+            {
+                EventId = ScheduleForEventView.EventId,
+                GetNextAfterId = discussions.Count > 0 ? discussions.Max(m => m.Id) : null,
+                Take = StaticData.EVENT_DISCUSSIONS_PER_BLOCK
+            });
+            discussions.AddRange(apiResponse.Response.Discussions);
+
+            // Ручная генерация компонентов сообщений
+            return await RenderDiscussions(apiResponse.Response.Discussions);
+        }
 
         /// <summary>
         /// Ручная генерация компонента OneDiscussion

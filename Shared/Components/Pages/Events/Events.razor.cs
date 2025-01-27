@@ -20,7 +20,6 @@ namespace Shared.Components.Pages.Events
         [Inject] IRepository<GetRegionsForEventsRequestDto, GetRegionsForEventsResponseDto> _repoGetRegions { get; set; } = null!;
         [Inject] IRepository<GetAdminsForEventsRequestDto, GetAdminsForEventsResponseDto> _repoGetAdmins { get; set; } = null!;
         [Inject] ShowDialogs ShowDialogs { get; set; } = null!;
-        [Inject] IJSProcessor _JSProcessor { get; set; } = null!;
         [Inject] IJSRuntime _JSRuntime { get; set; } = null!;
         [Inject] IComponentRenderer<OneSchedule> _renderer { get; set; } = null!;
 
@@ -74,8 +73,17 @@ namespace Shared.Components.Pages.Events
             }
         }
 
+        async Task ReloadItemsAsync()
+        {
+            _request.Skip = 0;
+            schedules.Clear();
+            await _JSModule.InvokeVoidAsync("ClearItems");
+            await _JSModule.InvokeVoidAsync("LoadItems");
+        }
+
+
         [JSInvokable]
-        public async Task<string> LoadItems()
+        public async Task<string> LoadItemsAsync()
         {
             var apiResponse = await _repoGetSchedules.HttpPostAsync(_request);
             _request.Skip = _request.Skip + StaticData.SCHEDULES_PER_BLOCK;
@@ -92,14 +100,6 @@ namespace Shared.Components.Pages.Events
             IsNotFoundVisible = schedules.Count == 0 ? true : false;
 
             return htmlItems.ToString();
-        }
-
-        async Task ReloadItemsAsync()
-        {
-            _request.Skip = 0;
-            schedules.Clear();
-            await _JSModule.InvokeVoidAsync("ClearItems");
-            await _JSModule.InvokeVoidAsync("LoadItems");
         }
 
         [JSInvokable]

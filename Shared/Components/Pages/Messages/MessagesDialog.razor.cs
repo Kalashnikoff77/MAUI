@@ -65,12 +65,13 @@ namespace Shared.Components.Pages.Messages
                 _dotNetReference = DotNetObjectReference.Create(this);
                 _JSModule = await _JSRuntime.InvokeAsync<IJSObjectReference>("import", "./js/Pages/Messages/MessagesScroll.js");
                 await _JSModule.InvokeVoidAsync("Initialize", _dotNetReference);
-                await _JSModule.InvokeVoidAsync("GetPreviousMessages");
+                await _JSModule.InvokeVoidAsync("LoadItems");
+                await _JSModule.InvokeVoidAsync("ScrollDivToBottom");
             }
         }
 
         [JSInvokable]
-        public async Task<string> GetPreviousMessagesAsync()
+        public async Task<string> LoadItemsAsync()
         {
             var request = new GetMessagesRequestDto
             {
