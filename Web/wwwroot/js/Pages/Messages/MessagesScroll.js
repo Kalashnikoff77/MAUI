@@ -1,7 +1,10 @@
 var _dotNetReference;
 
-export async function GetPreviousMessages(dotNetReference) {
+export async function Initialize(dotNetReference) {
     _dotNetReference = dotNetReference;
+}
+
+export async function GetPreviousMessages() {
     var result = await _dotNetReference.invokeMethodAsync('GetPreviousMessagesAsync'); // Получим сообщения
     $('#Scroll').prepend(result); // Добавим полученные сообщения в окно
     window.ScrollDivToBottom('Scroll'); // Прокрутим окно в самый низ

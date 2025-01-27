@@ -36,9 +36,6 @@ namespace Data.Services
         public async Task AppendNewMessages(string tag, string messages) =>
             await RunJSAsync(nameof(AppendNewMessages), tag, messages);
 
-        public async Task SetDotNetReference<T>(DotNetObjectReference<T> dotNetObjectReference) where T : class, IComponent =>
-            await RunJSAsync(nameof(SetDotNetReference), dotNetObjectReference);
-
         async Task RunJSAsync(string identifier, params object?[] args)
         {
             try

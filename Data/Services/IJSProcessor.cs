@@ -21,11 +21,6 @@ namespace Data.Services
         /// <param name="isShowZero">Показывать ли ноль</param>
         Task ChangeNumberInButtonsFadeInOut(string tagClass, int? number);
 
-        /// <summary>
-        /// Сохранение dotNetObjectReference (ссылки на экземпляр класса в C#) в переменной JS
-        /// </summary>
-        Task SetDotNetReference<T>(DotNetObjectReference<T> dotNetObjectReference) where T : class, IComponent;
-
         Task Redirect(string url);
 
         Task ScrollDivToBottom(string divId);

@@ -1,9 +1,4 @@
-﻿var _dotNetReference;
-function SetDotNetReference(dotNetReference) {
-    _dotNetReference = dotNetReference; // Сохраним ссылку на C#
-}
-
-// Затухание и появление числа (напр.: изменилось кол-во непрочитанных сообщений в чате)
+﻿// Затухание и появление числа (напр.: изменилось кол-во непрочитанных сообщений в чате)
 function ChangeNumberFadeInOut(tagClass, number, isShowZero) {
     var tag = $('.' + tagClass);
     if (tag.text() != number) {

@@ -1,3 +1,11 @@
+var _dotNetReference;
+
+
+export async function Initialize(dotNetReference) {
+    _dotNetReference = dotNetReference;
+    SetDotNetReference(dotNetReference);
+}
+
 export async function LoadItems() {
     $(window).off('scroll');
     var result = await _dotNetReference.invokeMethodAsync('LoadItems'); // Получим сообщения
