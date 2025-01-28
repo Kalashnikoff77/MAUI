@@ -32,5 +32,5 @@ export async function AppendNewMessages(messages) {
 }
 
 export function MarkMessageAsRead(id, htmlItem) {
-    $('#id_' + id).replaceWith(htmlItem);
+    $('#messageid_' + id).replaceWith(htmlItem);
 }

@@ -1,6 +1,6 @@
 ﻿<div class="d-flex gap-3 mt-1 mb-2">
     <ImageAvatar Account="Discussion.Sender" Size="EnumImageSize.s64x64" Class="avatar s40" />
-    <div class="mr-2" id="@("id_" + Discussion.Id)">
+    <div id="@("discussionid_" + Discussion.Id)" class="mr-2">
         <ColorizedAccountName Account="Discussion.Sender" Style="font-weight:500" />
         <MudText Typo="Typo.body2">@Discussion.Text</MudText>
         <MudText Style="text-align:left; font-size:12px; color:lightgray">@Discussion.CreateDate.ToMyString()</MudText>

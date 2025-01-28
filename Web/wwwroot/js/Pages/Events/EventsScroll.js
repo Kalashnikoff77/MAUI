@@ -9,7 +9,7 @@ export async function LoadItems() {
     $(window).off('scroll');
     var result = await _dotNetReference.invokeMethodAsync('LoadItemsAsync'); // Получим сообщения
     if (result != '') { // Если ещё есть сообщения, то добавляем их и включаем обработчик снова
-        $('#ScrollItems').append(result); // Добавим полученные сообщения в окно
+        $('#ScrollEvents').append(result); // Добавим полученные сообщения в окно
         $(window).on('scroll', ScrollEvent);
     };
 }
@@ -24,6 +24,6 @@ async function ScrollEvent(event) {
     if (scrollBottom > -500) { LoadItems(); }
 }
 
-export function ClearItems() { $('#ScrollItems').empty(); }
+export function ClearItems() { $('#ScrollEvents').empty(); }
 
-export function ReplaceItem(id, htmlItem) { $('#id_' + id).replaceWith(htmlItem); }
+export function ReplaceItem(id, htmlItem) { $('#eventid_' + id).replaceWith(htmlItem); }
