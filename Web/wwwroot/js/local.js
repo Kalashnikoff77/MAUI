@@ -1,12 +1,12 @@
 ﻿// Затухание и появление числа (напр.: изменилось кол-во непрочитанных сообщений в чате)
-function ChangeNumberFadeInOut(tagClass, number, isShowZero) {
-    var tag = $('.' + tagClass);
-    if (tag.text() != number) {
-        tag.fadeOut(200, function () {
-            tag.text('');
+function ChangeNumberFadeInOut(tag, number, isShowZero) {
+    var tg = $(tag);
+    if (tg.text() != number) {
+        tg.fadeOut(200, function () {
+            tg.text('');
             if (number > 0 || isShowZero) {
-                tag.text(number);
-                tag.fadeIn(200);
+                tg.text(number);
+                tg.fadeIn(200);
             }
         })
     }
