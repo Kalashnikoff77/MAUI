@@ -26,4 +26,4 @@ async function ScrollEvent(event) {
 
 export function ClearItems() { $('#ScrollEvents').empty(); }
 
-export function ReplaceItem(id, htmlItem) { $('#eventid_' + id).replaceWith(htmlItem); }
+export function ReplaceItem(id, htmlItem) { $('#scheduleid_' + id).replaceWith(htmlItem); }

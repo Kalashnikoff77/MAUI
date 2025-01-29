@@ -8,7 +8,7 @@
         <MudText Typo="Typo.h6" Class="mr-2">Клубы и мероприятия</MudText>
         @if (CurrentState.Account != null)
         {
-            <MudButton Href="/events/add" StartIcon="@Icons.Material.Filled.PlaylistAdd" Color="Color.Primary" Size="Size.Small" title="Добавить мероприятие">Добавить</MudButton>
+            <MudButton Href="/events/add" StartIcon="@Icons.Material.Filled.PlaylistAdd" Color="Color.Info" Size="Size.Small" title="Добавить мероприятие">Добавить</MudButton>
         }
     </div>
 
@@ -47,7 +47,7 @@
 
         <MudItem xs="12" Style="padding-top:10px">
             <div class="d-flex gap-0 justify-end">
-                <MudSwitch Size="Size.Small" Value="_request.IsActualEvents" ValueChanged="ActualEventsChanged" T="bool" Label="@actualEventsLabel" Color="Color.Primary" />
+                <MudSwitch Size="Size.Small" Value="_request.IsActualEvents" ValueChanged="ActualEventsChanged" T="bool" Label="@actualEventsLabel" Color="Color.Info" />
             </div>
         </MudItem>
     </MudGrid>
