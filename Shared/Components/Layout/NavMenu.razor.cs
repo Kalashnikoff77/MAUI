@@ -12,12 +12,14 @@ namespace Shared.Components.Layout
     {
         [CascadingParameter] public CurrentState CurrentState { get; set; } = null!;
         [Inject] IRepository<GetNotificationsCountRequestDto, GetNotificationsCountResponseDto> _repoGetNotificationsCount { get; set; } = null!;
+        [Inject] IRepository<GetMessagesCountRequestDto, GetMessagesCountResponseDto> _repoGetMessagesCount { get; set; } = null!;
         [Inject] IJSRuntime _JSRuntime { get; set; } = null!;
 
         DotNetObjectReference<NavMenu> _dotNetReference { get; set; } = null!;
         IJSObjectReference _JSModule { get; set; } = null!;
 
         int unreadNotificationsCount;
+        int unreadMessagesCount;
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
@@ -30,6 +32,7 @@ namespace Shared.Components.Layout
             else
             {
                 await _JSModule.InvokeVoidAsync("GetNotificationsCount");
+                await _JSModule.InvokeVoidAsync("GetMessagesCount");
             }
         }
 
@@ -39,6 +42,14 @@ namespace Shared.Components.Layout
             var notificationsCountResponse = await _repoGetNotificationsCount.HttpPostAsync(new GetNotificationsCountRequestDto() { Token = CurrentState.Account?.Token });
             unreadNotificationsCount = notificationsCountResponse.Response.UnreadCount;
             return unreadNotificationsCount;
+        }
+
+        [JSInvokable]
+        public async Task<int> GetMessagesCountAsync()
+        {
+            var messagesCountResponse = await _repoGetMessagesCount.HttpPostAsync(new GetMessagesCountRequestDto() { Token = CurrentState.Account?.Token });
+            unreadMessagesCount = messagesCountResponse.Response.UnreadCount;
+            return unreadMessagesCount;
         }
 
     }
