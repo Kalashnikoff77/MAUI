@@ -1,6 +1,12 @@
 ﻿    @if (CurrentState.Account != null)
     {
-        <MudMenu Icon="@Icons.Material.Filled.MoreVert" AnchorOrigin="Origin.TopLeft" TransformOrigin="Origin.TopCenter">
+        <div style="position:relative">
+            <div style="position:absolute; top:-2px; right:-2px; color:red; z-index:99; border-radius:50%"><b>5</b></div>
+            <MudIconButton Icon="@Icons.Material.Filled.Email" Color="Color.Info" />
+            @* <MudIcon Icon="@Icons.Material.Filled.Message" /> *@
+        </div>
+
+        <MudMenu Icon="@Icons.Material.Filled.MoreVert" AnchorOrigin="Origin.TopLeft" TransformOrigin="Origin.TopLeft">
             <MudMenuItem Href="/profile" Icon="@Icons.Material.Filled.Settings">Настройки профиля</MudMenuItem>
             <MudMenuItem Href="/" Icon="@Icons.Material.Filled.PeopleAlt">Мои друзья</MudMenuItem>
             <MudDivider />
@@ -9,7 +15,7 @@
     }
     else
     {
-        <MudMenu Icon="@Icons.Material.Filled.MoreVert" AnchorOrigin="Origin.TopLeft" TransformOrigin="Origin.TopCenter">
+        <MudMenu Icon="@Icons.Material.Filled.MoreVert" AnchorOrigin="Origin.TopLeft" TransformOrigin="Origin.TopLeft">
             <MudMenuItem Href="/login" Icon="@Icons.Material.Filled.Login">Войти</MudMenuItem>
             <MudMenuItem Href="/register" Icon="@Icons.Material.Filled.HowToReg">Зарегистрироваться</MudMenuItem>
         </MudMenu>
