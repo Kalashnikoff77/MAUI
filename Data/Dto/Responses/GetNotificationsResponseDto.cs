@@ -4,6 +4,12 @@ namespace Data.Dto.Responses
 {
     public class GetNotificationsResponseDto : ResponseDtoBase
     {
-        public List<NotificationsViewDto>? Notifications { get; set; }
+        public NotificationsDto? Notification { get; set; }
+        public List<NotificationsDto>? Notifications { get; set; }
+
+        /// <summary>
+        /// Id отправителя и получателя уведомления
+        /// </summary>
+        public Dictionary<int, AccountsViewDto> Accounts { get; set; } = null!;
     }
 }

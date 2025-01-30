@@ -28,10 +28,14 @@
         OnMarkMessagesAsReadClient,
 
         /// <summary>
-        /// Обновить список последних сообщений у обоих пользователей на странице /messages
+        /// Вызывается, когда меняется кол-во непрочитанных сообщений
         /// </summary>
         OnUpdateMessagesCountClient,
 
+        /// <summary>
+        /// Вызывается, когда меняется кол-во непрочитанных уведомлений
+        /// </summary>
+        OnUpdateNotificationsCountClient,
 
         // Требуется проверить, используются ли эти перечисления
         //NewMessageAddedServer,
