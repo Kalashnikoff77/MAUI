@@ -1,5 +1,6 @@
 ﻿using Data.Dto.Requests;
 using Data.Dto.Responses;
+using Data.Models.SignalR;
 using Data.Services;
 using Data.State;
 using Microsoft.AspNetCore.Components;
@@ -14,6 +15,8 @@ namespace Shared.Components.Layout
         [Inject] IRepository<GetNotificationsCountRequestDto, GetNotificationsCountResponseDto> _repoGetNotificationsCount { get; set; } = null!;
         [Inject] IRepository<GetMessagesCountRequestDto, GetMessagesCountResponseDto> _repoGetMessagesCount { get; set; } = null!;
         [Inject] IJSRuntime _JSRuntime { get; set; } = null!;
+
+        IDisposable? OnUpdateMessagesCountHandler;
 
         DotNetObjectReference<NavMenu> _dotNetReference { get; set; } = null!;
         IJSObjectReference _JSModule { get; set; } = null!;
@@ -31,10 +34,14 @@ namespace Shared.Components.Layout
             }
             else
             {
-                await _JSModule.InvokeVoidAsync("GetNotificationsCount");
-                await _JSModule.InvokeVoidAsync("GetMessagesCount");
+                // Оставить здесь, т.к. требуется как аутентификация пользователя, так и подключение по SignalR.
+                OnUpdateMessagesCountHandler = OnUpdateMessagesCountHandler.SignalRClient<OnUpdateMessagesCountResponse>(CurrentState, async (response) =>
+                    await GetNewItemsCount());
+
+                await GetNewItemsCount();
             }
         }
+
 
         [JSInvokable]
         public async Task<int> GetNotificationsCountAsync()
@@ -50,6 +57,13 @@ namespace Shared.Components.Layout
             var messagesCountResponse = await _repoGetMessagesCount.HttpPostAsync(new GetMessagesCountRequestDto() { Token = CurrentState.Account?.Token });
             unreadMessagesCount = messagesCountResponse.Response.UnreadCount;
             return unreadMessagesCount;
+        }
+
+
+        async Task GetNewItemsCount()
+        {
+            await _JSModule.InvokeVoidAsync("GetNotificationsCount");
+            await _JSModule.InvokeVoidAsync("GetMessagesCount");
         }
 
     }

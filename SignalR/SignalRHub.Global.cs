@@ -48,9 +48,9 @@ namespace SignalR
             if (request.OnMarkMessagesAsRead != null)
                 await OnMarkMessagesAsReadAsync(request.OnMarkMessagesAsRead);
 
-            // Обновить список последних сообщений у двух пользователей (страница /messages)
-            if (request.OnUpdateLastMessages != null)
-                await OnUpdateLastMessagesAsync(request.OnUpdateLastMessages);
+            // Вызывается, когда меняется кол-во непрочитанных сообщений
+            if (request.OnUpdateMessagesCount != null)
+                await OnUpdateMessagesCountAsync(request.OnUpdateMessagesCount);
         }
 
 
@@ -106,13 +106,13 @@ namespace SignalR
         }
 
         /// <summary>
-        /// Обновим список последних сообщений у двух пользователей (страница /messages)
+        /// Вызывается, когда меняется кол-во непрочитанных сообщений
         /// </summary>
-        async Task OnUpdateLastMessagesAsync(OnUpdateLastMessages request)
+        async Task OnUpdateMessagesCountAsync(OnUpdateMessagesCount request)
         {
             if (GetAccountDetails(out AccountDetails accountDetails, Context.UserIdentifier))
             {
-                var response = new OnUpdateLastMessagesResponse();
+                var response = new OnUpdateMessagesCountResponse();
                 await Clients
                     .Users([Context.UserIdentifier!, request.RecipientId.ToString()!])
                     .SendAsync(response.EnumSignalRHandlersClient.ToString(), response);

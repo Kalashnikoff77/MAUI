@@ -5,8 +5,8 @@
             <ImageEvent Event="Schedule.Event" Size="EnumImageSize.s150x150" Title="@Schedule.Event.Name" Class="d-xs-block d-sm-none" Style="border-radius:4%; border:solid; border-width:1px; border-color:lightgray; width:210px; height:210px" />
 
             <div class="d-flex flex-column gap-1">
-                <MudText Typo="Typo.body1" Color="Color.Info" Class="d-none d-sm-flex ma-1"><b>@Schedule.Event.Name</b></MudText>
-                <MudText Typo="Typo.body1" Color="Color.Info" Class="d-sm-none ma-1" Style="text-align:center"><b>@Schedule.Event.Name</b></MudText>
+                <MudText Typo="Typo.body1" Color="Color.Primary" Class="d-none d-sm-flex ma-1"><b>@Schedule.Event.Name</b></MudText>
+                <MudText Typo="Typo.body1" Color="Color.Primary" Class="d-sm-none ma-1" Style="text-align:center"><b>@Schedule.Event.Name</b></MudText>
                 <div class="d-flex align-center gap-1 d-sm-none">
                     <MudIcon Icon="@Icons.Material.Outlined.Person" Style="font-size:20px" />
                     <MudText Typo="Typo.body2"><b>@Schedule.Event.Admin?.Name</b></MudText>
@@ -25,7 +25,7 @@
                     @if (Schedule.Event.Statistic?.NumOfDiscussions > 0)
                     {
                         <div class="d-flex align-center gap-0" title="@("Обсуждений: " + Schedule.Event.Statistic.NumOfDiscussions.ToString())">
-                            <MudIcon Icon="@Icons.Material.Outlined.Chat" Color="Color.Info" Class="ml-4 mr-1" Style="font-size:18px" />
+                            <MudIcon Icon="@Icons.Material.Outlined.Chat" Color="Color.Primary" Class="ml-4 mr-1" Style="font-size:18px" />
                             <MudText Typo="Typo.body2" Style="margin-top:1px">@Schedule.Event.Statistic.NumOfDiscussions</MudText>
                         </div>
                     }

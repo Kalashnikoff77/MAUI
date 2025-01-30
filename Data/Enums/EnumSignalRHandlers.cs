@@ -30,7 +30,7 @@
         /// <summary>
         /// Обновить список последних сообщений у обоих пользователей на странице /messages
         /// </summary>
-        OnUpdateLastMessagesClient,
+        OnUpdateMessagesCountClient,
 
 
         // Требуется проверить, используются ли эти перечисления

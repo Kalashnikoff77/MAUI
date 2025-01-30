@@ -85,7 +85,7 @@ namespace Shared.Components.Pages.Messages
             messages.InsertRange(0, apiResponse.Response.Messages);
 
             // Обновим список последних сообщений на странице /messages
-            var lastMessagesRequest = new SignalGlobalRequest { OnUpdateLastMessages = new OnUpdateLastMessages { RecipientId = Recipient.Id } };
+            var lastMessagesRequest = new SignalGlobalRequest { OnUpdateMessagesCount = new OnUpdateMessagesCount { RecipientId = Recipient.Id } };
             await CurrentState.SignalRServerAsync(lastMessagesRequest);
 
             // Пометим сообщения как прочитанные в MessageDialog
@@ -159,8 +159,8 @@ namespace Shared.Components.Pages.Messages
                 await CurrentState.SignalRServerAsync(messagesRequest);
 
                 // Обновим список последних сообщений на странице /messages
-                var lastMessagesRequest = new SignalGlobalRequest { OnUpdateLastMessages = new OnUpdateLastMessages { RecipientId = Recipient.Id } };
-                await CurrentState.SignalRServerAsync(lastMessagesRequest);
+                var updateMessagesCountRequest = new SignalGlobalRequest { OnUpdateMessagesCount = new OnUpdateMessagesCount { RecipientId = Recipient.Id } };
+                await CurrentState.SignalRServerAsync(updateMessagesCountRequest);
 
                 text = null;
                 sending = false;

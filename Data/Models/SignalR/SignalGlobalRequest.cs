@@ -8,7 +8,7 @@ namespace Data.Models.SignalR
         public OnScheduleChanged? OnScheduleChanged { get; set; }
         public OnGetNewMessages? OnGetNewMessages { get; set; }
         public OnMarkMessagesAsRead? OnMarkMessagesAsRead { get; set; }
-        public OnUpdateLastMessages? OnUpdateLastMessages { get; set; }
+        public OnUpdateMessagesCount? OnUpdateMessagesCount { get; set; }
     }
 
 
@@ -23,6 +23,9 @@ namespace Data.Models.SignalR
         public int ScheduleId { get; set; }
     }
 
+    /// <summary>
+    /// Вызывается, когда добавляется новое сообщение
+    /// </summary>
     public class OnGetNewMessages
     {
         /// <summary>
@@ -31,6 +34,9 @@ namespace Data.Models.SignalR
         public int? RecipientId { get; set; }
     }
 
+    /// <summary>
+    /// Вызывается, когда сообщения помечаютя как прочитанные
+    /// </summary>
     public class OnMarkMessagesAsRead
     {
         /// <summary>
@@ -44,7 +50,10 @@ namespace Data.Models.SignalR
         public IEnumerable<int>? MessagesIds { get; set; } = null!;
     }
 
-    public class OnUpdateLastMessages
+    /// <summary>
+    /// Вызывается, когда меняется кол-во непрочитанных сообщений
+    /// </summary>
+    public class OnUpdateMessagesCount
     {
         /// <summary>
         /// Второй участник в диалоге (первый берётся из [Authorize])
