@@ -1,9 +1,9 @@
-﻿using Data.Dto.Views;
-
-namespace Data.Dto
+﻿namespace Data.Dto
 {
     public class MessagesDto : DtoBase
     {
+        public short Type { get; set; }
+
         public int SenderId { get; set; }
         public int RecipientId { get; set; }
 

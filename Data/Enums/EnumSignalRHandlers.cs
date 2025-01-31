@@ -32,12 +32,6 @@
         /// </summary>
         OnUpdateMessagesCountClient,
 
-        /// <summary>
-        /// Вызывается, когда меняется кол-во непрочитанных уведомлений
-        /// </summary>
-        OnUpdateNotificationsCountClient,
-
-
         // Требуется проверить, используются ли эти перечисления
         //NewMessageAddedServer,
         //NewMessageAddedClient,
@@ -45,14 +39,8 @@
         //NewEventDiscussionAddedServer,
         //NewEventDiscussionAddedClient,
 
-        //NewNotificationAddedServer,
-        //NewNotificationAddedClient,
-
         //UpdateMessagesCountServer,
         //UpdateMessagesCountClient,
-
-        //UpdateNotificationsCountServer,
-        //UpdateNotificationsCountClient,
 
         //UpdateOnlineAccountsClient,
 

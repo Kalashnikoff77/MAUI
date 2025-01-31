@@ -2,6 +2,8 @@
 {
     public class MessagesEntity : EntityBase
     {
+        public short Type { get; set; }
+
         public DateTime CreateDate { get; set; }
 
         public DateTime? ReadDate { get; set; } = null!;

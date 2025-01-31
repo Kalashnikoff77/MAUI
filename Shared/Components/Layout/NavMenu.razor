@@ -15,13 +15,6 @@
             </div>
         </MudNavLink>
 
-        <MudNavLink Href="/notifications" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Notifications">
-            <div class="d-flex justify-space-between">
-                <p>Уведомления</p>
-                <p id="NumberOfNotifications" style="color:orangered; font-weight:bold; display:none"></p>
-            </div>
-        </MudNavLink>
-
         <MudNavLink OnClick="async() => { await CurrentState.LogOutAsync(); }" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Logout">Выйти</MudNavLink>
     }
 </MudNavMenu>

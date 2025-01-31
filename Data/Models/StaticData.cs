@@ -66,11 +66,6 @@ namespace Data.Models
         public const short MESSAGES_PER_BLOCK = 20;
 
         /// <summary>
-        /// Кол-во сообщений в уведомлениях
-        /// </summary>
-        public const short NOTIFICATIONS_PER_BLOCK = 20;
-
-        /// <summary>
         /// Кол-во сообщений в блоке в разделе мероприятий - /events
         /// </summary>
         public const short SCHEDULES_PER_BLOCK = 10;

@@ -10,8 +10,6 @@ sp_refreshview 'EventsView'
 go
 sp_refreshview 'FeaturesForEventsView'
 go
-sp_refreshview 'NotificationsView'
-go
 sp_refreshview 'PhotosForAccountsView'
 go
 sp_refreshview 'RegionsForEventsView'
