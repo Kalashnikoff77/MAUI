@@ -1,0 +1,14 @@
+﻿<MudDialog Style="max-height:900px; width:550px; min-width:300px">
+    <TitleContent>
+        <div class="d-flex gap-3 align-center">
+            <ImageAvatar Account="CurrentState.Account" Size="EnumImageSize.s64x64" Class="avatar s45" />
+            <MudText Typo="Typo.h6">@CurrentState.Account?.Name</MudText>
+        </div>
+    </TitleContent>
+
+    <DialogContent>
+        @* Окно с уведомлениями *@
+        <div id="ScrollNotifications" style="max-height:450px; overflow:auto" />
+    </DialogContent>
+
+</MudDialog>

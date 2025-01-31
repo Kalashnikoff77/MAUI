@@ -5,7 +5,7 @@ namespace Data.Dto.Responses
     public class GetNotificationsResponseDto : ResponseDtoBase
     {
         public NotificationsDto? Notification { get; set; }
-        public List<NotificationsDto>? Notifications { get; set; }
+        public List<NotificationsDto> Notifications { get; set; } = new List<NotificationsDto>();
 
         /// <summary>
         /// Id отправителя и получателя уведомления

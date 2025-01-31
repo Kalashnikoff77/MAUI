@@ -3,6 +3,7 @@ using MudBlazor;
 using Shared.Components.Pages.Account;
 using Shared.Components.Pages.Events;
 using Shared.Components.Pages.Messages;
+using Shared.Components.Pages.Notifications;
 
 namespace Shared.Components.Dialogs
 {
@@ -69,6 +70,16 @@ namespace Shared.Components.Dialogs
                 { x => x.Recipient, account }
             };
             await _dialog.ShowAsync<MessagesDialog>(null, dialogParams, dialogOptions);
+        }
+
+        /// <summary>
+        /// Окно отображения уведомлений пользователя
+        /// </summary>
+        public async Task NotificationsDialogAsync()
+        {
+            DialogOptions dialogOptions = new() { CloseOnEscapeKey = true, CloseButton = true };
+            var dialogParams = new DialogParameters<NotificationsDialog>();
+            await _dialog.ShowAsync<NotificationsDialog>(null, dialogParams, dialogOptions);
         }
     }
 }
