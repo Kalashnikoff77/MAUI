@@ -1,6 +1,6 @@
 ﻿namespace Data.Entities.Sp
 {
-    public class LastNotificationsForAccountSpEntity
+    public class LastNotificationsForAccountSpEntity : EntityBase
     {
         public DateTime CreateDate { get; set; }
         public DateTime? ReadDate { get; set; }

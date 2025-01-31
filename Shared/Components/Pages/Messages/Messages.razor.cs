@@ -13,7 +13,7 @@ namespace Shared.Components.Pages.Messages
     {
         [CascadingParameter] public CurrentState CurrentState { get; set; } = null!;
         [Inject] IRepository<GetLastMessagesListRequestDto, GetLastMessagesListResponseDto> _repoGetLastMessagesList { get; set; } = null!;
-        [Inject] IRepository<MarkMessageAsReadRequestDto, ResponseDtoBase> _markMessageAsRead { get; set; } = null!;
+        [Inject] IRepository<MarkMessagesAsReadRequestDto, ResponseDtoBase> _markMessagesAsRead { get; set; } = null!;
         [Inject] ShowDialogs ShowDialogs { get; set; } = null!;
 
         IDisposable? OnUpdateMessagesCountHandler;
@@ -50,7 +50,7 @@ namespace Shared.Components.Pages.Messages
             if (index >= 0 && LastMessagesList[index].Recipient?.Id == CurrentState.Account?.Id && LastMessagesList[index].Sender != null && LastMessagesList[index].ReadDate == null)
             {
                 // Помечаем сообщение как прочитанное в БД
-                var apiResponse = await _markMessageAsRead.HttpPostAsync(new MarkMessageAsReadRequestDto { MessageId = markAsReadMessageId, MarkAllAsRead = false, Token = CurrentState.Account?.Token });
+                var apiResponse = await _markMessagesAsRead.HttpPostAsync(new MarkMessagesAsReadRequestDto { MessageId = markAsReadMessageId, MarkAllAsRead = false, Token = CurrentState.Account?.Token });
 
                 // Обновим список последних сообщений на странице /messages
                 var lastMessagesRequest = new SignalGlobalRequest { OnUpdateMessagesCount = new OnUpdateMessagesCount { RecipientId = LastMessagesList[index].Sender!.Id } };
@@ -68,7 +68,7 @@ namespace Shared.Components.Pages.Messages
             var index = LastMessagesList.FindIndex(x => x.Id == markAsReadMessageId);
             if (index >= 0 && LastMessagesList[index].Sender != null)
             {
-                var apiResponse = await _markMessageAsRead.HttpPostAsync(new MarkMessageAsReadRequestDto { MessageId = markAsReadMessageId, MarkAllAsRead = true, Token = CurrentState.Account?.Token });
+                var apiResponse = await _markMessagesAsRead.HttpPostAsync(new MarkMessagesAsReadRequestDto { MessageId = markAsReadMessageId, MarkAllAsRead = true, Token = CurrentState.Account?.Token });
 
                 // Обновим список последних сообщений на странице /messages
                 var lastMessagesRequest = new SignalGlobalRequest { OnUpdateMessagesCount = new OnUpdateMessagesCount { RecipientId = LastMessagesList[index].Sender!.Id } };

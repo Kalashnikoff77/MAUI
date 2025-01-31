@@ -1,6 +1,6 @@
 ﻿@page "/notifications"
 
-<PageTitle>Общение</PageTitle>
+<PageTitle>Уведомления</PageTitle>
 
 @if (CurrentState.Account != null) 
 {
@@ -26,7 +26,7 @@
                                     <div class="d-flex flex-column gap-0" @onclick="@(() => ShowDialogs.MessagesDialogAsync(accountsViewDto))" style="cursor:pointer; width:100%">
                                         <div style="text-align:end">
                                             <MudMenu Dense Icon="@Icons.Material.Filled.MoreVert" Size="Size.Small" AnchorOrigin="Origin.TopLeft" TransformOrigin="Origin.TopRight">
-                                                <MudMenuItem Icon="@Icons.Material.Filled.Check" IconColor="Color.Primary" Disabled="@(!(notification.ReadDate == null && CurrentState.Account.Id == notification.Recipient?.Id))" OnClick="() => MarkAsReadAsync(notification.Id)">Пометить сообщение прочитанными</MudMenuItem>
+                                                <MudMenuItem Icon="@Icons.Material.Filled.Check" IconColor="Color.Primary" Disabled="@(!(notification.ReadDate == null && CurrentState.Account.Id == notification.Recipient?.Id))" OnClick="() => MarkAsReadAsync(notification.Id)">Пометить прочитанным</MudMenuItem>
                                                 <MudMenuItem Icon="@Icons.Material.Filled.ChecklistRtl" IconColor="Color.Primary" Disabled="@(notification.UnreadNotifications == 0)" OnClick="() => MarkAllAsReadAsync(notification.Id)">Пометить все прочитанными</MudMenuItem>
                                             </MudMenu>
                                         </div>

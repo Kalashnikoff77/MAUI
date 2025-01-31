@@ -136,7 +136,7 @@ namespace WebAPI.Controllers
 
 
         [Route("MarkAsRead"), HttpPost, Authorize]
-        public async Task<ResponseDtoBase> MarkAsReadAsync(MarkMessageAsReadRequestDto request)
+        public async Task<ResponseDtoBase> MarkAsReadAsync(MarkMessagesAsReadRequestDto request)
         {
             AuthenticateUser();
 

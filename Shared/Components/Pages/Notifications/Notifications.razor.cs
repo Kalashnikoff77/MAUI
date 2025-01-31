@@ -13,7 +13,7 @@ namespace Shared.Components.Pages.Notifications
     {
         [CascadingParameter] public CurrentState CurrentState { get; set; } = null!;
         [Inject] IRepository<GetLastNotificationsListRequestDto, GetLastNotificationsListResponseDto> _repoGetLastNotificationsList { get; set; } = null!;
-        //[Inject] IRepository<MarkMessageAsReadRequestDto, ResponseDtoBase> _markMessageAsRead { get; set; } = null!;
+        [Inject] IRepository<MarkNotificationsAsReadRequestDto, ResponseDtoBase> _markNotificationsAsRead { get; set; } = null!;
         [Inject] ShowDialogs ShowDialogs { get; set; } = null!;
 
         IDisposable? OnUpdateNotificationsCountHandler;
@@ -43,41 +43,32 @@ namespace Shared.Components.Pages.Notifications
             }
         }
 
-        async Task MarkAsReadAsync(int markAsReadMessageId)
+        async Task MarkAsReadAsync(int markAsReadNotificationId)
         {
-            //var index = NotificationsList.FindIndex(x => x.Id == markAsReadMessageId);
-            //// Проверим, помечено ли сообщение как прочитанное и адресовано ли нам?
-            //if (index >= 0 && NotificationsList[index].Recipient?.Id == CurrentState.Account?.Id && NotificationsList[index].Sender != null && NotificationsList[index].ReadDate == null)
-            //{
-            //    // Помечаем сообщение как прочитанное в БД
-            //    var apiResponse = await _markMessageAsRead.HttpPostAsync(new MarkMessageAsReadRequestDto { MessageId = markAsReadMessageId, MarkAllAsRead = false, Token = CurrentState.Account?.Token });
+            var index = LastNotificationsList.FindIndex(x => x.Id == markAsReadNotificationId);
+            // Проверим, помечено ли уведомление как прочитанное и адресовано ли нам?
+            if (index >= 0 && LastNotificationsList[index].Recipient?.Id == CurrentState.Account?.Id && LastNotificationsList[index].Sender != null && LastNotificationsList[index].ReadDate == null)
+            {
+                // Помечаем уведомление как прочитанное в БД
+                var apiResponse = await _markNotificationsAsRead.HttpPostAsync(new MarkNotificationsAsReadRequestDto { NotificationId = markAsReadNotificationId, MarkAllAsRead = false, Token = CurrentState.Account?.Token });
 
-            //    // Обновим список последних сообщений на странице /messages
-            //    var lastMessagesRequest = new SignalGlobalRequest { OnUpdateMessagesCount = new OnUpdateMessagesCount { RecipientId = NotificationsList[index].Sender!.Id } };
-            //    await CurrentState.SignalRServerAsync(lastMessagesRequest);
-
-            //    // Пометим одно сообщение как прочитанное в MessageDialog
-            //    var messagesIds = new List<int> { NotificationsList[index].Id };
-            //    var markMessagesAsReadRequest = new SignalGlobalRequest { OnMarkMessagesAsRead = new OnMarkMessagesAsRead { RecipientId = NotificationsList[index].Sender!.Id, MessagesIds = messagesIds } };
-            //    await CurrentState.SignalRServerAsync(markMessagesAsReadRequest);
-            //}
+                // Обновим список последних уведомлений на странице /notifications
+                var lastNotificationRequest = new SignalGlobalRequest { OnUpdateNotificationsCount = new OnUpdateNotificationsCount() };
+                await CurrentState.SignalRServerAsync(lastNotificationRequest);
+            }
         }
 
-        async Task MarkAllAsReadAsync(int markAsReadMessageId)
+        async Task MarkAllAsReadAsync(int markAsReadNotificationId)
         {
-            //var index = NotificationsList.FindIndex(x => x.Id == markAsReadMessageId);
-            //if (index >= 0 && NotificationsList[index].Sender != null)
-            //{
-            //    var apiResponse = await _markMessageAsRead.HttpPostAsync(new MarkMessageAsReadRequestDto { MessageId = markAsReadMessageId, MarkAllAsRead = true, Token = CurrentState.Account?.Token });
+            var index = LastNotificationsList.FindIndex(x => x.Id == markAsReadNotificationId);
+            if (index >= 0 && LastNotificationsList[index].Sender != null)
+            {
+                var apiResponse = await _markNotificationsAsRead.HttpPostAsync(new MarkNotificationsAsReadRequestDto { NotificationId = markAsReadNotificationId, MarkAllAsRead = true, Token = CurrentState.Account?.Token });
 
-            //    // Обновим список последних сообщений на странице /messages
-            //    var lastMessagesRequest = new SignalGlobalRequest { OnUpdateMessagesCount = new OnUpdateMessagesCount { RecipientId = NotificationsList[index].Sender!.Id } };
-            //    await CurrentState.SignalRServerAsync(lastMessagesRequest);
-
-            //    // Пометим сообщения как прочитанные в MessageDialog
-            //    var markMessagesAsReadRequest = new SignalGlobalRequest { OnMarkMessagesAsRead = new OnMarkMessagesAsRead { RecipientId = NotificationsList[index].Sender!.Id, MessagesIds = null } };
-            //    await CurrentState.SignalRServerAsync(markMessagesAsReadRequest);
-            //}
+                // Обновим список последних уведомлений на странице /notifications
+                var lastNotificationsRequest = new SignalGlobalRequest { OnUpdateNotificationsCount = new OnUpdateNotificationsCount() };
+                await CurrentState.SignalRServerAsync(lastNotificationsRequest);
+            }
         }
 
         public void Dispose() =>

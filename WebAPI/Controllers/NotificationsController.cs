@@ -114,40 +114,42 @@ namespace WebAPI.Controllers
         }
 
 
-        //[Route("Get"), HttpPost, Authorize]
-        //public async Task<GetNotificationsResponseDto?> GetAsync(GetNotificationsRequestDto request)
-        //{
-        //    AuthenticateUser();
+        [Route("MarkAsRead"), HttpPost, Authorize]
+        public async Task<ResponseDtoBase> MarkAsReadAsync(MarkNotificationsAsReadRequestDto request)
+        {
+            AuthenticateUser();
 
-        //    var response = new GetNotificationsResponseDto();
+            // Получим уведомление по переданному Id
+            var sql = $"SELECT TOP 1 * FROM Notifications " +
+                $"WHERE {nameof(NotificationsEntity.Id)} = @NotificationId " +
+                $"AND ({nameof(NotificationsEntity.SenderId)} = @AccountId OR {nameof(NotificationsEntity.RecipientId)} = @AccountId)";
+            var currentNotification = await _unitOfWork.SqlConnection.QueryFirstOrDefaultAsync<NotificationsEntity>(sql, new { _unitOfWork.AccountId, request.NotificationId })
+                ?? throw new NotFoundException("Уведомление не найдено!");
 
-        //    // Получим все уведомления (с фильтром)
-        //    var sql = "SELECT * FROM NotificationsView " +
-        //        $"WHERE {nameof(NotificationsViewEntity.RecipientId)} = @AccountId" +
-        //        $"ORDER BY {nameof(NotificationsViewEntity.CreateDate)} DESC " +
-        //        $"OFFSET {request.Skip} ROWS FETCH NEXT {request.Take} ROWS ONLY";
-        //    var notifications = await _unitOfWork.SqlConnection.QueryAsync<NotificationsViewEntity>(sql, new { _unitOfWork.AccountId });
-        //    response.Notifications = _unitOfWork.Mapper.Map<List<NotificationsViewDto>>(notifications);
+            // Выберем отправителя
+            var senderId = currentNotification.SenderId == _unitOfWork.AccountId ? currentNotification.RecipientId : currentNotification.SenderId;
 
-        //    // Подсчитаем кол-во уведомлений (с фильтром)
-        //    sql = "SELECT COUNT(*) FROM NotificationsView " +
-        //        $"WHERE {nameof(NotificationsViewEntity.RecipientId)} = @AccountId";
-        //    response.Count = await _unitOfWork.SqlConnection.QuerySingleAsync<int>(sql, new { _unitOfWork.AccountId });
+            // Помечаем все уведомления как прочитанные
+            if (request.MarkAllAsRead)
+            {
+                sql = $"UPDATE Notifications SET {nameof(NotificationsEntity.ReadDate)} = @CurrentDate " +
+                    $"WHERE {nameof(NotificationsEntity.RecipientId)} = @AccountId AND {nameof(NotificationsEntity.SenderId)} = @senderId " +
+                    $"AND {nameof(NotificationsEntity.ReadDate)} IS NULL";
+                await _unitOfWork.SqlConnection.ExecuteAsync(sql, new { CurrentDate = DateTime.Now, _unitOfWork.AccountId, senderId });
+            }
+            // Помечаем одно уведомление как прочитанное
+            else
+            {
+                sql = $"UPDATE Notifications SET {nameof(NotificationsEntity.ReadDate)} = @CurrentDate " +
+                    $"WHERE Id = @NotificationId AND " +
+                    $"{nameof(NotificationsEntity.RecipientId)} = @AccountId AND " +
+                    $"{nameof(NotificationsEntity.SenderId)} = @senderId AND " +
+                    $"{nameof(NotificationsEntity.ReadDate)} IS NULL";
+                await _unitOfWork.SqlConnection.ExecuteAsync(sql, new { CurrentDate = DateTime.Now, request.NotificationId, _unitOfWork.AccountId, senderId });
+            }
 
-        //    // Будем отмечать уведомления, как прочитанные?
-        //    if (request.MarkAsRead && response.Notifications.Any(x => x.ReadDate == null))
-        //    {
-        //        var ids = response.Notifications
-        //            .Where(w => w.ReadDate == null)
-        //            .Select(s => s.Id.ToString());
-
-        //        if (ids.Any())
-        //            await _unitOfWork.SqlConnection.ExecuteAsync($"UPDATE Notifications SET {nameof(NotificationsEntity.ReadDate)} = getdate() " +
-        //                $"WHERE Id IN ({ids.Aggregate((a, b) => a + ", " + b)})");
-        //    }
-
-        //    return response;
-        //}
+            return new ResponseDtoBase();
+        }
 
 
         [Route("GetLastNotificationsList"), HttpPost, Authorize]

@@ -51,6 +51,10 @@ namespace SignalR
             // Вызывается, когда меняется кол-во непрочитанных сообщений
             if (request.OnUpdateMessagesCount != null)
                 await OnUpdateMessagesCountAsync(request.OnUpdateMessagesCount);
+
+            // Вызывается, когда меняется кол-во непрочитанных уведомлений
+            if (request.OnUpdateNotificationsCount != null)
+                await OnUpdateNotificationsCountAsync(request.OnUpdateNotificationsCount);
         }
 
 
@@ -115,6 +119,19 @@ namespace SignalR
                 var response = new OnUpdateMessagesCountResponse();
                 await Clients
                     .Users([Context.UserIdentifier!, request.RecipientId.ToString()!])
+                    .SendAsync(response.EnumSignalRHandlersClient.ToString(), response);
+            }
+        }
+
+        /// <summary>
+        /// Вызывается, когда меняется кол-во непрочитанных уведомлений
+        /// </summary>
+        async Task OnUpdateNotificationsCountAsync(OnUpdateNotificationsCount request)
+        {
+            if (GetAccountDetails(out AccountDetails accountDetails, Context.UserIdentifier))
+            {
+                var response = new OnUpdateNotificationsCountResponse();
+                await Clients.Caller
                     .SendAsync(response.EnumSignalRHandlersClient.ToString(), response);
             }
         }

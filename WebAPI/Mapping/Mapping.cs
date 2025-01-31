@@ -63,9 +63,6 @@ namespace WebAPI.Mapping
                 .ForMember(to => to.Sender, from => from.ConvertUsing<JsonToClassConverter<AccountsViewDto>, string?>(from => from.Sender))
                 .ForMember(to => to.Recipient, from => from.ConvertUsing<JsonToClassConverter<AccountsViewDto>, string?>(from => from.Recipient));
 
-            CreateMap<NotificationsViewEntity, NotificationsViewDto>()
-                .ForMember(to => to.Sender, from => from.ConvertUsing<JsonToClassConverter<AccountsViewDto>, string?>(from => from.Sender));
-
             CreateMap<PhotosForAccountsViewEntity, PhotosForAccountsViewDto>()
                 .ForMember(to => to.Account, from => from.ConvertUsing<JsonToClassConverter<AccountsViewDto>, string?>(from => from.Account));
 

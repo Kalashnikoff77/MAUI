@@ -9,6 +9,7 @@ namespace Data.Models.SignalR
         public OnGetNewMessages? OnGetNewMessages { get; set; }
         public OnMarkMessagesAsRead? OnMarkMessagesAsRead { get; set; }
         public OnUpdateMessagesCount? OnUpdateMessagesCount { get; set; }
+        public OnUpdateNotificationsCount? OnUpdateNotificationsCount { get; set; }
     }
 
 
@@ -59,6 +60,14 @@ namespace Data.Models.SignalR
         /// Второй участник в диалоге (первый берётся из [Authorize])
         /// </summary>
         public int RecipientId { get; set; }
+    }
+
+
+    /// <summary>
+    /// Вызывается, когда меняется кол-во непрочитанных уведомлений
+    /// </summary>
+    public class OnUpdateNotificationsCount
+    {
     }
 }
 

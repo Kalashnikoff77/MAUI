@@ -1,6 +1,6 @@
 ﻿namespace Data.Dto.Requests
 {
-    public class MarkMessageAsReadRequestDto : RequestDtoBase
+    public class MarkMessagesAsReadRequestDto : RequestDtoBase
     {
         public override string Uri => "/messages/MarkAsRead";
 
