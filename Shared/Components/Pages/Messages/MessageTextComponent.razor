@@ -1,19 +1,25 @@
-﻿<span>
-    
-    @htmlText
-    
-    @if (!string.IsNullOrWhiteSpace(Message.Text) && Message.Text.Length > MaxTextLength)
+﻿<div class="d-flex align-center">
+    @if (Message.Type != EnumMessages.Message) 
     {
-        <span @onclick="OnWrap" @onclick:stopPropagation="true" class="mud-primary-text" style="font-size:14px; font-weight:500; cursor:pointer">
-            @(isShortText ? " далее »" : " « скрыть")
-        </span>
+        <MudIcon Icon="@Icons.Material.Filled.Notifications" Color="Color.Inherit" Style="font-size:18px; color:#d94a4a; margin: 0 3px 2px 1px" />
     }
-    else 
-    {
-        if (Message.Recipient?.Id == CurrentState.Account?.Id && Message.ReadDate == null)
+    
+    <span>
+        @htmlText
+    
+        @if (!string.IsNullOrWhiteSpace(Message.Text) && Message.Text.Length > MaxTextLength)
         {
-            <MudIconButton OnClick="OnWrap" Icon="@Icons.Material.Outlined.DoneAll" Size="Size.Small" Color="Color.Primary" Variant="Variant.Text" Class="ml-3" title="Пометить как прочитанное" />
+            <span @onclick="OnWrap" @onclick:stopPropagation="true" class="mud-primary-text" style="font-size:14px; font-weight:500; cursor:pointer">
+                @(isShortText ? " далее »" : " « скрыть")
+            </span>
         }
-    }
+        else 
+        {
+            if (Message.Recipient?.Id == CurrentState.Account?.Id && Message.ReadDate == null)
+            {
+                <MudIconButton OnClick="OnWrap" Icon="@Icons.Material.Outlined.DoneAll" Size="Size.Small" Color="Color.Primary" Variant="Variant.Text" Class="ml-3" title="Пометить как прочитанное" />
+            }
+        }
 
-</span>
+    </span>
+</div>

@@ -1,9 +1,12 @@
 ﻿using Data.Dto.Views;
+using Data.Enums;
 
 namespace Data.Dto.Sp
 {
     public class LastMessagesForAccountSpDto : DtoBase
     {
+        public EnumMessages Type { get; set; }
+
         public DateTime CreateDate { get; set; }
         public DateTime? ReadDate { get; set; }
 
