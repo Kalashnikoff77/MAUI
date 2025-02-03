@@ -1,30 +1,73 @@
 ﻿@if (AccountId == Message.SenderId)
 {
-    <div id="messageid_@Message.Id" class="d-flex justify-end pa-2">
-        <div class="d-flex flex-column pa-2 ml-12" style="background-color:#d9f4ff; border-radius:3px">
-            <MudText Typo="Typo.body2">@Message.Text</MudText>
-            <div class="d-flex align-center justify-end" style="color:#85c3de">
-                <MudText Style="text-align:left; font-size:12px">@Message.CreateDate.ToMyString()</MudText>
-                @if (Message.ReadDate.HasValue) 
-                {
-                    <MudIcon Icon="@Icons.Material.Filled.DoneAll" Color="Color.Inherit" Style="font-size:16px; margin: 0 0 1px 5px" title="@($"Прочитано: {Message.ReadDate.Value.ToMyString()}")" />
-                }
-                else 
-                {
-                    <MudIcon Icon="@Icons.Material.Filled.Done" Color="Color.Inherit" Style="font-size:16px; margin: 0 0 1px 5px" />
-                }
+    // Сообщение от залогиненного к собеседнику
+    @if (Message.Type == 0) {
+        <div id="messageid_@Message.Id" class="d-flex justify-end pa-2">
+            <div class="d-flex flex-column pa-2 ml-12" style="background-color:#d9f4ff; border-radius:3px">
+                <MudText Typo="Typo.body2">@Message.Text</MudText>
+                <div class="d-flex align-center justify-end" style="color:#85c3de">
+                    <MudText Style="text-align:left; font-size:12px">@Message.CreateDate.ToMyString()</MudText>
+                    @if (Message.ReadDate.HasValue)
+                    {
+                        <MudIcon Icon="@Icons.Material.Filled.DoneAll" Color="Color.Inherit" Style="font-size:16px; margin: 0 0 1px 5px" title="@($"Прочитано: {Message.ReadDate.Value.ToMyString()}")" />
+                    }
+                    else
+                    {
+                        <MudIcon Icon="@Icons.Material.Filled.Done" Color="Color.Inherit" Style="font-size:16px; margin: 0 0 1px 5px" />
+                    }
+                </div>
             </div>
         </div>
-    </div>
+    }
+    // Уведомление
+    else 
+    {
+        <div id="messageid_@Message.Id" class="d-flex justify-end pa-2">
+            <div class="d-flex flex-column pa-2 ml-12" style="background-color:#fad7d7; border-radius:3px">
+                <div class="d-flex justify-center">
+                    <MudIcon Icon="@Icons.Material.Filled.Notifications" Color="Color.Inherit" Style="font-size:18px; color:#d94a4a; margin: 0 3px 2px 1px" />
+                    <MudText Typo="Typo.body2">@StaticData.NotificationTypes[Message.Type].SenderMessage</MudText>
+                </div>
+                <div class="d-flex align-center justify-end" style="color:#de7e7e">
+                    <MudText Style="text-align:left; font-size:12px">@Message.CreateDate.ToMyString()</MudText>
+                    @if (Message.ReadDate.HasValue)
+                    {
+                        <MudIcon Icon="@Icons.Material.Filled.DoneAll" Color="Color.Inherit" Style="font-size:16px; margin: 0 0 1px 5px" title="@($"Прочитано: {Message.ReadDate.Value.ToMyString()}")" />
+                    }
+                    else
+                    {
+                        <MudIcon Icon="@Icons.Material.Filled.Done" Color="Color.Inherit" Style="font-size:16px; margin: 0 0 1px 5px" />
+                    }
+                </div>
+            </div>
+        </div>
+    }
 }
+
+// Сообщение от собеседника к залогиненному
 else
 {
-    <div id="messageid_@Message.Id" class="d-flex pa-2">
-        <div class="pa-2 mr-12" style="background-color:#e8f7df; border-radius:7px">
-            <MudText Typo="Typo.body2">@Message.Text</MudText>
-            <MudText class="d-flex justify-end" Style="color:#90d665; text-align:left; font-size:12px">@Message.CreateDate.ToMyString()</MudText>
+    @if (Message.Type == 0) {
+        <div id="messageid_@Message.Id" class="d-flex pa-2">
+            <div class="pa-2 mr-12" style="background-color:#e8f7df; border-radius:7px">
+                <MudText Typo="Typo.body2">@Message.Text</MudText>
+                <MudText class="d-flex justify-end" Style="color:#90d665; text-align:left; font-size:12px">@Message.CreateDate.ToMyString()</MudText>
+            </div>
         </div>
-    </div>
+    } 
+    // Уведомление
+    else
+    {
+        <div id="messageid_@Message.Id" class="d-flex pa-2">
+            <div class="pa-2 mr-12" style="background-color:#fad7d7; border-radius:7px;">
+                <div class="d-flex justify-center">
+                    <MudIcon Icon="@Icons.Material.Filled.Notifications" Color="Color.Inherit" Style="font-size:18px; color:#d94a4a; margin: 0 3px 2px 1px" />
+                    <MudText Typo="Typo.body2">@StaticData.NotificationTypes[Message.Type].RecipientMessage</MudText>
+                </div>
+                <MudText class="d-flex justify-end" Style="color:#de7e7e; text-align:left; font-size:12px">@Message.CreateDate.ToMyString()</MudText>
+            </div>
+        </div>
+    }
 }
 
 @code {

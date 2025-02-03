@@ -54,6 +54,30 @@ namespace Data.Models
             public string Name { get; set; } = null!;
         }
 
+        /// <summary>
+        /// Типы уведомлений и тексты для таблицы messages, Type > 0
+        /// </summary>
+        public static Dictionary<short, NotificationType> NotificationTypes = new()
+        {
+            { 1, new NotificationType { SenderMessage = "Вы отправили запрос на добавление в друзья.", RecipientMessage = "Вы получили запрос на добавление в друзья.", Text = "Запрос в друзья." } },
+            { 2, new NotificationType { SenderMessage = "Ваш запрос на добавление в друзья отклонён.", RecipientMessage = "Вы отклонили запрос на добавление в друзья.", Text = "Запрос в друзья отклонён." } },
+            { 3, new NotificationType { SenderMessage = "Ваш запрос на добавление в друзья принят.", RecipientMessage = "Вы приняли запрос на добавление в друзья.", Text = "Вы теперь друзья." } },
+        };
+        public class NotificationType
+        {
+            /// <summary>
+            /// Сообщение от отправителя
+            /// </summary>
+            public string SenderMessage { get; set; } = null!;
+            /// <summary>
+            /// Сообщение получателю
+            /// </summary>
+            public string RecipientMessage { get; set; } = null!;
+            /// <summary>
+            /// Текст для таблицы Messages для отображения в разделе /messages
+            /// </summary>
+            public string Text { get; set; } = null!;
+        }
 
         /// <summary>
         /// Кол-во сообщений в обсуждениях мероприятий в блоке
