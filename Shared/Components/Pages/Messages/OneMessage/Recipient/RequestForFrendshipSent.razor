@@ -1,0 +1,18 @@
+﻿<div class="pa-2 mr-12" style="background-color:#fad7d7; border-radius:7px; font-size:14px">
+    <div class="d-flex">
+        <MudIcon Icon="@Icons.Material.Filled.Notifications" Color="Color.Inherit" Style="font-size:18px; color:#d94a4a; margin: 0 3px 2px 1px" />
+        <p>@StaticData.NotificationTypes[Message.Type].RecipientMessage</p>
+    </div>
+
+    <div class="d-flex justify-end">
+        <p onclick="_dotNetReference.invokeMethodAsync('AcceptFriendship', parseInt(@Message.Id))" style="cursor:pointer">Принять</p>
+        <p class="pl-2 pr-2">|</p>
+        <p onclick="_dotNetReference.invokeMethodAsync('DeclineFriendship', parseInt(@Message.Id))" style="cursor:pointer">Отклонить</p>
+    </div>
+
+    <p class="d-flex justify-end" style="color:#de7e7e; text-align:left; font-size:12px">@Message.CreateDate.ToMyString()</p>
+</div>
+
+@code {
+    [Parameter, EditorRequired] public MessagesDto Message { get; set; } = null!;
+}

@@ -19,6 +19,12 @@
                 <MudButton Disabled="@sending" OnClick="SubmitMessageAsync" Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Send" Size="Size.Small">Отправить</MudButton>
             </div>
         </DialogContent>
-
     </MudDialog>
 }
+
+<script>
+    var _dotNetReference;
+    function SetDotNetReferenceInMessagesDialogRazor(dotNetReference) {
+        _dotNetReference = dotNetReference;
+    }
+</script>

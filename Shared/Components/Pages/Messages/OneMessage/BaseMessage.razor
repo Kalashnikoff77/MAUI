@@ -1,0 +1,62 @@
+﻿@if (AccountId == Message.SenderId)
+{
+    // Сообщение от залогиненного к собеседнику
+    @if (Message.Type == EnumMessages.Message)
+    {
+        <div id="messageid_@Message.Id" class="d-flex justify-end pa-2">
+            <div class="d-flex flex-column pa-2 ml-12" style="background-color:#d9f4ff; border-radius:7px">
+                <p>@Message.Text</p>
+                <div class="d-flex align-center justify-end" style="color:#85c3de">
+                    <p style="text-align:left; font-size:12px">@Message.CreateDate.ToMyString()</p>
+                    @if (Message.ReadDate.HasValue)
+                    {
+                        <MudIcon Icon="@Icons.Material.Filled.DoneAll" Color="Color.Inherit" Style="font-size:16px; margin: 0 0 1px 5px" title="@($"Прочитано: {Message.ReadDate.Value.ToMyString()}")" />
+                    }
+                    else
+                    {
+                        <MudIcon Icon="@Icons.Material.Filled.Done" Color="Color.Inherit" Style="font-size:16px; margin: 0 0 1px 5px" />
+                    }
+                </div>
+            </div>
+        </div>
+    }
+    // Уведомление
+    else
+    {
+        <div id="messageid_@Message.Id" class="d-flex justify-end pa-2">
+            @if (Message.Type == EnumMessages.RequestForFrendshipSent) 
+            {
+                <Shared.Components.Pages.Messages.OneMessage.Sender.RequestForFrendshipSent Message="Message" />
+            }
+        </div>
+    }
+}
+
+// Сообщение от собеседника к залогиненному
+else
+{
+    @if (Message.Type == EnumMessages.Message) {
+        <div id="messageid_@Message.Id" class="d-flex pa-2">
+            <div class="pa-2 mr-12" style="background-color:#e8f7df; border-radius:7px; font-size:14px">
+                <p>@Message.Text</p>
+                <p class="d-flex justify-end" style="color:#90d665; text-align:left; font-size:12px">@Message.CreateDate.ToMyString()</p>
+            </div>
+        </div>
+    } 
+    // Уведомление
+    else
+    {
+        <div id="messageid_@Message.Id" class="d-flex pa-2">
+            @if (Message.Type == EnumMessages.RequestForFrendshipSent) 
+            {
+                <Shared.Components.Pages.Messages.OneMessage.Recipient.RequestForFrendshipSent Message="Message" />
+            }
+        </div>
+    }
+}
+
+
+@code {
+    [Parameter, EditorRequired] public int AccountId { get; set; }
+    [Parameter, EditorRequired] public MessagesDto Message { get; set; } = null!;
+}

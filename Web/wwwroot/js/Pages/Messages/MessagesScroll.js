@@ -2,6 +2,7 @@ var _dotNetReference;
 
 export async function Initialize(dotNetReference) {
     _dotNetReference = dotNetReference;
+    SetDotNetReferenceInMessagesDialogRazor(dotNetReference);
 }
 
 export async function ScrollDivToBottom() {

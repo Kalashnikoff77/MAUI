@@ -9,6 +9,7 @@ using Data.State;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using MudBlazor;
+using Shared.Components.Pages.Messages.OneMessage;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 
@@ -23,7 +24,7 @@ namespace Shared.Components.Pages.Messages
         [Inject] IRepository<AddMessageRequestDto, AddMessageResponseDto> _repoAddMessage { get; set; } = null!;
         [Inject] IRepository<GetMessagesRequestDto, GetMessagesResponseDto> _repoGetMessages { get; set; } = null!;
         [Inject] IJSRuntime _JSRuntime { get; set; } = null!;
-        [Inject] IComponentRenderer<OneMessage> _renderer { get; set; } = null!;
+        [Inject] IComponentRenderer<BaseMessage> _renderer { get; set; } = null!;
 
         DotNetObjectReference<MessagesDialog> _dotNetReference { get; set; } = null!;
         IJSObjectReference _JSModule { get; set; } = null!;
@@ -126,7 +127,7 @@ namespace Shared.Components.Pages.Messages
         }
 
         /// <summary>
-        /// Ручная генерация компонента OneMessage (сообщения пользователя)
+        /// Ручная генерация компонента BaseMessage (сообщения пользователя)
         /// </summary>
         async Task<string> RenderMessages(List<MessagesDto> messages)
         {
@@ -165,6 +166,16 @@ namespace Shared.Components.Pages.Messages
                 text = null;
                 sending = false;
             }
+        }
+
+        [JSInvokable]
+        public void AcceptFriendship(int messageId)
+        {
+        }
+
+        [JSInvokable]
+        public void DeclineFriendship(int messageId)
+        {
         }
 
         public async ValueTask DisposeAsync()
