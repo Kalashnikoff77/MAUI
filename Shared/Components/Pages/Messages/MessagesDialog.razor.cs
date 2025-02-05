@@ -180,10 +180,11 @@ namespace Shared.Components.Pages.Messages
         [JSInvokable]
         public async Task AcceptFriendshipAsync(int messageId)
         {
-            // Удалим сообщение с запросом дружбы у пользователей
+            // Удалим сообщение с запросом дружбы из UI у обоих пользователей
             var updateMessageRequest = new SignalGlobalRequest { OnUpdateMessage = new OnUpdateMessage { MessageId = messageId, RecipientId = Recipient.Id } };
             await CurrentState.SignalRServerAsync(updateMessageRequest);
 
+            // Удалим сообщение из БД
             var request = new DeleteMessageRequestDto
             {
                 MessageId = messageId,
@@ -199,10 +200,11 @@ namespace Shared.Components.Pages.Messages
         [JSInvokable]
         public async Task DeclineFriendshipAsync(int messageId)
         {
-            // Удалим сообщение с запросом дружбы у пользователей
+            // Удалим сообщение с запросом дружбы из UI у обоих пользователей
             var updateMessageRequest = new SignalGlobalRequest { OnUpdateMessage = new OnUpdateMessage { MessageId = messageId, RecipientId = Recipient.Id } };
             await CurrentState.SignalRServerAsync(updateMessageRequest);
 
+            // Удалим сообщение из БД
             var request = new DeleteMessageRequestDto
             {
                 MessageId = messageId,
@@ -213,6 +215,27 @@ namespace Shared.Components.Pages.Messages
 
             text = StaticData.NotificationTypes[EnumMessages.RequestForFrendshipDeclined].Text;
             await SubmitMessageAsync(EnumMessages.RequestForFrendshipDeclined);
+        }
+
+        [JSInvokable]
+        public async Task CancelFriendshipAsync(int messageId)
+        {
+            // Удалим сообщение с запросом дружбы из UI у обоих пользователей
+            var updateMessageRequest = new SignalGlobalRequest { OnUpdateMessage = new OnUpdateMessage { MessageId = messageId, RecipientId = Recipient.Id } };
+            await CurrentState.SignalRServerAsync(updateMessageRequest);
+
+            // Удалим сообщение из БД
+            var request = new DeleteMessageRequestDto
+            {
+                MessageId = messageId,
+                RecipientId = Recipient.Id,
+                Token = CurrentState.Account?.Token
+            };
+            var apiResponse = await _repoDeleteMessage.HttpPostAsync(request);
+
+            // Обновим список последних сообщений на странице /messages
+            var updateMessagesCountRequest = new SignalGlobalRequest { OnUpdateMessagesCount = new OnUpdateMessagesCount { RecipientId = Recipient.Id } };
+            await CurrentState.SignalRServerAsync(updateMessagesCountRequest);
         }
 
         public async ValueTask DisposeAsync()
