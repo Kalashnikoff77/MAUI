@@ -36,7 +36,8 @@ namespace WebAPI.Controllers
                 MessagesEntity? result;
                 var sql = $"SELECT * FROM Messages " +
                     $"WHERE (({nameof(MessagesEntity.SenderId)} = @AccountId AND {nameof(MessagesEntity.RecipientId)} = @RecipientId) " +
-                    $"OR ({nameof(MessagesEntity.SenderId)} = @RecipientId AND {nameof(MessagesEntity.RecipientId)} = @AccountId))";
+                    $"OR ({nameof(MessagesEntity.SenderId)} = @RecipientId AND {nameof(MessagesEntity.RecipientId)} = @AccountId)) " +
+                    $"AND IsDeleted = 0";
                 result = await _unitOfWork.SqlConnection.QueryFirstOrDefaultAsync<MessagesEntity>(sql, new { _unitOfWork.AccountId, request.RecipientId });
                 response.Message = _unitOfWork.Mapper.Map<MessagesDto>(result);
             }
@@ -46,8 +47,9 @@ namespace WebAPI.Controllers
 
                 // Получим кол-во сообщений
                 var sql = $"SELECT COUNT(*) FROM Messages " +
-                    $"WHERE ({nameof(MessagesEntity.SenderId)} = @AccountId AND {nameof(MessagesEntity.RecipientId)} = @RecipientId) " +
-                    $"OR ({nameof(MessagesEntity.SenderId)} = @RecipientId AND {nameof(MessagesEntity.RecipientId)} = @AccountId)";
+                    $"WHERE (({nameof(MessagesEntity.SenderId)} = @AccountId AND {nameof(MessagesEntity.RecipientId)} = @RecipientId) " +
+                    $"OR ({nameof(MessagesEntity.SenderId)} = @RecipientId AND {nameof(MessagesEntity.RecipientId)} = @AccountId)) " +
+                    $"AND IsDeleted = 0";
                 response.Count = await _unitOfWork.SqlConnection.QueryFirstAsync<int>(sql, new { _unitOfWork.AccountId, request.RecipientId });
 
                 // Запрос на получение предыдущих сообщений
@@ -68,6 +70,7 @@ namespace WebAPI.Controllers
                         $"WHERE (({nameof(MessagesEntity.SenderId)} = @AccountId AND {nameof(MessagesEntity.RecipientId)} = @RecipientId) " +
                         $"OR ({nameof(MessagesEntity.SenderId)} = @RecipientId AND {nameof(MessagesEntity.RecipientId)} = @AccountId)) " +
                         $"AND Id > {request.GetNextAfterId} " +
+                        $"AND IsDeleted = 0 " +
                         $"ORDER BY Id ASC";
                     result = await _unitOfWork.SqlConnection.QueryAsync<MessagesEntity>(sql, new { _unitOfWork.AccountId, request.RecipientId, request.Take });
                 }
@@ -77,8 +80,9 @@ namespace WebAPI.Controllers
                 {
                     int offset = response.Count.Value > StaticData.MESSAGES_PER_BLOCK ? response.Count.Value - StaticData.MESSAGES_PER_BLOCK : 0;
                     sql = $"SELECT * FROM Messages " +
-                        $"WHERE ({nameof(MessagesEntity.SenderId)} = @AccountId AND {nameof(MessagesEntity.RecipientId)} = @RecipientId) " +
-                        $"OR ({nameof(MessagesEntity.SenderId)} = @RecipientId AND {nameof(MessagesEntity.RecipientId)} = @AccountId) " +
+                        $"WHERE (({nameof(MessagesEntity.SenderId)} = @AccountId AND {nameof(MessagesEntity.RecipientId)} = @RecipientId) " +
+                        $"OR ({nameof(MessagesEntity.SenderId)} = @RecipientId AND {nameof(MessagesEntity.RecipientId)} = @AccountId)) " +
+                        $"AND IsDeleted = 0 " +
                         $"ORDER BY Id ASC " +
                         $"OFFSET {offset} ROWS";
                     result = await _unitOfWork.SqlConnection.QueryAsync<MessagesEntity>(sql, new { _unitOfWork.AccountId, request.RecipientId });
@@ -205,10 +209,30 @@ namespace WebAPI.Controllers
             sql = "SELECT TOP 1 Id FROM Accounts WHERE Id = @RecipientId";
             var recipientId = await _unitOfWork.SqlConnection.QueryFirstOrDefaultAsync<int?>(sql, new { request.RecipientId }) ?? throw new NotFoundException($"Пользователь-получатель с Id {_unitOfWork.AccountId} не найден!");
 
-            sql = $"INSERT INTO Messages ({nameof(MessagesEntity.SenderId)}, {nameof(MessagesEntity.RecipientId)}, {nameof(MessagesEntity.Text)}) " +
+            sql = $"INSERT INTO Messages ({nameof(MessagesEntity.Type)}, {nameof(MessagesEntity.SenderId)}, {nameof(MessagesEntity.RecipientId)}, {nameof(MessagesEntity.Text)}) " +
                 $"OUTPUT INSERTED.Id " +
-                $"VALUES (@senderId, @recipientId, @Text)";
-            response.NewId = await _unitOfWork.SqlConnection.QuerySingleAsync<int>(sql, new { senderId, recipientId, request.Text });
+                $"VALUES (@Type, @senderId, @recipientId, @Text)";
+            response.NewId = await _unitOfWork.SqlConnection.QuerySingleAsync<int>(sql, new { request.Type, senderId, recipientId, request.Text });
+
+            return response;
+        }
+
+        [Route("Delete"), HttpPost, Authorize]
+        public async Task<ResponseDtoBase> DeleteAsync(DeleteMessageRequestDto request)
+        {
+            AuthenticateUser();
+
+            var response = new ResponseDtoBase();
+
+            var sql = "SELECT TOP 1 Id FROM Accounts WHERE Id = @AccountId";
+            var senderId = await _unitOfWork.SqlConnection.QueryFirstOrDefaultAsync<int?>(sql, new { _unitOfWork.AccountId }) ?? throw new NotFoundException($"Пользователь-отправитель с Id {_unitOfWork.AccountId} не найден!");
+
+            sql = "SELECT TOP 1 Id FROM Accounts WHERE Id = @RecipientId";
+            var recipientId = await _unitOfWork.SqlConnection.QueryFirstOrDefaultAsync<int?>(sql, new { request.RecipientId }) ?? throw new NotFoundException($"Пользователь-получатель с Id {_unitOfWork.AccountId} не найден!");
+
+            sql = $"UPDATE Messages SET {nameof(MessagesEntity.IsDeleted)} = 1 " +
+                $"WHERE Id = @MessageId AND {nameof(MessagesEntity.SenderId)} = {nameof(MessagesEntity.SenderId)} AND {nameof(MessagesEntity.RecipientId)} = {nameof(MessagesEntity.RecipientId)}";
+            await _unitOfWork.SqlConnection.ExecuteAsync(sql, new { request.MessageId, SenderId = _unitOfWork.AccountId, request.RecipientId });
 
             return response;
         }

@@ -44,9 +44,13 @@ namespace SignalR
             if (request.OnGetNewMessages != null)
                 await OnGetNewMessagesAsync(request.OnGetNewMessages);
 
-            // Обновить сообщения у пользователя в диалоговом окне страницы /messages (например: отметка о прочтении, изменение текста)
+            // Отметить сообщения как прочитанное у пользователя в диалоговом окне страницы /messages
             if (request.OnMarkMessagesAsRead != null)
                 await OnMarkMessagesAsReadAsync(request.OnMarkMessagesAsRead);
+
+            // Обновить сообщения у пользователя в диалоговом окне страницы /messages (изменение, удаление)
+            if (request.OnUpdateMessage != null)
+                await OnUpdateMessageAsync(request.OnUpdateMessage);
 
             // Вызывается, когда меняется кол-во непрочитанных сообщений
             if (request.OnUpdateMessagesCount != null)
@@ -104,6 +108,22 @@ namespace SignalR
                     .SendAsync(response.EnumSignalRHandlersClient.ToString(), response);
             }
         }
+
+        /// <summary>
+        /// Вызывается, когда сообщение измененяется или удаленяется в MessageDialog страницы /messages
+        /// </summary>
+        async Task OnUpdateMessageAsync(OnUpdateMessage request)
+        {
+            if (GetAccountDetails(out AccountDetails accountDetails, Context.UserIdentifier))
+            {
+                var response = new OnUpdateMessageResponse { MessageId = request.MessageId };
+                await Clients
+                    .Users([Context.UserIdentifier!, request.RecipientId.ToString()])
+                    .SendAsync(response.EnumSignalRHandlersClient.ToString(), response);
+            }
+        }
+
+
 
         /// <summary>
         /// Вызывается, когда меняется кол-во непрочитанных сообщений

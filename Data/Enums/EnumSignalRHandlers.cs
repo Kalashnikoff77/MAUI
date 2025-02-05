@@ -28,6 +28,11 @@
         OnMarkMessagesAsReadClient,
 
         /// <summary>
+        /// Обновление сообщения в диалоговом окне страницы /messages (причина: изменено или удалено)
+        /// </summary>
+        OnUpdateMessageClient,
+
+        /// <summary>
         /// Вызывается, когда меняется кол-во непрочитанных сообщений
         /// </summary>
         OnUpdateMessagesCountClient,

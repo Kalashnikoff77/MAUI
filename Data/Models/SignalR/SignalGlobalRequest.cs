@@ -8,6 +8,7 @@ namespace Data.Models.SignalR
         public OnScheduleChanged? OnScheduleChanged { get; set; }
         public OnGetNewMessages? OnGetNewMessages { get; set; }
         public OnMarkMessagesAsRead? OnMarkMessagesAsRead { get; set; }
+        public OnUpdateMessage? OnUpdateMessage { get; set; }
         public OnUpdateMessagesCount? OnUpdateMessagesCount { get; set; }
     }
 
@@ -55,6 +56,22 @@ namespace Data.Models.SignalR
     /// </summary>
     public class OnUpdateMessagesCount
     {
+        /// <summary>
+        /// Второй участник в диалоге (первый берётся из [Authorize])
+        /// </summary>
+        public int RecipientId { get; set; }
+    }
+
+    /// <summary>
+    /// Вызывается, когда изменяется или удаляется одно сообщение
+    /// </summary>
+    public class OnUpdateMessage
+    {
+        /// <summary>
+        /// Id сообщения
+        /// </summary>
+        public int MessageId { get; set; }
+        
         /// <summary>
         /// Второй участник в диалоге (первый берётся из [Authorize])
         /// </summary>

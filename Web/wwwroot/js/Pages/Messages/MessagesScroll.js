@@ -32,6 +32,12 @@ export async function AppendNewMessages(messages) {
     }
 }
 
+// Пометить сообщение как прочитанное
 export function MarkMessageAsRead(id, htmlItem) {
     $('#messageid_' + id).replaceWith(htmlItem);
+}
+
+// Обновление или удаление сообщения
+export function UpdateMessage(id) {
+    $('#messageid_' + id).remove();
 }

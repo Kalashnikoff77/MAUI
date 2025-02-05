@@ -5,9 +5,9 @@
     </div>
 
     <div class="d-flex justify-end">
-        <p onclick="_dotNetReference.invokeMethodAsync('AcceptFriendship', parseInt(@Message.Id))" style="cursor:pointer">Принять</p>
+        <p onclick="_dotNetReference.invokeMethodAsync('AcceptFriendshipAsync', parseInt(@Message.Id))" style="cursor:pointer">Принять</p>
         <p class="pl-2 pr-2">|</p>
-        <p onclick="_dotNetReference.invokeMethodAsync('DeclineFriendship', parseInt(@Message.Id))" style="cursor:pointer">Отклонить</p>
+        <p onclick="_dotNetReference.invokeMethodAsync('DeclineFriendshipAsync', parseInt(@Message.Id))" style="cursor:pointer">Отклонить</p>
     </div>
 
     <p class="d-flex justify-end" style="color:#de7e7e; text-align:left; font-size:12px">@Message.CreateDate.ToMyString()</p>

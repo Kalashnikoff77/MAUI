@@ -28,6 +28,14 @@
             {
                 <Shared.Components.Pages.Messages.OneMessage.Sender.RequestForFrendshipSent Message="Message" />
             }
+            else if (Message.Type == EnumMessages.RequestForFrendshipAccepted)
+            {
+                <Shared.Components.Pages.Messages.OneMessage.Sender.RequestForFrendshipAccepted Message="Message" />
+            }
+            else if (Message.Type == EnumMessages.RequestForFrendshipDeclined)
+            {
+                <Shared.Components.Pages.Messages.OneMessage.Sender.RequestForFrendshipDeclined Message="Message" />
+            }
         </div>
     }
 }
@@ -50,6 +58,14 @@ else
             @if (Message.Type == EnumMessages.RequestForFrendshipSent) 
             {
                 <Shared.Components.Pages.Messages.OneMessage.Recipient.RequestForFrendshipSent Message="Message" />
+            }
+            else if (Message.Type == EnumMessages.RequestForFrendshipAccepted)
+            {
+                <Shared.Components.Pages.Messages.OneMessage.Recipient.RequestForFrendshipAccepted Message="Message" />
+            }
+            else if (Message.Type == EnumMessages.RequestForFrendshipDeclined)
+            {
+                <Shared.Components.Pages.Messages.OneMessage.Recipient.RequestForFrendshipDeclined Message="Message" />
             }
         </div>
     }

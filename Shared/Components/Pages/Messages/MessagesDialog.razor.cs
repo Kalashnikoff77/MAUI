@@ -2,6 +2,7 @@
 using Data.Dto.Requests;
 using Data.Dto.Responses;
 using Data.Dto.Views;
+using Data.Enums;
 using Data.Models;
 using Data.Models.SignalR;
 using Data.Services;
@@ -21,13 +22,15 @@ namespace Shared.Components.Pages.Messages
         [CascadingParameter] protected MudDialogInstance MudDialog { get; set; } = null!;
         [Parameter, Required] public AccountsViewDto Recipient { get; set; } = null!;
 
-        [Inject] IRepository<AddMessageRequestDto, AddMessageResponseDto> _repoAddMessage { get; set; } = null!;
         [Inject] IRepository<GetMessagesRequestDto, GetMessagesResponseDto> _repoGetMessages { get; set; } = null!;
+        [Inject] IRepository<AddMessageRequestDto, AddMessageResponseDto> _repoAddMessage { get; set; } = null!;
+        [Inject] IRepository<DeleteMessageRequestDto, ResponseDtoBase> _repoDeleteMessage { get; set; } = null!;
         [Inject] IJSRuntime _JSRuntime { get; set; } = null!;
         [Inject] IComponentRenderer<BaseMessage> _renderer { get; set; } = null!;
 
         DotNetObjectReference<MessagesDialog> _dotNetReference { get; set; } = null!;
         IJSObjectReference _JSModule { get; set; } = null!;
+        IDisposable? OnUpdateMessagesHandler;
         IDisposable? OnGetNewMessagesHandler;
         IDisposable? OnMarkMessagesAsReadHandler;
 
@@ -43,6 +46,10 @@ namespace Shared.Components.Pages.Messages
                 // Добавим сообщения в диалог двух пользователей (диалоговое окно страницы /messages)
                 OnGetNewMessagesHandler = OnGetNewMessagesHandler.SignalRClient<OnGetNewMessagesResponse>(CurrentState, async (response) =>
                     await _JSModule.InvokeVoidAsync("AppendNewMessages", await GetNewMessages()));
+
+                // Обновим или удалим сообщение в диалогах двух пользователей (диалоговое окно страницы /messages)
+                OnUpdateMessagesHandler = OnUpdateMessagesHandler.SignalRClient<OnUpdateMessageResponse>(CurrentState, async (response) =>
+                    await _JSModule.InvokeVoidAsync("UpdateMessage", response.MessageId));
 
                 // Пометим сообщения как прочитанные в диалоговом окне страницы /messages
                 OnMarkMessagesAsReadHandler = OnMarkMessagesAsReadHandler.SignalRClient<OnMarkMessagesAsReadResponse>(CurrentState, async (response) =>
@@ -143,13 +150,14 @@ namespace Shared.Components.Pages.Messages
         /// <summary>
         /// Отправка сообщения
         /// </summary>
-        async Task SubmitMessageAsync()
+        async Task SubmitMessageAsync(EnumMessages type = EnumMessages.Message)
         {
             if (!string.IsNullOrWhiteSpace(text))
             {
                 sending = true;
                 var response = await _repoAddMessage.HttpPostAsync(new AddMessageRequestDto
                 {
+                    Type = type,
                     RecipientId = Recipient.Id,
                     Text = text,
                     Token = CurrentState.Account?.Token
@@ -168,14 +176,43 @@ namespace Shared.Components.Pages.Messages
             }
         }
 
+
         [JSInvokable]
-        public void AcceptFriendship(int messageId)
+        public async Task AcceptFriendshipAsync(int messageId)
         {
+            // Удалим сообщение с запросом дружбы у пользователей
+            var updateMessageRequest = new SignalGlobalRequest { OnUpdateMessage = new OnUpdateMessage { MessageId = messageId, RecipientId = Recipient.Id } };
+            await CurrentState.SignalRServerAsync(updateMessageRequest);
+
+            var request = new DeleteMessageRequestDto
+            {
+                MessageId = messageId,
+                RecipientId = Recipient.Id,
+                Token = CurrentState.Account?.Token
+            };
+            var apiResponse = await _repoDeleteMessage.HttpPostAsync(request);
+
+            text = StaticData.NotificationTypes[EnumMessages.RequestForFrendshipAccepted].Text;
+            await SubmitMessageAsync(EnumMessages.RequestForFrendshipAccepted);
         }
 
         [JSInvokable]
-        public void DeclineFriendship(int messageId)
+        public async Task DeclineFriendshipAsync(int messageId)
         {
+            // Удалим сообщение с запросом дружбы у пользователей
+            var updateMessageRequest = new SignalGlobalRequest { OnUpdateMessage = new OnUpdateMessage { MessageId = messageId, RecipientId = Recipient.Id } };
+            await CurrentState.SignalRServerAsync(updateMessageRequest);
+
+            var request = new DeleteMessageRequestDto
+            {
+                MessageId = messageId,
+                RecipientId = Recipient.Id,
+                Token = CurrentState.Account?.Token
+            };
+            var apiResponse = await _repoDeleteMessage.HttpPostAsync(request);
+
+            text = StaticData.NotificationTypes[EnumMessages.RequestForFrendshipDeclined].Text;
+            await SubmitMessageAsync(EnumMessages.RequestForFrendshipAccepted);
         }
 
         public async ValueTask DisposeAsync()
@@ -184,6 +221,7 @@ namespace Shared.Components.Pages.Messages
             {
                 OnGetNewMessagesHandler?.Dispose();
                 OnMarkMessagesAsReadHandler?.Dispose();
+                OnUpdateMessagesHandler?.Dispose();
 
                 _dotNetReference?.Dispose();
                 if (_JSModule != null)

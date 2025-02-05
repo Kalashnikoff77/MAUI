@@ -1,4 +1,21 @@
-﻿<h3>RequestForFrendshipAccepted</h3>
+﻿<div class="d-flex flex-column pa-2 ml-12" style="background-color:#fad7d7; border-radius:3px">
+    <div class="d-flex justify-center">
+        <MudIcon Icon="@Icons.Material.Filled.Notifications" Color="Color.Inherit" Style="font-size:18px; color:#d94a4a; margin: 0 3px 2px 1px" />
+        <MudText Typo="Typo.body2">@StaticData.NotificationTypes[Message.Type].RecipientMessage</MudText>
+    </div>
+
+    <div class="d-flex align-center justify-end" style="color:#de7e7e">
+        <MudText Style="text-align:left; font-size:12px">@Message.CreateDate.ToMyString()</MudText>
+        @if (Message.ReadDate.HasValue)
+        {
+            <MudIcon Icon="@Icons.Material.Filled.DoneAll" Color="Color.Inherit" Style="font-size:16px; margin: 0 0 1px 5px" title="@($"Прочитано: {Message.ReadDate.Value.ToMyString()}")" />
+        }
+        else
+        {
+            <MudIcon Icon="@Icons.Material.Filled.Done" Color="Color.Inherit" Style="font-size:16px; margin: 0 0 1px 5px" />
+        }
+    </div>
+</div>
 
 @code {
     [Parameter, EditorRequired] public MessagesDto Message { get; set; } = null!;
