@@ -4,7 +4,7 @@
     {
         Message,
         RequestForFrendshipSent,
-        RequestForFrendshipDeclined,
-        RequestForFrendshipAccepted
+        RequestForFrendshipAccepted,
+        RequestForFrendshipDeclined
     }
 }

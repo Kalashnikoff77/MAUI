@@ -212,7 +212,7 @@ namespace Shared.Components.Pages.Messages
             var apiResponse = await _repoDeleteMessage.HttpPostAsync(request);
 
             text = StaticData.NotificationTypes[EnumMessages.RequestForFrendshipDeclined].Text;
-            await SubmitMessageAsync(EnumMessages.RequestForFrendshipAccepted);
+            await SubmitMessageAsync(EnumMessages.RequestForFrendshipDeclined);
         }
 
         public async ValueTask DisposeAsync()
