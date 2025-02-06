@@ -60,8 +60,8 @@ namespace Data.Models
         public static Dictionary<EnumMessages, NotificationType> NotificationTypes = new()
         {
             { EnumMessages.RequestForFrendshipSent, new NotificationType { SenderMessage = "Вы отправили запрос на добавление в друзья.", RecipientMessage = "Вы получили запрос на добавление в друзья.", Text = "Запрос в друзья." } },
-            { EnumMessages.RequestForFrendshipDeclined, new NotificationType { SenderMessage = "Ваш запрос на добавление в друзья отклонён.", RecipientMessage = "Вы отклонили запрос на добавление в друзья.", Text = "Запрос в друзья отклонён." } },
             { EnumMessages.RequestForFrendshipAccepted, new NotificationType { SenderMessage = "Ваш запрос на добавление в друзья принят.", RecipientMessage = "Вы приняли запрос на добавление в друзья.", Text = "Вы теперь друзья." } },
+            { EnumMessages.RequestForFrendshipDeclined, new NotificationType { SenderMessage = "Ваш запрос на добавление в друзья отклонён.", RecipientMessage = "Вы отклонили запрос на добавление в друзья.", Text = "Запрос в друзья отклонён." } }
         };
         public class NotificationType
         {
