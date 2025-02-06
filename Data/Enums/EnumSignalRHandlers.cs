@@ -37,6 +37,11 @@
         /// </summary>
         OnUpdateMessagesCountClient,
 
+        /// <summary>
+        /// Вызывается, когда изменяется связь с пользователями (блокировка, дружба и т.п.)
+        /// </summary>
+        OnUpdateAccountRelation,
+
         // Требуется проверить, используются ли эти перечисления
         //NewMessageAddedServer,
         //NewMessageAddedClient,

@@ -10,6 +10,8 @@ namespace Data.Models.SignalR
         public OnMarkMessagesAsRead? OnMarkMessagesAsRead { get; set; }
         public OnUpdateMessage? OnUpdateMessage { get; set; }
         public OnUpdateMessagesCount? OnUpdateMessagesCount { get; set; }
+
+        public OnUpdateAccountRelation? OnUpdateAccountRelation { get; set; }
     }
 
 
@@ -74,6 +76,18 @@ namespace Data.Models.SignalR
         
         /// <summary>
         /// Второй участник в диалоге (первый берётся из [Authorize])
+        /// </summary>
+        public int RecipientId { get; set; }
+    }
+
+
+    /// <summary>
+    /// Вызывается, когда пользователь блокируется
+    /// </summary>
+    public class OnUpdateAccountRelation
+    {
+        /// <summary>
+        /// Второй участник блокировки (первый берётся из [Authorize])
         /// </summary>
         public int RecipientId { get; set; }
     }

@@ -55,6 +55,10 @@ namespace SignalR
             // Вызывается, когда меняется кол-во непрочитанных сообщений
             if (request.OnUpdateMessagesCount != null)
                 await OnUpdateMessagesCountAsync(request.OnUpdateMessagesCount);
+
+            // Вызывается, когда пользователя блокируют
+            if (request.OnUpdateAccountRelation != null)
+                await OnUpdateAccountRelationAsync(request.OnUpdateAccountRelation);
         }
 
 
@@ -123,8 +127,6 @@ namespace SignalR
             }
         }
 
-
-
         /// <summary>
         /// Вызывается, когда меняется кол-во непрочитанных сообщений
         /// </summary>
@@ -133,6 +135,20 @@ namespace SignalR
             if (GetAccountDetails(out AccountDetails accountDetails, Context.UserIdentifier))
             {
                 var response = new OnUpdateMessagesCountResponse();
+                await Clients
+                    .Users([Context.UserIdentifier!, request.RecipientId.ToString()!])
+                    .SendAsync(response.EnumSignalRHandlersClient.ToString(), response);
+            }
+        }
+
+        /// <summary>
+        /// Вызывается, когда изменяется связь с пользователями (блокировка, дружба и т.п.)
+        /// </summary>
+        async Task OnUpdateAccountRelationAsync(OnUpdateAccountRelation request)
+        {
+            if (GetAccountDetails(out AccountDetails accountDetails, Context.UserIdentifier))
+            {
+                var response = new OnUpdateAccountRelationResponse();
                 await Clients
                     .Users([Context.UserIdentifier!, request.RecipientId.ToString()!])
                     .SendAsync(response.EnumSignalRHandlersClient.ToString(), response);

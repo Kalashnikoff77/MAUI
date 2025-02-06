@@ -3,6 +3,9 @@ using Data.Enums;
 using Dapper;
 using Data.Entities;
 using System.Data.Common;
+using Azure.Core;
+using System.Reflection;
+using WebAPI.Exceptions;
 
 namespace WebAPI.Models
 {
@@ -13,7 +16,7 @@ namespace WebAPI.Models
 
         public DbConnection Conn { get; set; } = null!;
 
-        public UpdateRelationResponseDto Response { get; set; } = null!;
+        public ResponseDtoBase Response { get; set; } = null!;
 
         /// <summary>
         /// Удаление всех связей
@@ -21,7 +24,7 @@ namespace WebAPI.Models
         public async Task RemoveAllRelationsAsync()
         {
             var sql = $"DELETE FROM RelationsForAccounts " +
-                $"WHERE ({nameof(RelationsForAccountsEntity.SenderId)} = @{nameof(RelationsForAccountsEntity.SenderId)} AND {nameof(RelationsForAccountsEntity.RecipientId)} = @{nameof(RelationsForAccountsEntity.RecipientId)}) " +
+            $"WHERE ({nameof(RelationsForAccountsEntity.SenderId)} = @{nameof(RelationsForAccountsEntity.SenderId)} AND {nameof(RelationsForAccountsEntity.RecipientId)} = @{nameof(RelationsForAccountsEntity.RecipientId)}) " +
                 $"OR ({nameof(RelationsForAccountsEntity.SenderId)} = @{nameof(RelationsForAccountsEntity.RecipientId)} AND {nameof(RelationsForAccountsEntity.RecipientId)} = @{nameof(RelationsForAccountsEntity.SenderId)})";
             await Conn.ExecuteAsync(sql, new { SenderId, RecipientId });
         }
@@ -50,8 +53,6 @@ namespace WebAPI.Models
                     $"VALUES " +
                     $"(@{nameof(RelationsForAccountsEntity.SenderId)}, @{nameof(RelationsForAccountsEntity.RecipientId)}, {(short)EnumRelations.Blocked}, 1)";
                 await Conn.ExecuteAsync(sql, new { SenderId, RecipientId });
-
-                Response.IsRelationAdded = true;
             }
         }
 
@@ -73,16 +74,14 @@ namespace WebAPI.Models
             {
                 sql = $"INSERT INTO RelationsForAccounts ({nameof(RelationsForAccountsEntity.SenderId)}, {nameof(RelationsForAccountsEntity.RecipientId)}, {nameof(RelationsForAccountsEntity.Type)}, {nameof(RelationsForAccountsEntity.IsConfirmed)}) " +
                     $"VALUES " +
-                    $"(@{nameof(RelationsForAccountsEntity.SenderId)}, @{nameof(RelationsForAccountsEntity.RecipientId)}, {(short)EnumRelations.Friend}, 1)";
+                    $"(@{nameof(RelationsForAccountsEntity.RecipientId)}, @{nameof(RelationsForAccountsEntity.SenderId)}, {(short)EnumRelations.Friend}, 1)";
                 await Conn.ExecuteAsync(sql, new { SenderId, RecipientId });
-                Response.IsRelationAdded = true;
             }
             // Иначе связь удаляем
             else
             {
                 sql = $"DELETE FROM RelationsForAccounts WHERE Id = @Id";
                 await Conn.ExecuteAsync(sql, new { currentRelation.Id });
-                Response.IsRelationAdded = false;
             }
         }
     }

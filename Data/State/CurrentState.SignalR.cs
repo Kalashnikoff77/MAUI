@@ -11,8 +11,8 @@ namespace Data.State
 
         IDisposable? updateOnlineAccountsHandler;
         IDisposable? onAvatarChangedHandler;
+        IDisposable? onUpdateAccountRelationHandler;
 
-        //IDisposable? updateRelationsTriggerHandler;
         //IDisposable? updateEventRegisterTriggerHandler;
 
         public async Task SignalRConnect()
@@ -38,7 +38,10 @@ namespace Data.State
             onAvatarChangedHandler = onAvatarChangedHandler.SignalRClient<OnAvatarChangedResponse>(this);
 
             //// Пользователь изменил взаимоотношения с другим (дружба, подписка, блокировка)
-            //updateRelationsTriggerHandler = updateRelationsTriggerHandler.SignalRClient<GetRelationsModel>(this);
+            onUpdateAccountRelationHandler = onUpdateAccountRelationHandler.SignalRClient<OnUpdateAccountRelationResponse>(this, async (response) => 
+            {
+                var acc = Account;
+            });
 
             await SignalR.StartAsync();
         }

@@ -32,10 +32,13 @@ namespace Shared.Components.Layout
             else
             {
                 // Оставить здесь, т.к. требуется как аутентификация пользователя, так и подключение по SignalR.
-                OnUpdateMessagesCountHandler = OnUpdateMessagesCountHandler.SignalRClient<OnUpdateMessagesCountResponse>(CurrentState, async (response) =>
-                    await GetNewItemsCount());
+                if (CurrentState.Account != null)
+                {
+                    OnUpdateMessagesCountHandler = OnUpdateMessagesCountHandler.SignalRClient<OnUpdateMessagesCountResponse>(CurrentState, async (response) =>
+                        await _JSModule.InvokeVoidAsync("GetMessagesCount"));
 
-                await GetNewItemsCount();
+                    await _JSModule.InvokeVoidAsync("GetMessagesCount");
+                }
             }
         }
 
@@ -48,11 +51,6 @@ namespace Shared.Components.Layout
             return unreadMessagesCount;
         }
 
-
-        async Task GetNewItemsCount()
-        {
-            await _JSModule.InvokeVoidAsync("GetMessagesCount");
-        }
 
         public async ValueTask DisposeAsync()
         {

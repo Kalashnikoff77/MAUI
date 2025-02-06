@@ -312,21 +312,18 @@ namespace WebAPI.Controllers
 
 
         [Route("UpdateRelation"), HttpPost, Authorize]
-        public async Task<UpdateRelationResponseDto> UpdateRelationAsync(UpdateRelationRequestDto request)
+        public async Task<ResponseDtoBase> UpdateRelationAsync(UpdateRelationRequestDto request)
         {
             AuthenticateUser();
-
-            if (_unitOfWork.AccountId!.Value != request.RecipientId) 
-                throw new BadRequestException($"Некорректный запрос при обновлении взаимосвязей пользователей!");
 
             var model = new UpdateRelationModel
             {
                 Conn = _unitOfWork.SqlConnection,
-                Response = new UpdateRelationResponseDto()
+                Response = new ResponseDtoBase()
             };
 
-            var sql = "SELECT TOP 1 Id FROM Accounts WHERE Id = @SenderId";
-            model.SenderId = await _unitOfWork.SqlConnection.QueryFirstOrDefaultAsync<int?>(sql, new { request.SenderId }) ?? throw new BadRequestException($"Аккаунт с Id {request.SenderId} не найден!");
+            var sql = "SELECT TOP 1 Id FROM Accounts WHERE Id = @AccountId";
+            model.SenderId = await _unitOfWork.SqlConnection.QueryFirstOrDefaultAsync<int?>(sql, new { _unitOfWork.AccountId }) ?? throw new BadRequestException($"Аккаунт с Id {_unitOfWork.AccountId} не найден!");
 
             sql = "SELECT TOP 1 Id FROM Accounts WHERE Id = @RecipientId";
             model.RecipientId = await _unitOfWork.SqlConnection.QueryFirstOrDefaultAsync<int?>(sql, new { request.RecipientId }) ?? throw new BadRequestException($"Аккаунт с Id {request.RecipientId} не найден!");

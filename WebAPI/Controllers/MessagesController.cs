@@ -128,11 +128,11 @@ namespace WebAPI.Controllers
             var response = new GetMessagesCountResponseDto();
 
             var sql = $"SELECT COUNT(*) FROM Messages " +
-                $"WHERE {nameof(MessagesEntity.SenderId)} = @AccountId OR {nameof(MessagesEntity.RecipientId)} = @AccountId";
+                $"WHERE ({nameof(MessagesEntity.SenderId)} = @AccountId OR {nameof(MessagesEntity.RecipientId)} = @AccountId) AND {nameof(MessagesEntity.IsDeleted)} = 0";
             response.TotalCount = await _unitOfWork.SqlConnection.QueryFirstAsync<int>(sql, new { _unitOfWork.AccountId });
 
             sql = $"SELECT COUNT(*) FROM Messages " +
-                $"WHERE {nameof(MessagesEntity.RecipientId)} = @AccountId AND {nameof(MessagesEntity.ReadDate)} IS NULL";
+                $"WHERE ({nameof(MessagesEntity.RecipientId)} = @AccountId AND {nameof(MessagesEntity.ReadDate)} IS NULL) AND {nameof(MessagesEntity.IsDeleted)} = 0";
             response.UnreadCount = await _unitOfWork.SqlConnection.QueryFirstAsync<int>(sql, new { _unitOfWork.AccountId });
 
             return response;

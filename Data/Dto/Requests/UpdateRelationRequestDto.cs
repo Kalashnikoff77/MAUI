@@ -6,7 +6,6 @@ namespace Data.Dto.Requests
     {
         public override string Uri => "/Accounts/UpdateRelation";
 
-        public int SenderId { get; set; }
         public int RecipientId { get; set; }
         public EnumRelations EnumRelation { get; set; }
     }

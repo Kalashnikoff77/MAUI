@@ -1,6 +1,7 @@
 ﻿using Data.Dto.Requests;
 using Data.Dto.Responses;
 using Data.Dto.Sp;
+using Data.Enums;
 using Data.Models.SignalR;
 using Data.Services;
 using Data.State;
@@ -14,6 +15,7 @@ namespace Shared.Components.Pages.Messages
         [CascadingParameter] public CurrentState CurrentState { get; set; } = null!;
         [Inject] IRepository<GetLastMessagesListRequestDto, GetLastMessagesListResponseDto> _repoGetLastMessagesList { get; set; } = null!;
         [Inject] IRepository<MarkMessagesAsReadRequestDto, ResponseDtoBase> _markMessagesAsRead { get; set; } = null!;
+        [Inject] IRepository<UpdateRelationRequestDto, ResponseDtoBase> _repoUpdateRelation { get; set; } = null!;
         [Inject] ShowDialogs ShowDialogs { get; set; } = null!;
 
         IDisposable? OnUpdateMessagesCountHandler;
@@ -43,14 +45,14 @@ namespace Shared.Components.Pages.Messages
             }
         }
 
-        async Task MarkAsReadAsync(int markAsReadMessageId)
+        async Task MarkAsReadAsync(int messageId)
         {
-            var index = LastMessagesList.FindIndex(x => x.Id == markAsReadMessageId);
+            var index = LastMessagesList.FindIndex(x => x.Id == messageId);
             // Проверим, помечено ли сообщение как прочитанное и адресовано ли нам?
             if (index >= 0 && LastMessagesList[index].Recipient?.Id == CurrentState.Account?.Id && LastMessagesList[index].Sender != null && LastMessagesList[index].ReadDate == null)
             {
                 // Помечаем сообщение как прочитанное в БД
-                var apiResponse = await _markMessagesAsRead.HttpPostAsync(new MarkMessagesAsReadRequestDto { MessageId = markAsReadMessageId, MarkAllAsRead = false, Token = CurrentState.Account?.Token });
+                var apiResponse = await _markMessagesAsRead.HttpPostAsync(new MarkMessagesAsReadRequestDto { MessageId = messageId, MarkAllAsRead = false, Token = CurrentState.Account?.Token });
 
                 // Обновим список последних сообщений на странице /messages
                 var lastMessagesRequest = new SignalGlobalRequest { OnUpdateMessagesCount = new OnUpdateMessagesCount { RecipientId = LastMessagesList[index].Sender!.Id } };
@@ -63,12 +65,12 @@ namespace Shared.Components.Pages.Messages
             }
         }
 
-        async Task MarkAllAsReadAsync(int markAsReadMessageId)
+        async Task MarkAllAsReadAsync(int messageId)
         {
-            var index = LastMessagesList.FindIndex(x => x.Id == markAsReadMessageId);
+            var index = LastMessagesList.FindIndex(x => x.Id == messageId);
             if (index >= 0 && LastMessagesList[index].Sender != null)
             {
-                var apiResponse = await _markMessagesAsRead.HttpPostAsync(new MarkMessagesAsReadRequestDto { MessageId = markAsReadMessageId, MarkAllAsRead = true, Token = CurrentState.Account?.Token });
+                var apiResponse = await _markMessagesAsRead.HttpPostAsync(new MarkMessagesAsReadRequestDto { MessageId = messageId, MarkAllAsRead = true, Token = CurrentState.Account?.Token });
 
                 // Обновим список последних сообщений на странице /messages
                 var lastMessagesRequest = new SignalGlobalRequest { OnUpdateMessagesCount = new OnUpdateMessagesCount { RecipientId = LastMessagesList[index].Sender!.Id } };
@@ -80,8 +82,23 @@ namespace Shared.Components.Pages.Messages
             }
         }
 
-        async Task BlockAccountAsync()
+        async Task BlockAccountAsync(int messageId)
         {
+            var index = LastMessagesList.FindIndex(x => x.Id == messageId);
+            if (index >= 0 && LastMessagesList[index].Sender != null)
+            {
+                int blockingUserId = LastMessagesList[index].Sender!.Id == CurrentState.Account!.Id ? LastMessagesList[index].Recipient!.Id : LastMessagesList[index].Sender!.Id;
+
+                var apiUpdateResponse = await _repoUpdateRelation.HttpPostAsync(new UpdateRelationRequestDto
+                {
+                    RecipientId = blockingUserId,
+                    EnumRelation = EnumRelations.Blocked,
+                    Token = CurrentState.Account?.Token
+                });
+
+                var updateAccountRelationRequest = new SignalGlobalRequest { OnUpdateAccountRelation = new OnUpdateAccountRelation { RecipientId = blockingUserId } };
+                await CurrentState.SignalRServerAsync(updateAccountRelationRequest);
+            }
         }
 
         async Task OnSearch(string text)

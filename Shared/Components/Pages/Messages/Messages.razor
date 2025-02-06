@@ -33,7 +33,7 @@
                                             <MudMenu Dense Icon="@Icons.Material.Filled.MoreVert" Size="Size.Small" AnchorOrigin="Origin.TopLeft" TransformOrigin="Origin.TopRight">
                                                 <MudMenuItem Icon="@Icons.Material.Filled.DoneAll" IconColor="Color.Primary" Disabled="@(!(message.ReadDate == null && CurrentState.Account.Id == message.Recipient?.Id))" OnClick="() => MarkAsReadAsync(message.Id)">Пометить сообщение прочитанным</MudMenuItem>
                                                 <MudMenuItem Icon="@Icons.Material.Filled.ChecklistRtl" IconColor="Color.Primary" Disabled="@(message.UnreadMessages == 0)" OnClick="() => MarkAllAsReadAsync(message.Id)">Пометить все прочитанными</MudMenuItem>
-                                                <MudMenuItem Icon="@Icons.Material.Filled.Block" IconColor="Color.Error" OnClick="BlockAccountAsync">Заблокировать отправителя</MudMenuItem>
+                                                <MudMenuItem Icon="@Icons.Material.Filled.Block" IconColor="Color.Error" OnClick="() => BlockAccountAsync(message.Id)">Заблокировать отправителя</MudMenuItem>
                                             </MudMenu>
                                         </div>
 
