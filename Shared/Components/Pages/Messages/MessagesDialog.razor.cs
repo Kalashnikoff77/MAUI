@@ -25,6 +25,7 @@ namespace Shared.Components.Pages.Messages
         [Inject] IRepository<GetMessagesRequestDto, GetMessagesResponseDto> _repoGetMessages { get; set; } = null!;
         [Inject] IRepository<AddMessageRequestDto, AddMessageResponseDto> _repoAddMessage { get; set; } = null!;
         [Inject] IRepository<DeleteMessageRequestDto, ResponseDtoBase> _repoDeleteMessage { get; set; } = null!;
+        [Inject] IRepository<UpdateRelationRequestDto, UpdateRelationResponseDto> _repoUpdateRelation { get; set; } = null!;
         [Inject] IJSRuntime _JSRuntime { get; set; } = null!;
         [Inject] IComponentRenderer<BaseMessage> _renderer { get; set; } = null!;
 
@@ -177,6 +178,9 @@ namespace Shared.Components.Pages.Messages
         }
 
 
+        /// <summary>
+        /// Принимаем дружбу
+        /// </summary>
         [JSInvokable]
         public async Task AcceptFriendshipAsync(int messageId)
         {
@@ -184,14 +188,23 @@ namespace Shared.Components.Pages.Messages
             var updateMessageRequest = new SignalGlobalRequest { OnUpdateMessage = new OnUpdateMessage { MessageId = messageId, RecipientId = Recipient.Id } };
             await CurrentState.SignalRServerAsync(updateMessageRequest);
 
+            // Обновим данные о дружбе в БД
+            // Sender и Recipient идут наоборот, т.к. дружба добавляется в сообщениях, где отправить и получатель наоборот
+            var apiUpdateResponse = await _repoUpdateRelation.HttpPostAsync(new UpdateRelationRequestDto 
+            {
+                SenderId = Recipient.Id,
+                RecipientId = CurrentState.Account?.Id ?? 0,
+                EnumRelation = EnumRelations.Friend, 
+                Token = CurrentState.Account?.Token 
+            });
+
             // Удалим сообщение из БД
-            var request = new DeleteMessageRequestDto
+            var apiDeleteResponse = await _repoDeleteMessage.HttpPostAsync(new DeleteMessageRequestDto
             {
                 MessageId = messageId,
                 RecipientId = Recipient.Id,
                 Token = CurrentState.Account?.Token
-            };
-            var apiResponse = await _repoDeleteMessage.HttpPostAsync(request);
+            });
 
             text = StaticData.NotificationTypes[EnumMessages.RequestForFrendshipAccepted].Text;
             await SubmitMessageAsync(EnumMessages.RequestForFrendshipAccepted);

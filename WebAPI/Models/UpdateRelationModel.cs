@@ -6,25 +6,34 @@ using System.Data.Common;
 
 namespace WebAPI.Models
 {
-    internal class UpdateRelationModel
+    public class UpdateRelationModel
     {
         public int SenderId { get; set; }
         public int RecipientId { get; set; }
 
         public DbConnection Conn { get; set; } = null!;
 
-        public RelationsUpdateResponseDto Response { get; set; } = null!;
+        public UpdateRelationResponseDto Response { get; set; } = null!;
 
+        /// <summary>
+        /// Удаление всех связей
+        /// </summary>
         public async Task RemoveAllRelationsAsync()
         {
-            var sql = $"DELETE FROM AccountsRelations WHERE ({nameof(RelationsForAccountsEntity.SenderId)} = @SenderId AND {nameof(RelationsForAccountsEntity.RecipientId)} = @RecipientId) OR ({nameof(RelationsForAccountsEntity.SenderId)} = @RecipientId AND {nameof(RelationsForAccountsEntity.RecipientId)} = @SenderId)";
+            var sql = $"DELETE FROM RelationsForAccounts " +
+                $"WHERE ({nameof(RelationsForAccountsEntity.SenderId)} = @{nameof(RelationsForAccountsEntity.SenderId)} AND {nameof(RelationsForAccountsEntity.RecipientId)} = @{nameof(RelationsForAccountsEntity.RecipientId)}) " +
+                $"OR ({nameof(RelationsForAccountsEntity.SenderId)} = @{nameof(RelationsForAccountsEntity.RecipientId)} AND {nameof(RelationsForAccountsEntity.RecipientId)} = @{nameof(RelationsForAccountsEntity.SenderId)})";
             await Conn.ExecuteAsync(sql, new { SenderId, RecipientId });
         }
 
-        public async Task BlockUserAsync()
+        
+        /// <summary>
+        /// Блокировка пользователя
+        /// </summary>
+        public async Task BlockAsync()
         {
             // Проверим, заблокирован ли пользователь в данный момент?
-            var sql = $"SELECT TOP 1 Id FROM AccountsRelations WHERE " +
+            var sql = $"SELECT TOP 1 Id FROM RelationsForAccounts WHERE " +
                 $"(({nameof(RelationsForAccountsEntity.SenderId)} = @SenderId AND {nameof(RelationsForAccountsEntity.RecipientId)} = @RecipientId) " +
                 $"OR " +
                 $"({nameof(RelationsForAccountsEntity.SenderId)} = @RecipientId AND {nameof(RelationsForAccountsEntity.RecipientId)} = @SenderId)) " +
@@ -37,7 +46,7 @@ namespace WebAPI.Models
             // Добавим связь "Заблокирован"
             if (currentBlocked == null)
             {
-                sql = $"INSERT INTO AccountsRelations ({nameof(RelationsForAccountsEntity.SenderId)}, {nameof(RelationsForAccountsEntity.RecipientId)}, {nameof(RelationsForAccountsEntity.Type)}, {nameof(RelationsForAccountsEntity.IsConfirmed)}) " +
+                sql = $"INSERT INTO RelationsForAccounts ({nameof(RelationsForAccountsEntity.SenderId)}, {nameof(RelationsForAccountsEntity.RecipientId)}, {nameof(RelationsForAccountsEntity.Type)}, {nameof(RelationsForAccountsEntity.IsConfirmed)}) " +
                     $"VALUES " +
                     $"(@{nameof(RelationsForAccountsEntity.SenderId)}, @{nameof(RelationsForAccountsEntity.RecipientId)}, {(short)EnumRelations.Blocked}, 1)";
                 await Conn.ExecuteAsync(sql, new { SenderId, RecipientId });
@@ -46,62 +55,34 @@ namespace WebAPI.Models
             }
         }
 
-        public async Task SubscribeUserAsync()
+
+        /// <summary>
+        /// Дружба пользователя
+        /// </summary>
+        public async Task FriendshipAsync() 
         {
             // Проверим, есть ли такая связь?
-            var sql = $"SELECT TOP 1 Id FROM AccountsRelations WHERE " +
-                $"({nameof(RelationsForAccountsEntity.SenderId)} = @SenderId AND {nameof(RelationsForAccountsEntity.RecipientId)} = @RecipientId) AND {nameof(RelationsForAccountsEntity.Type)} = {(short)EnumRelations.Subscriber}";
-            var relationId = await Conn.QueryFirstOrDefaultAsync<int?>(sql, new { SenderId, RecipientId });
-
-            if (relationId == null)
-            {
-                sql = $"INSERT INTO AccountsRelations ({nameof(RelationsForAccountsEntity.SenderId)}, {nameof(RelationsForAccountsEntity.RecipientId)}, {nameof(RelationsForAccountsEntity.Type)}, {nameof(RelationsForAccountsEntity.IsConfirmed)}) " +
-                    $"VALUES " +
-                    $"(@{nameof(RelationsForAccountsEntity.SenderId)}, @{nameof(RelationsForAccountsEntity.RecipientId)}, {(short)EnumRelations.Subscriber}, 1)";
-                await Conn.ExecuteAsync(sql, new { SenderId, RecipientId });
-                Response.IsRelationAdded = true;
-            }
-            else
-            {
-                sql = $"DELETE FROM AccountsRelations WHERE Id = @relationId";
-                await Conn.ExecuteAsync(sql, new { relationId });
-                Response.IsRelationAdded = false;
-            }
-        }
-
-
-        public async Task FriendshipUserAsync() 
-        {
-            // Проверим, есть ли такая связь?
-            var sql = $"SELECT TOP 1 * FROM AccountsRelations WHERE " +
-                $"(({nameof(RelationsForAccountsEntity.SenderId)} = @SenderId AND {nameof(RelationsForAccountsEntity.RecipientId)} = @RecipientId) " +
-                $"OR ({nameof(RelationsForAccountsEntity.SenderId)} = @RecipientId AND {nameof(RelationsForAccountsEntity.RecipientId)} = @SenderId)) " +
+            var sql = $"SELECT TOP 1 * FROM RelationsForAccounts WHERE " +
+                $"(({nameof(RelationsForAccountsEntity.SenderId)} = @{nameof(RelationsForAccountsEntity.SenderId)} AND {nameof(RelationsForAccountsEntity.RecipientId)} = @{nameof(RelationsForAccountsEntity.RecipientId)}) " +
+                $"OR ({nameof(RelationsForAccountsEntity.SenderId)} = @{nameof(RelationsForAccountsEntity.RecipientId)} AND {nameof(RelationsForAccountsEntity.RecipientId)} = @{nameof(RelationsForAccountsEntity.SenderId)})) " +
                 $"AND {nameof(RelationsForAccountsEntity.Type)} = {(short)EnumRelations.Friend}";
             var currentRelation = await Conn.QueryFirstOrDefaultAsync<RelationsForAccountsEntity>(sql, new { SenderId, RecipientId });
 
+            // Если связь не существует, то добавляем
             if (currentRelation == null)
             {
-                sql = $"INSERT INTO AccountsRelations ({nameof(RelationsForAccountsEntity.SenderId)}, {nameof(RelationsForAccountsEntity.RecipientId)}, {nameof(RelationsForAccountsEntity.Type)}, {nameof(RelationsForAccountsEntity.IsConfirmed)}) " +
+                sql = $"INSERT INTO RelationsForAccounts ({nameof(RelationsForAccountsEntity.SenderId)}, {nameof(RelationsForAccountsEntity.RecipientId)}, {nameof(RelationsForAccountsEntity.Type)}, {nameof(RelationsForAccountsEntity.IsConfirmed)}) " +
                     $"VALUES " +
-                    $"(@{nameof(RelationsForAccountsEntity.SenderId)}, @{nameof(RelationsForAccountsEntity.RecipientId)}, {(short)EnumRelations.Friend}, 0)";
+                    $"(@{nameof(RelationsForAccountsEntity.SenderId)}, @{nameof(RelationsForAccountsEntity.RecipientId)}, {(short)EnumRelations.Friend}, 1)";
                 await Conn.ExecuteAsync(sql, new { SenderId, RecipientId });
                 Response.IsRelationAdded = true;
             }
+            // Иначе связь удаляем
             else
             {
-                // Если связь подтверждена, то удаляем
-                if (currentRelation.IsConfirmed)
-                {
-                    sql = $"DELETE FROM AccountsRelations WHERE Id = @Id";
-                    await Conn.ExecuteAsync(sql, new { currentRelation.Id });
-                    Response.IsRelationAdded = false;
-                }
-                // Если связь не подтверждена, то подтверждаем
-                else
-                {
-                    sql = $"UPDATE AccountsRelations SET {nameof(RelationsForAccountsEntity.IsConfirmed)} = 1 WHERE Id = {currentRelation.Id}";
-                    await Conn.ExecuteAsync(sql);
-                }
+                sql = $"DELETE FROM RelationsForAccounts WHERE Id = @Id";
+                await Conn.ExecuteAsync(sql, new { currentRelation.Id });
+                Response.IsRelationAdded = false;
             }
         }
     }

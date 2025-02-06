@@ -13,11 +13,6 @@
         None = 0,
 
         /// <summary>
-        /// Подписчик
-        /// </summary>
-        Subscriber = 10,
-        
-        /// <summary>
         /// Друг
         /// </summary>
         Friend = 20

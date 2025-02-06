@@ -1,6 +1,6 @@
 ﻿namespace Data.Dto.Responses
 {
-    public class RelationsUpdateResponseDto : ResponseDtoBase
+    public class UpdateRelationResponseDto : ResponseDtoBase
     {
         public bool IsRelationAdded { get; set; } = false;
     }

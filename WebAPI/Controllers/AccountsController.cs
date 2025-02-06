@@ -201,41 +201,6 @@ namespace WebAPI.Controllers
         }
 
 
-        [Route("UpdateRelations"), HttpPost, Authorize]
-        public async Task<RelationsUpdateResponseDto> UpdateRelationsAsync(RelationsUpdateRequestDto request)
-        {
-            AuthenticateUser();
-
-            var sql = "SELECT TOP 1 Id FROM Accounts WHERE Id = @RecipientId";
-            var recipientId = await _unitOfWork.SqlConnection.QueryFirstOrDefaultAsync<int?>(sql, new { request.RecipientId }) ?? throw new BadRequestException($"Аккаунт с Id {request.RecipientId} не найден!");
-
-            var model = new UpdateRelationModel
-            {
-                SenderId = _unitOfWork.AccountId!.Value,
-                RecipientId = recipientId,
-                Conn = _unitOfWork.SqlConnection,
-                Response = new RelationsUpdateResponseDto()
-            };
-
-            switch (request.EnumRelation)
-            {
-                case EnumRelations.None:
-                    await model.RemoveAllRelationsAsync(); break;
-
-                case EnumRelations.Blocked:
-                    await model.BlockUserAsync(); break;
-
-                case EnumRelations.Subscriber:
-                    await model.SubscribeUserAsync(); break;
-
-                case EnumRelations.Friend:
-                    await model.FriendshipUserAsync(); break;
-            }
-
-            return model.Response;
-        }
-
-
         [Route("UpdateVisits"), HttpPost, Authorize]
         public async Task<ResponseDtoBase> UpdateVisitsAsync(VisitsForAccountsUpdateRequestDto request)
         {
@@ -314,7 +279,7 @@ namespace WebAPI.Controllers
         }
 
 
-        // Получить список друзей, подписчиков и т.п. указанного пользователя
+        // Получить список друзей и т.п. указанного пользователя
         [Route("GetRelations"), HttpPost]
         public async Task<GetAccountsResponseDto> GetRelationsAsync(GetRelationsForAccountsRequestDto request)
         {
@@ -335,12 +300,6 @@ namespace WebAPI.Controllers
                         $"SELECT {nameof(RelationsForAccountsEntity.SenderId)} FROM RelationsForAccounts WHERE {nameof(RelationsForAccountsEntity.RecipientId)} = @AccountId AND Type = @Relation AND IsConfirmed = 1)";
                     break;
 
-                case EnumRelations.Subscriber:
-                    sql = $"SELECT {columns.Aggregate((a, b) => a + ", " + b)} FROM AccountsView " +
-                        $"WHERE Id IN (" +
-                        $"SELECT {nameof(RelationsForAccountsEntity.SenderId)} FROM RelationsForAccounts WHERE {nameof(RelationsForAccountsEntity.RecipientId)} = @AccountId AND Type = @Relation AND IsConfirmed = 1)";
-                    break;
-
                 default:
                     throw new BadRequestException($"Неверно указан тип взаимосвязи: {request.Relation}!");
             }
@@ -349,6 +308,42 @@ namespace WebAPI.Controllers
             response.Accounts = _unitOfWork.Mapper.Map<List<AccountsViewDto>>(result);
 
             return response;
+        }
+
+
+        [Route("UpdateRelation"), HttpPost, Authorize]
+        public async Task<UpdateRelationResponseDto> UpdateRelationAsync(UpdateRelationRequestDto request)
+        {
+            AuthenticateUser();
+
+            if (_unitOfWork.AccountId!.Value != request.RecipientId) 
+                throw new BadRequestException($"Некорректный запрос при обновлении взаимосвязей пользователей!");
+
+            var model = new UpdateRelationModel
+            {
+                Conn = _unitOfWork.SqlConnection,
+                Response = new UpdateRelationResponseDto()
+            };
+
+            var sql = "SELECT TOP 1 Id FROM Accounts WHERE Id = @SenderId";
+            model.SenderId = await _unitOfWork.SqlConnection.QueryFirstOrDefaultAsync<int?>(sql, new { request.SenderId }) ?? throw new BadRequestException($"Аккаунт с Id {request.SenderId} не найден!");
+
+            sql = "SELECT TOP 1 Id FROM Accounts WHERE Id = @RecipientId";
+            model.RecipientId = await _unitOfWork.SqlConnection.QueryFirstOrDefaultAsync<int?>(sql, new { request.RecipientId }) ?? throw new BadRequestException($"Аккаунт с Id {request.RecipientId} не найден!");
+
+            switch (request.EnumRelation)
+            {
+                case EnumRelations.None:
+                    await model.RemoveAllRelationsAsync(); break;
+
+                case EnumRelations.Blocked:
+                    await model.BlockAsync(); break;
+
+                case EnumRelations.Friend:
+                    await model.FriendshipAsync(); break;
+            }
+
+            return model.Response;
         }
 
 
