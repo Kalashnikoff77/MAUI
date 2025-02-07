@@ -32,6 +32,10 @@ namespace SignalR
         [Authorize]
         public async Task GlobalHandler(SignalGlobalRequest request)
         {
+            // Вызывается, когда нужно обновить состояние пользователя
+            if (request.OnReloadAccount != null)
+                await OnReloadAccountAsync(request.OnReloadAccount);
+
             // Изменения в расписании мероприятия (пока только добавлено одно сообщение в обсуждение)
             if (request.OnScheduleChanged != null)
                 await OnScheduleChangedAsync(request.OnScheduleChanged);
@@ -40,27 +44,27 @@ namespace SignalR
             if (request.OnAvatarChanged != null)
                 await OnAvatarChangedAsync(request.OnAvatarChanged);
 
-            // Обновить сообщения у двух пользователей в диалоговом окне страницы /messages
-            if (request.OnGetNewMessages != null)
-                await OnGetNewMessagesAsync(request.OnGetNewMessages);
-
-            // Отметить сообщения как прочитанное у пользователя в диалоговом окне страницы /messages
-            if (request.OnMarkMessagesAsRead != null)
-                await OnMarkMessagesAsReadAsync(request.OnMarkMessagesAsRead);
-
-            // Обновить сообщения у пользователя в диалоговом окне страницы /messages (изменение, удаление)
-            if (request.OnUpdateMessage != null)
-                await OnUpdateMessageAsync(request.OnUpdateMessage);
-
-            // Вызывается, когда меняется кол-во непрочитанных сообщений
-            if (request.OnUpdateMessagesCount != null)
-                await OnUpdateMessagesCountAsync(request.OnUpdateMessagesCount);
-
-            // Вызывается, когда нужно обновить состояние пользователя
-            if (request.OnReloadAccount != null)
-                await OnReloadAccountAsync(request.OnReloadAccount);
+            // Изменения в таблице Messages
+            if (request.OnMessagesUpdatedRequest != null)
+                await OnMessagesUpdatedAsync(request.OnMessagesUpdatedRequest);
         }
 
+
+        /// <summary>
+        /// Вызывается, когда нужно обновить состояние пользователя
+        /// </summary>
+        async Task OnReloadAccountAsync(OnReloadAccount request)
+        {
+            if (GetAccountDetails(out AccountDetails accountDetails, Context.UserIdentifier))
+            {
+                var response = new OnReloadAccountResponse();
+
+                await Clients.Caller.SendAsync(response.EnumSignalRHandlersClient.ToString(), response);
+
+                if (request.AdditionalAccountId.HasValue)
+                    await Clients.User(request.AdditionalAccountId.ToString()!).SendAsync(response.EnumSignalRHandlersClient.ToString(), response);
+            }
+        }
 
         /// <summary>
         /// Изменение в расписании мероприятия
@@ -86,74 +90,25 @@ namespace SignalR
         }
 
         /// <summary>
-        /// Добавим сообщения в диалог двух пользователей (диалоговое окно страницы /messages)
+        /// Изменения в таблице Messages
         /// </summary>
-        async Task OnGetNewMessagesAsync(OnGetNewMessages request)
+        async Task OnMessagesUpdatedAsync(OnMessagesUpdatedRequest request)
         {
             if (GetAccountDetails(out AccountDetails accountDetails, Context.UserIdentifier))
             {
-                var response = new OnGetNewMessagesResponse();
-                await Clients
-                    .Users([Context.UserIdentifier!, request.RecipientId?.ToString()!])
-                    .SendAsync(response.EnumSignalRHandlersClient.ToString(), response);
-            }
-        }
-
-        /// <summary>
-        /// Пометим сообщения как прочитанные в MessageDialog страницы /messages
-        /// </summary>
-        async Task OnMarkMessagesAsReadAsync(OnMarkMessagesAsRead request)
-        {
-            if (GetAccountDetails(out AccountDetails accountDetails, Context.UserIdentifier))
-            {
-                var response = new OnMarkMessagesAsReadResponse { MessagesIds = request.MessagesIds };
-                await Clients
-                    .User(request.RecipientId.ToString())
-                    .SendAsync(response.EnumSignalRHandlersClient.ToString(), response);
-            }
-        }
-
-        /// <summary>
-        /// Вызывается, когда сообщение измененяется или удаляется в MessageDialog страницы /messages
-        /// </summary>
-        async Task OnUpdateMessageAsync(OnUpdateMessage request)
-        {
-            if (GetAccountDetails(out AccountDetails accountDetails, Context.UserIdentifier))
-            {
-                var response = new OnUpdateMessageResponse { MessageId = request.MessageId };
-                await Clients
-                    .Users([Context.UserIdentifier!, request.RecipientId.ToString()])
-                    .SendAsync(response.EnumSignalRHandlersClient.ToString(), response);
-            }
-        }
-
-        /// <summary>
-        /// Вызывается, когда меняется кол-во непрочитанных сообщений
-        /// </summary>
-        async Task OnUpdateMessagesCountAsync(OnUpdateMessagesCount request)
-        {
-            if (GetAccountDetails(out AccountDetails accountDetails, Context.UserIdentifier))
-            {
-                var response = new OnUpdateMessagesResponse();
-                await Clients
-                    .Users([Context.UserIdentifier!, request.RecipientId.ToString()!])
-                    .SendAsync(response.EnumSignalRHandlersClient.ToString(), response);
-            }
-        }
-
-        /// <summary>
-        /// Вызывается, когда нужно обновить состояние пользователя
-        /// </summary>
-        async Task OnReloadAccountAsync(OnReloadAccount request)
-        {
-            if (GetAccountDetails(out AccountDetails accountDetails, Context.UserIdentifier))
-            {
-                var response = new OnReloadAccountResponse();
+                var response = new OnMessagesUpdatedResponse
+                {
+                    MessageId = request.MessageId,
+                    MessagesIds = request.MessagesIds,
+                    AppendNewMessages = request.AppendNewMessages,
+                    MarkMessagesAsRead = request.MarkMessagesAsRead,
+                    UpdateMessage = request.UpdateMessage,
+                };
 
                 await Clients.Caller.SendAsync(response.EnumSignalRHandlersClient.ToString(), response);
 
-                if (request.AdditionalAccountId.HasValue)
-                    await Clients.User(request.AdditionalAccountId.ToString()!).SendAsync(response.EnumSignalRHandlersClient.ToString(), response);
+                if (request.RecipientId.HasValue)
+                    await Clients.User(request.RecipientId.ToString()!).SendAsync(response.EnumSignalRHandlersClient.ToString(), response);
             }
         }
     }

@@ -31,9 +31,8 @@ namespace Shared.Components.Pages.Messages
 
         DotNetObjectReference<MessagesDialog> _dotNetReference { get; set; } = null!;
         IJSObjectReference _JSModule { get; set; } = null!;
-        IDisposable? OnUpdateMessagesHandler;
-        IDisposable? OnGetNewMessagesHandler;
-        IDisposable? OnMarkMessagesAsReadHandler;
+
+        IDisposable? OnMessagesUpdatedHandler;
 
         List<MessagesDto> messages = new List<MessagesDto>();
 
@@ -44,31 +43,35 @@ namespace Shared.Components.Pages.Messages
         {
             if (firstRender)
             {
-                // Добавим сообщения в диалог двух пользователей (диалоговое окно страницы /messages)
-                OnGetNewMessagesHandler = OnGetNewMessagesHandler.SignalRClient<OnGetNewMessagesResponse>(CurrentState, async (response) =>
-                    await _JSModule.InvokeVoidAsync("AppendNewMessages", await GetNewMessages()));
-
-                // Обновим или удалим сообщение в диалогах двух пользователей (диалоговое окно страницы /messages)
-                OnUpdateMessagesHandler = OnUpdateMessagesHandler.SignalRClient<OnUpdateMessageResponse>(CurrentState, async (response) =>
-                    await _JSModule.InvokeVoidAsync("UpdateMessage", response.MessageId));
-
-                // Пометим сообщения как прочитанные в диалоговом окне страницы /messages
-                OnMarkMessagesAsReadHandler = OnMarkMessagesAsReadHandler.SignalRClient<OnMarkMessagesAsReadResponse>(CurrentState, async (response) =>
+                OnMessagesUpdatedHandler = OnMessagesUpdatedHandler.SignalRClient<OnMessagesUpdatedResponse>(CurrentState, async (response) =>
                 {
-                    // Если MessagesIds = null, то помечаем прочитанными все сообщения
-                    if (response.MessagesIds == null)
-                        response.MessagesIds = messages.Where(x => x.RecipientId == Recipient.Id && x.ReadDate == null).Select(x => x.Id);
+                    // Добавление сообщения в диалог двух пользователей в MessagesDialog
+                    if (response.AppendNewMessages)
+                        await _JSModule.InvokeVoidAsync("AppendNewMessages", await GetNewMessages());
 
-                    foreach (var messageId in response.MessagesIds)
+                    // Обновление или удаление сообщения в диалогах двух пользователей в MessagesDialog
+                    if (response.UpdateMessage && response.MessageId.HasValue)
+                        await _JSModule.InvokeVoidAsync("UpdateMessage", response.MessageId);
+
+                    // Пометить сообщения как прочитанные
+                    if (response.MarkMessagesAsRead)
                     {
-                        var index = messages.FindIndex(x => x.Id == messageId && x.ReadDate == null);
-                        if (index >= 0)
+                        // Если MessagesIds = null, то помечаем прочитанными все сообщения
+                        if (response.MessagesIds == null)
+                            response.MessagesIds = messages.Where(x => x.RecipientId == Recipient.Id && x.ReadDate == null).Select(x => x.Id);
+
+                        foreach (var messageId in response.MessagesIds)
                         {
-                            messages[index].ReadDate = DateTime.Now;
-                            var html = await _renderer.RenderAsync(new Dictionary<string, object?> { { "AccountId", CurrentState.Account?.Id }, { "Message", messages[index] } });
-                            await _JSModule.InvokeVoidAsync("MarkMessageAsRead", messageId, html);
+                            var index = messages.FindIndex(x => x.Id == messageId && x.ReadDate == null);
+                            if (index >= 0)
+                            {
+                                messages[index].ReadDate = DateTime.Now;
+                                var html = await _renderer.RenderAsync(new Dictionary<string, object?> { { "AccountId", CurrentState.Account?.Id }, { "Message", messages[index] } });
+                                await _JSModule.InvokeVoidAsync("MarkMessageAsRead", messageId, html);
+                            }
                         }
                     }
+
                 });
 
                 _dotNetReference = DotNetObjectReference.Create(this);
@@ -93,16 +96,12 @@ namespace Shared.Components.Pages.Messages
             var apiResponse = await _repoGetMessages.HttpPostAsync(request);
             messages.InsertRange(0, apiResponse.Response.Messages);
 
-            // Обновим список последних сообщений на странице /messages
-            var lastMessagesRequest = new SignalGlobalRequest { OnUpdateMessagesCount = new OnUpdateMessagesCount { RecipientId = Recipient.Id } };
-            await CurrentState.SignalRServerAsync(lastMessagesRequest);
-
             // Пометим сообщения как прочитанные в MessageDialog
             var messagesIds = apiResponse.Response.Messages.Where(x => x.SenderId == Recipient.Id).Select(s => s.Id);
             if (messagesIds.Count() > 0)
             {
-                var markMessagesAsReadRequest = new SignalGlobalRequest { OnMarkMessagesAsRead = new OnMarkMessagesAsRead { RecipientId = Recipient.Id, MessagesIds = messagesIds } };
-                await CurrentState.SignalRServerAsync(markMessagesAsReadRequest);
+                var onMessagesUpdatedRequest = new SignalGlobalRequest { OnMessagesUpdatedRequest = new OnMessagesUpdatedRequest { MarkMessagesAsRead = true, RecipientId = Recipient.Id, MessagesIds = messagesIds } };
+                await CurrentState.SignalRServerAsync(onMessagesUpdatedRequest);
             }
 
             // Ручная генерация компонентов сообщений
@@ -126,8 +125,8 @@ namespace Shared.Components.Pages.Messages
             var messagesIds = apiResponse.Response.Messages.Where(x => x.SenderId == Recipient.Id).Select(s => s.Id);
             if (messagesIds.Count() > 0)
             {
-                var markMessagesAsReadRequest = new SignalGlobalRequest { OnMarkMessagesAsRead = new OnMarkMessagesAsRead { RecipientId = Recipient.Id, MessagesIds = messagesIds } };
-                await CurrentState.SignalRServerAsync(markMessagesAsReadRequest);
+                var onMessagesUpdatedRequest = new SignalGlobalRequest { OnMessagesUpdatedRequest = new OnMessagesUpdatedRequest { MarkMessagesAsRead = true, RecipientId = Recipient.Id, MessagesIds = messagesIds } };
+                await CurrentState.SignalRServerAsync(onMessagesUpdatedRequest);
             }
 
             // Ручная генерация компонентов сообщений
@@ -164,13 +163,15 @@ namespace Shared.Components.Pages.Messages
                     Token = CurrentState.Account?.Token
                 });
 
-                // Добавим сообщение в MessageDialog
-                var messagesRequest = new SignalGlobalRequest { OnGetNewMessages = new OnGetNewMessages { RecipientId = Recipient.Id } };
-                await CurrentState.SignalRServerAsync(messagesRequest);
-
-                // Обновим список последних сообщений на странице /messages
-                var updateMessagesCountRequest = new SignalGlobalRequest { OnUpdateMessagesCount = new OnUpdateMessagesCount { RecipientId = Recipient.Id } };
-                await CurrentState.SignalRServerAsync(updateMessagesCountRequest);
+                var onMessagesUpdatedRequest = new SignalGlobalRequest 
+                {
+                    OnMessagesUpdatedRequest = new OnMessagesUpdatedRequest 
+                    {
+                        AppendNewMessages = true,
+                        RecipientId = Recipient.Id
+                    } 
+                };
+                await CurrentState.SignalRServerAsync(onMessagesUpdatedRequest);
 
                 text = null;
                 sending = false;
@@ -183,10 +184,6 @@ namespace Shared.Components.Pages.Messages
         [JSInvokable]
         public async Task AcceptFriendshipAsync(int messageId)
         {
-            // Удалим сообщение с запросом дружбы из UI у обоих пользователей
-            var updateMessageRequest = new SignalGlobalRequest { OnUpdateMessage = new OnUpdateMessage { MessageId = messageId, RecipientId = Recipient.Id } };
-            await CurrentState.SignalRServerAsync(updateMessageRequest);
-
             // Обновим данные о дружбе в БД
             var apiUpdateResponse = await _repoUpdateRelation.HttpPostAsync(new UpdateRelationRequestDto 
             {
@@ -207,6 +204,18 @@ namespace Shared.Components.Pages.Messages
             text = StaticData.NotificationTypes[EnumMessages.RequestForFrendshipAccepted].Text;
             await SubmitMessageAsync(EnumMessages.RequestForFrendshipAccepted);
 
+            // Удалим сообщение с запросом дружбы из UI у обоих пользователей
+            var onMessagesUpdatedRequest = new SignalGlobalRequest
+            {
+                OnMessagesUpdatedRequest = new OnMessagesUpdatedRequest
+                {
+                    UpdateMessage = true,
+                    MessageId = messageId,
+                    RecipientId = Recipient.Id
+                }
+            };
+            await CurrentState.SignalRServerAsync(onMessagesUpdatedRequest);
+
             // Обновим состояние у обоих пользователей
             var reloadAccountRequest = new SignalGlobalRequest { OnReloadAccount = new OnReloadAccount { AdditionalAccountId = Recipient.Id } };
             await CurrentState.SignalRServerAsync(reloadAccountRequest);
@@ -215,10 +224,6 @@ namespace Shared.Components.Pages.Messages
         [JSInvokable]
         public async Task DeclineFriendshipAsync(int messageId)
         {
-            // Удалим сообщение с запросом дружбы из UI у обоих пользователей
-            var updateMessageRequest = new SignalGlobalRequest { OnUpdateMessage = new OnUpdateMessage { MessageId = messageId, RecipientId = Recipient.Id } };
-            await CurrentState.SignalRServerAsync(updateMessageRequest);
-
             // Удалим сообщение из БД
             var request = new DeleteMessageRequestDto
             {
@@ -230,15 +235,23 @@ namespace Shared.Components.Pages.Messages
 
             text = StaticData.NotificationTypes[EnumMessages.RequestForFrendshipDeclined].Text;
             await SubmitMessageAsync(EnumMessages.RequestForFrendshipDeclined);
+
+            // Удалим сообщение с запросом дружбы из UI у обоих пользователей
+            var onMessagesUpdatedRequest = new SignalGlobalRequest
+            {
+                OnMessagesUpdatedRequest = new OnMessagesUpdatedRequest
+                {
+                    UpdateMessage = true,
+                    MessageId = messageId,
+                    RecipientId = Recipient.Id
+                }
+            };
+            await CurrentState.SignalRServerAsync(onMessagesUpdatedRequest);
         }
 
         [JSInvokable]
         public async Task CancelFriendshipAsync(int messageId)
         {
-            // Удалим сообщение с запросом дружбы из UI у обоих пользователей
-            var updateMessageRequest = new SignalGlobalRequest { OnUpdateMessage = new OnUpdateMessage { MessageId = messageId, RecipientId = Recipient.Id } };
-            await CurrentState.SignalRServerAsync(updateMessageRequest);
-
             // Удалим сообщение из БД
             var request = new DeleteMessageRequestDto
             {
@@ -248,20 +261,26 @@ namespace Shared.Components.Pages.Messages
             };
             var apiResponse = await _repoDeleteMessage.HttpPostAsync(request);
 
-            // Обновим список последних сообщений на странице /messages
-            var updateMessagesCountRequest = new SignalGlobalRequest { OnUpdateMessagesCount = new OnUpdateMessagesCount { RecipientId = Recipient.Id } };
-            await CurrentState.SignalRServerAsync(updateMessagesCountRequest);
+            // Удалим сообщение с запросом дружбы из UI у обоих пользователей
+            var onMessagesUpdatedRequest = new SignalGlobalRequest
+            {
+                OnMessagesUpdatedRequest = new OnMessagesUpdatedRequest
+                {
+                    UpdateMessage = true,
+                    MessageId = messageId,
+                    RecipientId = Recipient.Id
+                }
+            };
+            await CurrentState.SignalRServerAsync(onMessagesUpdatedRequest);
         }
 
         public async ValueTask DisposeAsync()
         {
             try
             {
-                OnGetNewMessagesHandler?.Dispose();
-                OnMarkMessagesAsReadHandler?.Dispose();
-                OnUpdateMessagesHandler?.Dispose();
-
+                OnMessagesUpdatedHandler?.Dispose();
                 _dotNetReference?.Dispose();
+
                 if (_JSModule != null)
                     await _JSModule.DisposeAsync();
             }

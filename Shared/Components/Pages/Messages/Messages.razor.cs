@@ -18,7 +18,7 @@ namespace Shared.Components.Pages.Messages
         [Inject] IRepository<UpdateRelationRequestDto, ResponseDtoBase> _repoUpdateRelation { get; set; } = null!;
         [Inject] ShowDialogs ShowDialogs { get; set; } = null!;
 
-        IDisposable? OnUpdateMessagesHandler;
+        IDisposable? OnMessagesUpdatedHandler;
         List<LastMessagesForAccountSpDto> LastMessagesList = new List<LastMessagesForAccountSpDto>();
 
         protected override async Task OnParametersSetAsync()
@@ -35,7 +35,7 @@ namespace Shared.Components.Pages.Messages
         {
             if (!firstRender)
             {
-                OnUpdateMessagesHandler = OnUpdateMessagesHandler.SignalRClient<OnUpdateMessagesResponse>(CurrentState, async (response) =>
+                OnMessagesUpdatedHandler = OnMessagesUpdatedHandler.SignalRClient<OnMessagesUpdatedResponse>(CurrentState, async (response) =>
                 {
                     var request = new GetLastMessagesListRequestDto() { Token = CurrentState.Account?.Token };
                     var apiResponse = await _repoGetLastMessagesList.HttpPostAsync(request);
@@ -54,14 +54,16 @@ namespace Shared.Components.Pages.Messages
                 // Помечаем сообщение как прочитанное в БД
                 var apiResponse = await _markMessagesAsRead.HttpPostAsync(new MarkMessagesAsReadRequestDto { MessageId = messageId, MarkAllAsRead = false, Token = CurrentState.Account?.Token });
 
-                // Обновим список последних сообщений на странице /messages
-                var lastMessagesRequest = new SignalGlobalRequest { OnUpdateMessagesCount = new OnUpdateMessagesCount { RecipientId = LastMessagesList[index].Sender!.Id } };
-                await CurrentState.SignalRServerAsync(lastMessagesRequest);
-
-                // Пометим одно сообщение как прочитанное в MessageDialog
-                var messagesIds = new List<int> { LastMessagesList[index].Id };
-                var markMessagesAsReadRequest = new SignalGlobalRequest { OnMarkMessagesAsRead = new OnMarkMessagesAsRead { RecipientId = LastMessagesList[index].Sender!.Id, MessagesIds = messagesIds } };
-                await CurrentState.SignalRServerAsync(markMessagesAsReadRequest);
+                var onMessagesUpdatedRequest = new SignalGlobalRequest 
+                { 
+                    OnMessagesUpdatedRequest = new OnMessagesUpdatedRequest 
+                    { 
+                        MarkMessagesAsRead = true, 
+                        RecipientId = LastMessagesList[index].Sender!.Id, 
+                        MessagesIds = new List<int> { LastMessagesList[index].Id }
+                    } 
+                };
+                await CurrentState.SignalRServerAsync(onMessagesUpdatedRequest);
             }
         }
 
@@ -72,13 +74,16 @@ namespace Shared.Components.Pages.Messages
             {
                 var apiResponse = await _markMessagesAsRead.HttpPostAsync(new MarkMessagesAsReadRequestDto { MessageId = messageId, MarkAllAsRead = true, Token = CurrentState.Account?.Token });
 
-                // Обновим список последних сообщений на странице /messages
-                var lastMessagesRequest = new SignalGlobalRequest { OnUpdateMessagesCount = new OnUpdateMessagesCount { RecipientId = LastMessagesList[index].Sender!.Id } };
-                await CurrentState.SignalRServerAsync(lastMessagesRequest);
-
-                // Пометим сообщения как прочитанные в MessageDialog
-                var markMessagesAsReadRequest = new SignalGlobalRequest { OnMarkMessagesAsRead = new OnMarkMessagesAsRead { RecipientId = LastMessagesList[index].Sender!.Id, MessagesIds = null } };
-                await CurrentState.SignalRServerAsync(markMessagesAsReadRequest);
+                var onMessagesUpdatedRequest = new SignalGlobalRequest
+                {
+                    OnMessagesUpdatedRequest = new OnMessagesUpdatedRequest
+                    {
+                        MarkMessagesAsRead = true,
+                        RecipientId = LastMessagesList[index].Sender!.Id,
+                        MessagesIds = null
+                    }
+                };
+                await CurrentState.SignalRServerAsync(onMessagesUpdatedRequest);
             }
         }
 
@@ -96,13 +101,13 @@ namespace Shared.Components.Pages.Messages
                     Token = CurrentState.Account?.Token
                 });
 
-                // Обновим состояния у обоих пользователей
-                var accountReloadRequest = new SignalGlobalRequest { OnReloadAccount = new OnReloadAccount { AdditionalAccountId = blockingUserId } };
-                await CurrentState.SignalRServerAsync(accountReloadRequest);
+                //// Обновим состояния у обоих пользователей
+                //var accountReloadRequest = new SignalGlobalRequest { OnReloadAccount = new OnReloadAccount { AdditionalAccountId = blockingUserId } };
+                //await CurrentState.SignalRServerAsync(accountReloadRequest);
 
-                // Обновим список последних сообщений на странице /messages
-                var lastMessagesRequest = new SignalGlobalRequest { OnUpdateMessagesCount = new OnUpdateMessagesCount { RecipientId = LastMessagesList[index].Sender!.Id } };
-                await CurrentState.SignalRServerAsync(lastMessagesRequest);
+                //// Обновим список последних сообщений на странице /messages
+                //var lastMessagesRequest = new SignalGlobalRequest { OnUpdateMessagesCount = new OnUpdateMessagesCount { RecipientId = LastMessagesList[index].Sender!.Id } };
+                //await CurrentState.SignalRServerAsync(lastMessagesRequest);
             }
         }
 
@@ -111,6 +116,6 @@ namespace Shared.Components.Pages.Messages
         }
 
         public void Dispose() =>
-            OnUpdateMessagesHandler?.Dispose();
+            OnMessagesUpdatedHandler?.Dispose();
     }
 }

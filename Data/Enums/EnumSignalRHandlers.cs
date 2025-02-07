@@ -17,25 +17,30 @@
         /// </summary>
         OnAvatarChangedClient,
 
-        /// <summary>
-        /// Получаем новые сообщения для двух пользователей (диалоговое окно страницы /messages)
-        /// </summary>
-        OnGetNewMessagesClient,
+        ///// <summary>
+        ///// Получаем новые сообщения для двух пользователей (диалоговое окно страницы /messages)
+        ///// </summary>
+        //OnGetNewMessagesClient,
+
+        ///// <summary>
+        ///// Обновляем сообщения в диалоговом окне страницы /messages (причина: сообщение прочитано)
+        ///// </summary>
+        //OnMarkMessagesAsReadClient,
+
+        ///// <summary>
+        ///// Обновление сообщения в диалоговом окне страницы /messages (причина: изменено или удалено)
+        ///// </summary>
+        //OnUpdateMessageClient,
 
         /// <summary>
-        /// Обновляем сообщения в диалоговом окне страницы /messages (причина: сообщение прочитано)
+        /// Изменения в таблице Messages
         /// </summary>
-        OnMarkMessagesAsReadClient,
+        OnMessagesUpdatedClient,
 
-        /// <summary>
-        /// Обновление сообщения в диалоговом окне страницы /messages (причина: изменено или удалено)
-        /// </summary>
-        OnUpdateMessageClient,
-
-        /// <summary>
-        /// Вызывается, когда меняется кол-во непрочитанных сообщений
-        /// </summary>
-        OnUpdateMessagesClient,
+        ///// <summary>
+        ///// Вызывается, когда меняется кол-во непрочитанных сообщений
+        ///// </summary>
+        //OnUpdateMessagesClient,
 
         /// <summary>
         /// Вызывается, когда изменяется связь с пользователями (блокировка, дружба и т.п.)
