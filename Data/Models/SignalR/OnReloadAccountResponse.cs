@@ -2,7 +2,7 @@
 
 namespace Data.Models.SignalR
 {
-    public class OnUpdateAccountRelationResponse : SignalRModelBase<OnUpdateAccountRelationResponse>
+    public class OnReloadAccountResponse : SignalRModelBase<OnReloadAccountResponse>
     {
         public override EnumSignalRHandlers EnumSignalRHandlersClient => EnumSignalRHandlers.OnUpdateAccountRelation;
 

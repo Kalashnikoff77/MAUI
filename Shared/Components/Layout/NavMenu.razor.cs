@@ -14,7 +14,7 @@ namespace Shared.Components.Layout
         [Inject] IRepository<GetMessagesCountRequestDto, GetMessagesCountResponseDto> _repoGetMessagesCount { get; set; } = null!;
         [Inject] IJSRuntime _JSRuntime { get; set; } = null!;
 
-        IDisposable? OnUpdateMessagesCountHandler;
+        IDisposable? OnUpdateMessagesHandler;
 
         DotNetObjectReference<NavMenu> _dotNetReference { get; set; } = null!;
         IJSObjectReference _JSModule { get; set; } = null!;
@@ -34,7 +34,7 @@ namespace Shared.Components.Layout
                 // Оставить здесь, т.к. требуется как аутентификация пользователя, так и подключение по SignalR.
                 if (CurrentState.Account != null)
                 {
-                    OnUpdateMessagesCountHandler = OnUpdateMessagesCountHandler.SignalRClient<OnUpdateMessagesCountResponse>(CurrentState, async (response) =>
+                    OnUpdateMessagesHandler = OnUpdateMessagesHandler.SignalRClient<OnUpdateMessagesResponse>(CurrentState, async (response) =>
                         await _JSModule.InvokeVoidAsync("GetMessagesCount"));
 
                     await _JSModule.InvokeVoidAsync("GetMessagesCount");
@@ -56,7 +56,7 @@ namespace Shared.Components.Layout
         {
             try
             {
-                OnUpdateMessagesCountHandler?.Dispose();
+                OnUpdateMessagesHandler?.Dispose();
                 if (_JSModule != null)
                     await _JSModule.DisposeAsync();
                 _dotNetReference?.Dispose();

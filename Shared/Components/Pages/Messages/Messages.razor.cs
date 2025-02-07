@@ -18,7 +18,7 @@ namespace Shared.Components.Pages.Messages
         [Inject] IRepository<UpdateRelationRequestDto, ResponseDtoBase> _repoUpdateRelation { get; set; } = null!;
         [Inject] ShowDialogs ShowDialogs { get; set; } = null!;
 
-        IDisposable? OnUpdateMessagesCountHandler;
+        IDisposable? OnUpdateMessagesHandler;
         List<LastMessagesForAccountSpDto> LastMessagesList = new List<LastMessagesForAccountSpDto>();
 
         protected override async Task OnParametersSetAsync()
@@ -35,7 +35,7 @@ namespace Shared.Components.Pages.Messages
         {
             if (!firstRender)
             {
-                OnUpdateMessagesCountHandler = OnUpdateMessagesCountHandler.SignalRClient<OnUpdateMessagesCountResponse>(CurrentState, async (response) =>
+                OnUpdateMessagesHandler = OnUpdateMessagesHandler.SignalRClient<OnUpdateMessagesResponse>(CurrentState, async (response) =>
                 {
                     var request = new GetLastMessagesListRequestDto() { Token = CurrentState.Account?.Token };
                     var apiResponse = await _repoGetLastMessagesList.HttpPostAsync(request);
@@ -96,8 +96,13 @@ namespace Shared.Components.Pages.Messages
                     Token = CurrentState.Account?.Token
                 });
 
-                var updateAccountRelationRequest = new SignalGlobalRequest { OnUpdateAccountRelation = new OnUpdateAccountRelation { RecipientId = blockingUserId } };
-                await CurrentState.SignalRServerAsync(updateAccountRelationRequest);
+                // Обновим состояния у обоих пользователей
+                var accountReloadRequest = new SignalGlobalRequest { OnReloadAccount = new OnReloadAccount { AdditionalAccountId = blockingUserId } };
+                await CurrentState.SignalRServerAsync(accountReloadRequest);
+
+                // Обновим список последних сообщений на странице /messages
+                var lastMessagesRequest = new SignalGlobalRequest { OnUpdateMessagesCount = new OnUpdateMessagesCount { RecipientId = LastMessagesList[index].Sender!.Id } };
+                await CurrentState.SignalRServerAsync(lastMessagesRequest);
             }
         }
 
@@ -106,6 +111,6 @@ namespace Shared.Components.Pages.Messages
         }
 
         public void Dispose() =>
-            OnUpdateMessagesCountHandler?.Dispose();
+            OnUpdateMessagesHandler?.Dispose();
     }
 }

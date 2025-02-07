@@ -177,7 +177,6 @@ namespace Shared.Components.Pages.Messages
             }
         }
 
-
         /// <summary>
         /// Принимаем дружбу
         /// </summary>
@@ -196,7 +195,7 @@ namespace Shared.Components.Pages.Messages
                 Token = CurrentState.Account?.Token 
             });
 
-            // Удалим сообщение из БД
+            // Удалим сообщение о запросе дружбы из БД
             var apiDeleteResponse = await _repoDeleteMessage.HttpPostAsync(new DeleteMessageRequestDto
             {
                 MessageId = messageId,
@@ -204,8 +203,13 @@ namespace Shared.Components.Pages.Messages
                 Token = CurrentState.Account?.Token
             });
 
+            // Добавим сообщение обоим пользователям о принятии дружбы
             text = StaticData.NotificationTypes[EnumMessages.RequestForFrendshipAccepted].Text;
             await SubmitMessageAsync(EnumMessages.RequestForFrendshipAccepted);
+
+            // Обновим состояние у обоих пользователей
+            var reloadAccountRequest = new SignalGlobalRequest { OnReloadAccount = new OnReloadAccount { AdditionalAccountId = Recipient.Id } };
+            await CurrentState.SignalRServerAsync(reloadAccountRequest);
         }
 
         [JSInvokable]

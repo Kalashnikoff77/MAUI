@@ -11,7 +11,7 @@ namespace Data.State
 
         IDisposable? updateOnlineAccountsHandler;
         IDisposable? onAvatarChangedHandler;
-        IDisposable? onUpdateAccountRelationHandler;
+        IDisposable? onReloadAccountHandler;
 
         //IDisposable? updateEventRegisterTriggerHandler;
 
@@ -34,11 +34,11 @@ namespace Data.State
             // Пользователь подключился
             updateOnlineAccountsHandler = updateOnlineAccountsHandler.SignalRClient<OnAccountConnectedResponse>(this);
 
-            //// Пользователь сменил аватар
+            // Пользователь сменил аватар
             onAvatarChangedHandler = onAvatarChangedHandler.SignalRClient<OnAvatarChangedResponse>(this);
 
-            //// Пользователь изменил взаимоотношения с другим (дружба, подписка, блокировка)
-            onUpdateAccountRelationHandler = onUpdateAccountRelationHandler.SignalRClient<OnUpdateAccountRelationResponse>(this, async (response) => 
+            // Необходима перезагрузка состояния пользователя
+            onReloadAccountHandler = onReloadAccountHandler.SignalRClient<OnReloadAccountResponse>(this, async (response) => 
             {
                 var acc = Account;
             });
@@ -59,9 +59,7 @@ namespace Data.State
         {
             updateOnlineAccountsHandler?.Dispose();
             onAvatarChangedHandler?.Dispose();
-
-            //updateRelationsTriggerHandler?.Dispose();
-            //updateEventRegisterTriggerHandler?.Dispose();
+            onReloadAccountHandler?.Dispose();
         }
     }
 }

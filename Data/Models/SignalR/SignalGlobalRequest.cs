@@ -11,7 +11,7 @@ namespace Data.Models.SignalR
         public OnUpdateMessage? OnUpdateMessage { get; set; }
         public OnUpdateMessagesCount? OnUpdateMessagesCount { get; set; }
 
-        public OnUpdateAccountRelation? OnUpdateAccountRelation { get; set; }
+        public OnReloadAccount? OnReloadAccount { get; set; }
     }
 
 
@@ -82,14 +82,14 @@ namespace Data.Models.SignalR
 
 
     /// <summary>
-    /// Вызывается, когда пользователь блокируется
+    /// Вызывается, когда нужно перезагрузить состояние пользователя
     /// </summary>
-    public class OnUpdateAccountRelation
+    public class OnReloadAccount
     {
         /// <summary>
-        /// Второй участник блокировки (первый берётся из [Authorize])
+        /// Дополнительно перезагрузить второго пользователя (первый берётся из [Authorize])
         /// </summary>
-        public int RecipientId { get; set; }
+        public int? AdditionalAccountId { get; set; }
     }
 }
 

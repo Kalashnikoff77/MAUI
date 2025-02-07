@@ -5,8 +5,8 @@ namespace Data.Models.SignalR
     /// <summary>
     /// Вызывается, когда меняется кол-во непрочитанных сообщений
     /// </summary>
-    public class OnUpdateMessagesCountResponse : SignalRModelBase<OnUpdateMessagesCountResponse>
+    public class OnUpdateMessagesResponse : SignalRModelBase<OnUpdateMessagesResponse>
     {
-        public override EnumSignalRHandlers EnumSignalRHandlersClient => EnumSignalRHandlers.OnUpdateMessagesCountClient;
+        public override EnumSignalRHandlers EnumSignalRHandlersClient => EnumSignalRHandlers.OnUpdateMessagesClient;
     }
 }

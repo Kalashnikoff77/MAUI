@@ -35,7 +35,7 @@
         /// <summary>
         /// Вызывается, когда меняется кол-во непрочитанных сообщений
         /// </summary>
-        OnUpdateMessagesCountClient,
+        OnUpdateMessagesClient,
 
         /// <summary>
         /// Вызывается, когда изменяется связь с пользователями (блокировка, дружба и т.п.)

@@ -56,9 +56,9 @@ namespace SignalR
             if (request.OnUpdateMessagesCount != null)
                 await OnUpdateMessagesCountAsync(request.OnUpdateMessagesCount);
 
-            // Вызывается, когда пользователя блокируют
-            if (request.OnUpdateAccountRelation != null)
-                await OnUpdateAccountRelationAsync(request.OnUpdateAccountRelation);
+            // Вызывается, когда нужно обновить состояние пользователя
+            if (request.OnReloadAccount != null)
+                await OnReloadAccountAsync(request.OnReloadAccount);
         }
 
 
@@ -114,7 +114,7 @@ namespace SignalR
         }
 
         /// <summary>
-        /// Вызывается, когда сообщение измененяется или удаленяется в MessageDialog страницы /messages
+        /// Вызывается, когда сообщение измененяется или удаляется в MessageDialog страницы /messages
         /// </summary>
         async Task OnUpdateMessageAsync(OnUpdateMessage request)
         {
@@ -134,7 +134,7 @@ namespace SignalR
         {
             if (GetAccountDetails(out AccountDetails accountDetails, Context.UserIdentifier))
             {
-                var response = new OnUpdateMessagesCountResponse();
+                var response = new OnUpdateMessagesResponse();
                 await Clients
                     .Users([Context.UserIdentifier!, request.RecipientId.ToString()!])
                     .SendAsync(response.EnumSignalRHandlersClient.ToString(), response);
@@ -142,16 +142,18 @@ namespace SignalR
         }
 
         /// <summary>
-        /// Вызывается, когда изменяется связь с пользователями (блокировка, дружба и т.п.)
+        /// Вызывается, когда нужно обновить состояние пользователя
         /// </summary>
-        async Task OnUpdateAccountRelationAsync(OnUpdateAccountRelation request)
+        async Task OnReloadAccountAsync(OnReloadAccount request)
         {
             if (GetAccountDetails(out AccountDetails accountDetails, Context.UserIdentifier))
             {
-                var response = new OnUpdateAccountRelationResponse();
-                await Clients
-                    .Users([Context.UserIdentifier!, request.RecipientId.ToString()!])
-                    .SendAsync(response.EnumSignalRHandlersClient.ToString(), response);
+                var response = new OnReloadAccountResponse();
+
+                await Clients.Caller.SendAsync(response.EnumSignalRHandlersClient.ToString(), response);
+
+                if (request.AdditionalAccountId.HasValue)
+                    await Clients.User(request.AdditionalAccountId.ToString()!).SendAsync(response.EnumSignalRHandlersClient.ToString(), response);
             }
         }
     }
