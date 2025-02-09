@@ -37,11 +37,9 @@ namespace Data.State
             // Пользователь сменил аватар
             onAvatarChangedHandler = onAvatarChangedHandler.SignalRClient<OnAvatarChangedResponse>(this);
 
-            // Необходима перезагрузка состояния пользователя
+            // Перезагрузить состояние пользователя
             onReloadAccountHandler = onReloadAccountHandler.SignalRClient<OnReloadAccountResponse>(this, async (response) => 
-            {
-                var acc = Account;
-            });
+                await ReloadAccountAsync());
 
             await SignalR.StartAsync();
         }

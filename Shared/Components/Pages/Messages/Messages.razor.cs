@@ -101,13 +101,13 @@ namespace Shared.Components.Pages.Messages
                     Token = CurrentState.Account?.Token
                 });
 
-                //// Обновим состояния у обоих пользователей
-                //var accountReloadRequest = new SignalGlobalRequest { OnReloadAccount = new OnReloadAccount { AdditionalAccountId = blockingUserId } };
-                //await CurrentState.SignalRServerAsync(accountReloadRequest);
+                // Обновим состояния у обоих пользователей
+                var accountReloadRequest = new SignalGlobalRequest { OnReloadAccount = new OnReloadAccount { AdditionalAccountId = blockingUserId } };
+                await CurrentState.SignalRServerAsync(accountReloadRequest);
 
-                //// Обновим список последних сообщений на странице /messages
-                //var lastMessagesRequest = new SignalGlobalRequest { OnUpdateMessagesCount = new OnUpdateMessagesCount { RecipientId = LastMessagesList[index].Sender!.Id } };
-                //await CurrentState.SignalRServerAsync(lastMessagesRequest);
+                // Обновим список последних сообщений на странице /messages
+                var onMessagesUpdatedRequest = new SignalGlobalRequest { OnMessagesUpdatedRequest = new OnMessagesUpdatedRequest() };
+                await CurrentState.SignalRServerAsync(onMessagesUpdatedRequest);
             }
         }
 
