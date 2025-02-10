@@ -24,7 +24,7 @@ namespace Shared.Components.Pages.Messages
 
         [Inject] IRepository<GetMessagesRequestDto, GetMessagesResponseDto> _repoGetMessages { get; set; } = null!;
         [Inject] IRepository<AddMessageRequestDto, AddMessageResponseDto> _repoAddMessage { get; set; } = null!;
-        [Inject] IRepository<DeleteMessageRequestDto, ResponseDtoBase> _repoDeleteMessage { get; set; } = null!;
+        [Inject] IRepository<DeleteMessagesRequestDto, ResponseDtoBase> _repoDeleteMessage { get; set; } = null!;
         [Inject] IRepository<UpdateRelationRequestDto, ResponseDtoBase> _repoUpdateRelation { get; set; } = null!;
         [Inject] IJSRuntime _JSRuntime { get; set; } = null!;
         [Inject] IComponentRenderer<BaseMessage> _renderer { get; set; } = null!;
@@ -52,6 +52,10 @@ namespace Shared.Components.Pages.Messages
                     // Обновление или удаление сообщения в диалогах двух пользователей в MessagesDialog
                     if (response.UpdateMessage && response.MessageId.HasValue)
                         await _JSModule.InvokeVoidAsync("UpdateMessage", response.MessageId);
+
+                    // Удаление всей переписки в диалогах двух пользователей в MessagesDialog
+                    if (response.DeleteMessages)
+                        await InvokeAsync(MudDialog.Close);
 
                     // Пометить сообщения как прочитанные
                     if (response.MarkMessagesAsRead)
@@ -146,7 +150,6 @@ namespace Shared.Components.Pages.Messages
             return html.ToString();
         }
 
-
         /// <summary>
         /// Отправка сообщения
         /// </summary>
@@ -193,7 +196,7 @@ namespace Shared.Components.Pages.Messages
             });
 
             // Удалим сообщение о запросе дружбы из БД
-            var apiDeleteResponse = await _repoDeleteMessage.HttpPostAsync(new DeleteMessageRequestDto
+            var apiDeleteResponse = await _repoDeleteMessage.HttpPostAsync(new DeleteMessagesRequestDto
             {
                 MessageId = messageId,
                 RecipientId = Recipient.Id,
@@ -225,7 +228,7 @@ namespace Shared.Components.Pages.Messages
         public async Task DeclineFriendshipAsync(int messageId)
         {
             // Удалим сообщение из БД
-            var request = new DeleteMessageRequestDto
+            var request = new DeleteMessagesRequestDto
             {
                 MessageId = messageId,
                 RecipientId = Recipient.Id,
@@ -253,7 +256,7 @@ namespace Shared.Components.Pages.Messages
         public async Task CancelFriendshipAsync(int messageId)
         {
             // Удалим сообщение из БД
-            var request = new DeleteMessageRequestDto
+            var request = new DeleteMessagesRequestDto
             {
                 MessageId = messageId,
                 RecipientId = Recipient.Id,

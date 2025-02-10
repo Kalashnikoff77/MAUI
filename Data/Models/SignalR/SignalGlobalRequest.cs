@@ -62,6 +62,11 @@ namespace Data.Models.SignalR
         /// Пометить сообщения как прочитанные
         /// </summary>
         public bool MarkMessagesAsRead { get; set; }
+
+        /// <summary>
+        /// Удалить одно или несколько сообщений
+        /// </summary>
+        public bool DeleteMessages { get; set; }
     }
 }
 

@@ -218,7 +218,7 @@ namespace WebAPI.Controllers
         }
 
         [Route("Delete"), HttpPost, Authorize]
-        public async Task<ResponseDtoBase> DeleteAsync(DeleteMessageRequestDto request)
+        public async Task<ResponseDtoBase> DeleteAsync(DeleteMessagesRequestDto request)
         {
             AuthenticateUser();
 
@@ -228,11 +228,21 @@ namespace WebAPI.Controllers
             var senderId = await _unitOfWork.SqlConnection.QueryFirstOrDefaultAsync<int?>(sql, new { _unitOfWork.AccountId }) ?? throw new NotFoundException($"Пользователь-отправитель с Id {_unitOfWork.AccountId} не найден!");
 
             sql = "SELECT TOP 1 Id FROM Accounts WHERE Id = @RecipientId";
-            var recipientId = await _unitOfWork.SqlConnection.QueryFirstOrDefaultAsync<int?>(sql, new { request.RecipientId }) ?? throw new NotFoundException($"Пользователь-получатель с Id {_unitOfWork.AccountId} не найден!");
+            var recipientId = await _unitOfWork.SqlConnection.QueryFirstOrDefaultAsync<int?>(sql, new { request.RecipientId }) ?? throw new NotFoundException($"Пользователь-получатель с Id {request.RecipientId} не найден!");
 
-            sql = $"UPDATE Messages SET {nameof(MessagesEntity.IsDeleted)} = 1 " +
-                $"WHERE Id = @MessageId AND {nameof(MessagesEntity.SenderId)} = {nameof(MessagesEntity.SenderId)} AND {nameof(MessagesEntity.RecipientId)} = {nameof(MessagesEntity.RecipientId)}";
-            await _unitOfWork.SqlConnection.ExecuteAsync(sql, new { request.MessageId, SenderId = _unitOfWork.AccountId, request.RecipientId });
+            if (request.DeleteAll)
+            {
+                sql = $"UPDATE Messages SET {nameof(MessagesEntity.IsDeleted)} = 1 " +
+                    $"WHERE ({nameof(MessagesEntity.SenderId)} = @{nameof(MessagesEntity.SenderId)} AND {nameof(MessagesEntity.RecipientId)} = @{nameof(MessagesEntity.RecipientId)}) " +
+                    $"OR ({nameof(MessagesEntity.SenderId)} = @{nameof(MessagesEntity.RecipientId)} AND {nameof(MessagesEntity.RecipientId)} = @{nameof(MessagesEntity.SenderId)})";
+                await _unitOfWork.SqlConnection.ExecuteAsync(sql, new { SenderId = _unitOfWork.AccountId, request.RecipientId });
+            }
+            else
+            {
+                sql = $"UPDATE Messages SET {nameof(MessagesEntity.IsDeleted)} = 1 " +
+                    $"WHERE Id = @MessageId AND {nameof(MessagesEntity.SenderId)} = @{nameof(MessagesEntity.SenderId)} AND {nameof(MessagesEntity.RecipientId)} = @{nameof(MessagesEntity.RecipientId)}";
+                await _unitOfWork.SqlConnection.ExecuteAsync(sql, new { request.MessageId, SenderId = _unitOfWork.AccountId, request.RecipientId });
+            }
 
             return response;
         }

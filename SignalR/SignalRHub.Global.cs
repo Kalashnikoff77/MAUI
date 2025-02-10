@@ -102,7 +102,8 @@ namespace SignalR
                     MessagesIds = request.MessagesIds,
                     AppendNewMessages = request.AppendNewMessages,
                     MarkMessagesAsRead = request.MarkMessagesAsRead,
-                    UpdateMessage = request.UpdateMessage
+                    UpdateMessage = request.UpdateMessage,
+                    DeleteMessages = request.DeleteMessages
                 };
 
                 await Clients.Caller.SendAsync(response.EnumSignalRHandlersClient.ToString(), response);

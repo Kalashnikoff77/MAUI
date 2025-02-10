@@ -15,6 +15,7 @@ namespace Shared.Components.Pages.Messages
         [CascadingParameter] public CurrentState CurrentState { get; set; } = null!;
         [Inject] IRepository<GetLastMessagesListRequestDto, GetLastMessagesListResponseDto> _repoGetLastMessagesList { get; set; } = null!;
         [Inject] IRepository<MarkMessagesAsReadRequestDto, ResponseDtoBase> _markMessagesAsRead { get; set; } = null!;
+        [Inject] IRepository<DeleteMessagesRequestDto, ResponseDtoBase> _deleteMessages { get; set; } = null!;
         [Inject] IRepository<UpdateRelationRequestDto, ResponseDtoBase> _repoUpdateRelation { get; set; } = null!;
         [Inject] ShowDialogs ShowDialogs { get; set; } = null!;
 
@@ -113,6 +114,24 @@ namespace Shared.Components.Pages.Messages
 
         async Task DeleteAllMessagesAsync(int messageId)
         {
+            var index = LastMessagesList.FindIndex(x => x.Id == messageId);
+            if (index >= 0 && LastMessagesList[index].Sender != null)
+            {
+                int deletingAccountMessages = LastMessagesList[index].Sender!.Id == CurrentState.Account!.Id ? LastMessagesList[index].Recipient!.Id : LastMessagesList[index].Sender!.Id;
+
+                var apiResponse = await _deleteMessages.HttpPostAsync(new DeleteMessagesRequestDto { DeleteAll = true, RecipientId = deletingAccountMessages, Token = CurrentState.Account?.Token });
+
+                var onMessagesUpdatedRequest = new SignalGlobalRequest
+                {
+                    OnMessagesUpdatedRequest = new OnMessagesUpdatedRequest
+                    {
+                        DeleteMessages = true,
+                        RecipientId = deletingAccountMessages,
+                        MessagesIds = null
+                    }
+                };
+                await CurrentState.SignalRServerAsync(onMessagesUpdatedRequest);
+            }
         }
 
         async Task OnSearch(string text)

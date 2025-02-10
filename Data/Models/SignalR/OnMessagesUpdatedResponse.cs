@@ -20,6 +20,11 @@ namespace Data.Models.SignalR
         public bool UpdateMessage { get; set; }
 
         /// <summary>
+        /// Удаление всей переписки в диалогах двух пользователей в MessagesDialog
+        /// </summary>
+        public bool DeleteMessages { get; set; }
+
+        /// <summary>
         /// Пометить сообщения как прочитанные
         /// </summary>
         public bool MarkMessagesAsRead { get; set; }
