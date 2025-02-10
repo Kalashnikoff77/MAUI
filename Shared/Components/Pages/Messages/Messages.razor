@@ -23,8 +23,9 @@
                     if (accountsViewDto != null)
                     {
                         @* Заблокирован ли один из собеседников? *@
-                        var blockerId = GetBlockerId(message);
-                        <tr style=@(blockerId != null ? "background-color:#fff2f2" : null)>
+                        var blocker = CurrentState.Account.GetBlockInfo(message.Sender, message.Recipient);
+
+                        <tr style=@(blocker.Item1 ? "background-color:#fff2f2" : null)>
                             <td>
                                 <div class="d-flex align-center gap-3" >
                                     <div @onclick="@(() => ShowDialogs.AccountInfoCardDialogAsync(accountsViewDto))" style="cursor:pointer">
@@ -35,9 +36,9 @@
                                     <div class="d-flex flex-column gap-0" @onclick="@(() => ShowDialogs.MessagesDialogAsync(accountsViewDto))" style="cursor:pointer; width:100%">
                                         <div style="text-align:end">
                                             <MudMenu Dense Icon="@Icons.Material.Filled.MoreVert" Size="Size.Small" AnchorOrigin="Origin.TopLeft" TransformOrigin="Origin.TopRight">
-                                                @if (blockerId != null)
+                                                @if (blocker.Item1)
                                                 {
-                                                    @if (blockerId.Value == CurrentState.Account.Id) 
+                                                    @if (blocker.Item2.Id == CurrentState.Account.Id) 
                                                     {
                                                         <MudMenuItem Icon="@Icons.Material.Filled.Done" IconColor="Color.Success" OnClick="() => BlockAccountAsync(message.Id)">Разблокировать собеседника</MudMenuItem>
                                                     }

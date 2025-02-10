@@ -1,6 +1,8 @@
-﻿using Data.Dto.Requests;
+﻿using Data.Dto;
+using Data.Dto.Requests;
 using Data.Dto.Responses;
 using Data.Dto.Sp;
+using Data.Dto.Views;
 using Data.Enums;
 using Data.Models.SignalR;
 using Data.Services;
@@ -148,6 +150,16 @@ namespace Shared.Components.Pages.Messages
                 
             return blockingInfo == null ? null : blockingInfo.SenderId;
         }
+
+        //public Tuple<bool, int?> BlockInfo(AccountsViewDto account1, AccountsViewDto account2)
+        //{
+        //    var blockingInfo = account1.Relations?
+        //        .FirstOrDefault(x => x.Type == (short)EnumRelations.Blocked && ((x.SenderId == account1.Id && x.RecipientId == message.Recipient?.Id) || (x.RecipientId == message.Sender?.Id && x.SenderId == message.Recipient?.Id)));
+
+        //    return blockingInfo == null ? null : blockingInfo.SenderId;
+
+        //    var result = new Tuple<bool, int?>();
+        //}
 
         public void Dispose() =>
             OnMessagesUpdatedHandler?.Dispose();
