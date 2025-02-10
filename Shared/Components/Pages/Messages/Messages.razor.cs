@@ -111,8 +111,24 @@ namespace Shared.Components.Pages.Messages
             }
         }
 
+        async Task DeleteAllMessagesAsync(int messageId)
+        {
+        }
+
         async Task OnSearch(string text)
         {
+        }
+
+        public bool IsAccountBlocked(LastMessagesForAccountSpDto message)
+        {
+            if (CurrentState.Account?.Relations != null && CurrentState.Account.Relations.Any(x => x.Type == (short)EnumRelations.Blocked))
+            {
+                int secondId = CurrentState.Account.Id == message.Sender?.Id ? message.Recipient!.Id : secondId = message.Sender!.Id;
+
+                if (CurrentState.Account.Relations.Any(x => x.Type == (short)EnumRelations.Blocked && (x.SenderId == secondId || x.RecipientId == secondId)))
+                    return true;
+            }
+            return false;
         }
 
         public void Dispose() =>

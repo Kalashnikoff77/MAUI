@@ -20,7 +20,8 @@
                     AccountsViewDto? accountsViewDto = CurrentState.Account.Id == message.Sender?.Id ? message.Recipient : message.Sender;
                     if (accountsViewDto != null)
                     {
-                        <tr>
+                        var isAccountBlocked = IsAccountBlocked(message);
+                        <tr style=@(isAccountBlocked ? "background-color:#fff2f2" : null)>
                             <td>
                                 <div class="d-flex align-center gap-3" >
                                     <div @onclick="@(() => ShowDialogs.AccountInfoCardDialogAsync(accountsViewDto))" style="cursor:pointer">
@@ -31,15 +32,16 @@
                                     <div class="d-flex flex-column gap-0" @onclick="@(() => ShowDialogs.MessagesDialogAsync(accountsViewDto))" style="cursor:pointer; width:100%">
                                         <div style="text-align:end">
                                             <MudMenu Dense Icon="@Icons.Material.Filled.MoreVert" Size="Size.Small" AnchorOrigin="Origin.TopLeft" TransformOrigin="Origin.TopRight">
-                                                @if (CurrentState.Account.Relations != null && !CurrentState.Account.Relations.Any(x => x.Type == (short)EnumRelations.Blocked && (x.RecipientId == message.Sender?.Id || x.RecipientId == message.Recipient?.Id)))
+                                                @if (isAccountBlocked)
                                                 {
-                                                    <MudMenuItem Icon="@Icons.Material.Filled.DoneAll" IconColor="Color.Primary" Disabled="@(!(message.ReadDate == null && CurrentState.Account.Id == message.Recipient?.Id))" OnClick="() => MarkAsReadAsync(message.Id)">Пометить сообщение прочитанным</MudMenuItem>
-                                                    <MudMenuItem Icon="@Icons.Material.Filled.ChecklistRtl" IconColor="Color.Primary" Disabled="@(message.UnreadMessages == 0)" OnClick="() => MarkAllAsReadAsync(message.Id)">Пометить все прочитанными</MudMenuItem>
-                                                    <MudMenuItem Icon="@Icons.Material.Filled.Block" IconColor="Color.Error" OnClick="() => BlockAccountAsync(message.Id)">Заблокировать отправителя</MudMenuItem>
+                                                    <MudMenuItem Icon="@Icons.Material.Filled.Done" IconColor="Color.Success" OnClick="() => BlockAccountAsync(message.Id)">Разблокировать собеседника</MudMenuItem>
                                                 }
                                                 else 
                                                 {
-                                                    <MudMenuItem Icon="@Icons.Material.Filled.Done" IconColor="Color.Success" OnClick="() => BlockAccountAsync(message.Id)">Разблокировать отправителя</MudMenuItem>
+                                                    <MudMenuItem Icon="@Icons.Material.Filled.DoneAll" IconColor="Color.Primary" Disabled="@(!(message.ReadDate == null && CurrentState.Account.Id == message.Recipient?.Id))" OnClick="() => MarkAsReadAsync(message.Id)">Пометить сообщение прочитанным</MudMenuItem>
+                                                    <MudMenuItem Icon="@Icons.Material.Filled.ChecklistRtl" IconColor="Color.Primary" Disabled="@(message.UnreadMessages == 0)" OnClick="() => MarkAllAsReadAsync(message.Id)">Пометить все прочитанными</MudMenuItem>
+                                                    <MudMenuItem Icon="@Icons.Material.Filled.Clear" IconColor="Color.Error" Disabled="@(message.UnreadMessages == 0)" OnClick="() => DeleteAllMessagesAsync(message.Id)">Удалить всю переписку</MudMenuItem>
+                                                    <MudMenuItem Icon="@Icons.Material.Filled.Block" IconColor="Color.Error" OnClick="() => BlockAccountAsync(message.Id)">Заблокировать собеседника</MudMenuItem>
                                                 }
                                             </MudMenu>
                                         </div>
