@@ -34,7 +34,7 @@ namespace Shared.Components.Pages.Events
 
                 var request = new SignalGlobalRequest
                 {
-                    OnScheduleChanged = new OnScheduleChanged { EventId = ScheduleForEventView.EventId, ScheduleId = ScheduleForEventView.Id }
+                    OnScheduleUpdatedRequest = new OnScheduleUpdatedRequest { EventId = ScheduleForEventView.EventId, ScheduleId = ScheduleForEventView.Id }
                 };
                 await CurrentState.SignalRServerAsync(request);
             }

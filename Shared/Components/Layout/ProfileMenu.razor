@@ -1,18 +1,6 @@
 ﻿@if (CurrentState.Account != null)
 {
-@*     <div id="NumberOfMessagesButton" style="margin-right:3px; display:none">
-        <MudButton StartIcon="@Icons.Material.Outlined.Chat" Color="Color.Info">
-            <span id="NumberOfMessages" style="color:orangered"></span>
-        </MudButton>
-    </div>
-
-    <div id="NumberOfNotificationsButton" style="margin-right:3px; display:none">
-        <MudButton StartIcon="@Icons.Material.Filled.NotificationsNone" Color="Color.Info" IconSize="Size.Large">
-            <span id="NumberOfNotifications" style="color:orangered"></span>
-        </MudButton>
-    </div> *@
-
-    <MudMenu Icon="@Icons.Material.Filled.MoreVert" AnchorOrigin="Origin.TopLeft" TransformOrigin="Origin.TopLeft" Color="Color.Info">
+    <MudMenu Icon="@Icons.Material.Filled.MoreVert" AnchorOrigin="Origin.TopLeft" TransformOrigin="Origin.TopLeft" Color="Color.Primary">
         <MudMenuItem Href="/profile" Icon="@Icons.Material.Filled.Settings">Настройки профиля</MudMenuItem>
         <MudMenuItem Href="/" Icon="@Icons.Material.Filled.PeopleAlt">Мои друзья</MudMenuItem>
         <MudDivider />

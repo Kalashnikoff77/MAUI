@@ -33,16 +33,16 @@ namespace SignalR
         public async Task GlobalHandler(SignalGlobalRequest request)
         {
             // Вызывается, когда нужно обновить состояние пользователя
-            if (request.OnReloadAccount != null)
-                await OnReloadAccountAsync(request.OnReloadAccount);
+            if (request.OnReloadAccountRequest != null)
+                await OnReloadAccountAsync(request.OnReloadAccountRequest);
 
             // Изменения в расписании мероприятия (пока только добавлено одно сообщение в обсуждение)
-            if (request.OnScheduleChanged != null)
-                await OnScheduleChangedAsync(request.OnScheduleChanged);
+            if (request.OnScheduleUpdatedRequest != null)
+                await OnScheduleUpdatedAsync(request.OnScheduleUpdatedRequest);
 
             // Пользователь изменил свой аватар
-            if (request.OnAvatarChanged != null)
-                await OnAvatarChangedAsync(request.OnAvatarChanged);
+            if (request.OnAvatarChangedRequest != null)
+                await OnAvatarChangedAsync(request.OnAvatarChangedRequest);
 
             // Изменения в таблице Messages
             if (request.OnMessagesUpdatedRequest != null)
@@ -53,7 +53,7 @@ namespace SignalR
         /// <summary>
         /// Вызывается, когда нужно обновить состояние пользователя
         /// </summary>
-        async Task OnReloadAccountAsync(OnReloadAccount request)
+        async Task OnReloadAccountAsync(OnReloadAccountRequest request)
         {
             if (GetAccountDetails(out AccountDetails accountDetails, Context.UserIdentifier))
             {
@@ -69,18 +69,18 @@ namespace SignalR
         /// <summary>
         /// Изменение в расписании мероприятия
         /// </summary>
-        async Task OnScheduleChangedAsync(OnScheduleChanged request)
+        async Task OnScheduleUpdatedAsync(OnScheduleUpdatedRequest request)
         {
             var service = _serviceProvider.GetService<IRepository<GetSchedulesRequestDto, GetSchedulesResponseDto>>()!;
             var apiResponse = await service.HttpPostAsync(new GetSchedulesRequestDto { ScheduleId = request.ScheduleId });
-            var response = new OnScheduleChangedResponse { UpdatedSchedule = apiResponse.Response.Schedule };
+            var response = new OnScheduleUpdatedResponse { UpdatedSchedule = apiResponse.Response.Schedule };
             await Clients.All.SendAsync(response.EnumSignalRHandlersClient.ToString(), response);
         }
 
         /// <summary>
         /// Пользователь изменил свой аватар, уведомляем всех об этом
         /// </summary>
-        async Task OnAvatarChangedAsync(OnAvatarChanged request)
+        async Task OnAvatarChangedAsync(OnAvatarChangedRequest request)
         {
             if (GetAccountDetails(out AccountDetails accountDetails, Context.UserIdentifier))
             {
@@ -102,7 +102,7 @@ namespace SignalR
                     MessagesIds = request.MessagesIds,
                     AppendNewMessages = request.AppendNewMessages,
                     MarkMessagesAsRead = request.MarkMessagesAsRead,
-                    UpdateMessage = request.UpdateMessage,
+                    UpdateMessage = request.UpdateMessage
                 };
 
                 await Clients.Caller.SendAsync(response.EnumSignalRHandlersClient.ToString(), response);

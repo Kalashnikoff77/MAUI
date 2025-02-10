@@ -217,7 +217,7 @@ namespace Shared.Components.Pages.Messages
             await CurrentState.SignalRServerAsync(onMessagesUpdatedRequest);
 
             // Обновим состояние у обоих пользователей
-            var reloadAccountRequest = new SignalGlobalRequest { OnReloadAccount = new OnReloadAccount { AdditionalAccountId = Recipient.Id } };
+            var reloadAccountRequest = new SignalGlobalRequest { OnReloadAccountRequest = new OnReloadAccountRequest { AdditionalAccountId = Recipient.Id } };
             await CurrentState.SignalRServerAsync(reloadAccountRequest);
         }
 

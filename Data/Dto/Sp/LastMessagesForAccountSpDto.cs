@@ -15,6 +15,7 @@ namespace Data.Dto.Sp
         public AccountsViewDto? Sender { get; set; }
         public AccountsViewDto? Recipient { get; set; }
 
+        public int? TotalMessages { get; set; }
         public int? UnreadMessages { get; set; }
     }
 }

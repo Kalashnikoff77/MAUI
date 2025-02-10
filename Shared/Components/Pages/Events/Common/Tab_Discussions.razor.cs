@@ -33,7 +33,7 @@ namespace Shared.Components.Pages.Events.Common
         {
             if (firstRender)
             {
-                OnScheduleChangedHandler = OnScheduleChangedHandler.SignalRClient<OnScheduleChangedResponse>(CurrentState, async (response) =>
+                OnScheduleChangedHandler = OnScheduleChangedHandler.SignalRClient<OnScheduleUpdatedResponse>(CurrentState, async (response) =>
                     await _JSModule.InvokeVoidAsync("AppendNewDiscussions", await GetNewDiscussions()));
 
                 _dotNetReference = DotNetObjectReference.Create(this);
@@ -107,7 +107,7 @@ namespace Shared.Components.Pages.Events.Common
 
                 var request = new SignalGlobalRequest
                 {
-                    OnScheduleChanged = new OnScheduleChanged { EventId = ScheduleForEventView.EventId, ScheduleId = ScheduleForEventView.Id }
+                    OnScheduleUpdatedRequest = new OnScheduleUpdatedRequest { EventId = ScheduleForEventView.EventId, ScheduleId = ScheduleForEventView.Id }
                 };
                 await CurrentState.SignalRServerAsync(request);
 

@@ -102,11 +102,11 @@ namespace Shared.Components.Pages.Messages
                 });
 
                 // Обновим состояния у обоих пользователей
-                var accountReloadRequest = new SignalGlobalRequest { OnReloadAccount = new OnReloadAccount { AdditionalAccountId = blockingUserId } };
+                var accountReloadRequest = new SignalGlobalRequest { OnReloadAccountRequest = new OnReloadAccountRequest { AdditionalAccountId = blockingUserId } };
                 await CurrentState.SignalRServerAsync(accountReloadRequest);
 
                 // Обновим список последних сообщений на странице /messages
-                var onMessagesUpdatedRequest = new SignalGlobalRequest { OnMessagesUpdatedRequest = new OnMessagesUpdatedRequest() };
+                var onMessagesUpdatedRequest = new SignalGlobalRequest { OnMessagesUpdatedRequest = new OnMessagesUpdatedRequest { RecipientId = blockingUserId } };
                 await CurrentState.SignalRServerAsync(onMessagesUpdatedRequest);
             }
         }
@@ -119,16 +119,15 @@ namespace Shared.Components.Pages.Messages
         {
         }
 
-        public bool IsAccountBlocked(LastMessagesForAccountSpDto message)
+        /// <summary>
+        /// Возвращает Id аккаунта, который является инициатором блокировки, иначе - null
+        /// </summary>
+        public int? GetBlockerId(LastMessagesForAccountSpDto message)
         {
-            if (CurrentState.Account?.Relations != null && CurrentState.Account.Relations.Any(x => x.Type == (short)EnumRelations.Blocked))
-            {
-                int secondId = CurrentState.Account.Id == message.Sender?.Id ? message.Recipient!.Id : secondId = message.Sender!.Id;
-
-                if (CurrentState.Account.Relations.Any(x => x.Type == (short)EnumRelations.Blocked && (x.SenderId == secondId || x.RecipientId == secondId)))
-                    return true;
-            }
-            return false;
+            var blockingInfo = CurrentState.Account?.Relations?
+                .FirstOrDefault(x => x.Type == (short)EnumRelations.Blocked && ((x.SenderId == message.Sender?.Id && x.RecipientId == message.Recipient?.Id) || (x.RecipientId == message.Sender?.Id && x.SenderId == message.Recipient?.Id)));
+                
+            return blockingInfo == null ? null : blockingInfo.SenderId;
         }
 
         public void Dispose() =>

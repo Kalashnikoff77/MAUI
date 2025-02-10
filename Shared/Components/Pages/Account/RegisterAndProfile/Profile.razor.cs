@@ -82,7 +82,7 @@ namespace Shared.Components.Pages.Account.RegisterAndProfile
                 {
                     var signalRequest = new SignalGlobalRequest
                     {
-                        OnAvatarChanged = new OnAvatarChanged { NewAvatar = newAvatar }
+                        OnAvatarChangedRequest = new OnAvatarChangedRequest { NewAvatar = newAvatar }
                     };
                     await CurrentState.SignalRServerAsync(signalRequest);
                 }

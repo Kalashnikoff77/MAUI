@@ -17,7 +17,7 @@ namespace Shared.Components.Pages.Events
 
         protected override void OnAfterRender(bool firstRender)
         {
-            OnScheduleChangedHandler = OnScheduleChangedHandler.SignalRClient<OnScheduleChangedResponse>(CurrentState, async (response) =>
+            OnScheduleChangedHandler = OnScheduleChangedHandler.SignalRClient<OnScheduleUpdatedResponse>(CurrentState, async (response) =>
             {
                 if (response.UpdatedSchedule != null)
                 {

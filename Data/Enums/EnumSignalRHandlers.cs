@@ -10,7 +10,7 @@
         /// <summary>
         /// При добавлении обсуждения в мероприятие
         /// </summary>
-        OnScheduleChangedClient,
+        OnScheduleUpdatedClient,
 
         /// <summary>
         /// Пользователь изменил свой аватар

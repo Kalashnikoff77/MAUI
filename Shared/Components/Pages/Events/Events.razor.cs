@@ -56,7 +56,7 @@ namespace Shared.Components.Pages.Events
             }
             else
             {
-                OnScheduleChangedHandler = OnScheduleChangedHandler.SignalRClient(CurrentState, (Func<OnScheduleChangedResponse, Task>)(async (response) =>
+                OnScheduleChangedHandler = OnScheduleChangedHandler.SignalRClient(CurrentState, (Func<OnScheduleUpdatedResponse, Task>)(async (response) =>
                 {
                     if (response.UpdatedSchedule != null)
                     {

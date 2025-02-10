@@ -4,16 +4,16 @@ namespace Data.Models.SignalR
 {
     public class SignalGlobalRequest
     {
-        public OnReloadAccount? OnReloadAccount { get; set; }
-        public OnAvatarChanged? OnAvatarChanged { get; set; }
-        public OnScheduleChanged? OnScheduleChanged { get; set; }
+        public OnReloadAccountRequest? OnReloadAccountRequest { get; set; }
+        public OnAvatarChangedRequest? OnAvatarChangedRequest { get; set; }
+        public OnScheduleUpdatedRequest? OnScheduleUpdatedRequest { get; set; }
         public OnMessagesUpdatedRequest? OnMessagesUpdatedRequest { get; set; }
     }
 
     /// <summary>
     /// Вызывается, когда нужно перезагрузить состояние пользователя
     /// </summary>
-    public class OnReloadAccount
+    public class OnReloadAccountRequest
     {
         /// <summary>
         /// Дополнительно перезагрузить второго пользователя (первый берётся из [Authorize])
@@ -24,7 +24,7 @@ namespace Data.Models.SignalR
     /// <summary>
     /// Пользователь изменил аватар
     /// </summary>
-    public class OnAvatarChanged
+    public class OnAvatarChangedRequest
     {
         public PhotosForAccountsDto NewAvatar { get; set; } = null!;
     }
@@ -32,7 +32,7 @@ namespace Data.Models.SignalR
     /// <summary>
     /// Изменения в расписании
     /// </summary>
-    public class OnScheduleChanged
+    public class OnScheduleUpdatedRequest
     {
         public int? EventId { get; set; }
         public int ScheduleId { get; set; }

@@ -17,11 +17,14 @@
             <tbody>
                 @foreach (var message in LastMessagesList)
                 {
+                    @* Получим инфу о собеседнике *@
                     AccountsViewDto? accountsViewDto = CurrentState.Account.Id == message.Sender?.Id ? message.Recipient : message.Sender;
+
                     if (accountsViewDto != null)
                     {
-                        var isAccountBlocked = IsAccountBlocked(message);
-                        <tr style=@(isAccountBlocked ? "background-color:#fff2f2" : null)>
+                        @* Заблокирован ли один из собеседников? *@
+                        var blockerId = GetBlockerId(message);
+                        <tr style=@(blockerId != null ? "background-color:#fff2f2" : null)>
                             <td>
                                 <div class="d-flex align-center gap-3" >
                                     <div @onclick="@(() => ShowDialogs.AccountInfoCardDialogAsync(accountsViewDto))" style="cursor:pointer">
@@ -32,15 +35,22 @@
                                     <div class="d-flex flex-column gap-0" @onclick="@(() => ShowDialogs.MessagesDialogAsync(accountsViewDto))" style="cursor:pointer; width:100%">
                                         <div style="text-align:end">
                                             <MudMenu Dense Icon="@Icons.Material.Filled.MoreVert" Size="Size.Small" AnchorOrigin="Origin.TopLeft" TransformOrigin="Origin.TopRight">
-                                                @if (isAccountBlocked)
+                                                @if (blockerId != null)
                                                 {
-                                                    <MudMenuItem Icon="@Icons.Material.Filled.Done" IconColor="Color.Success" OnClick="() => BlockAccountAsync(message.Id)">Разблокировать собеседника</MudMenuItem>
+                                                    @if (blockerId.Value == CurrentState.Account.Id) 
+                                                    {
+                                                        <MudMenuItem Icon="@Icons.Material.Filled.Done" IconColor="Color.Success" OnClick="() => BlockAccountAsync(message.Id)">Разблокировать собеседника</MudMenuItem>
+                                                    }
+                                                    else
+                                                    {
+                                                        <MudMenuItem Icon="@Icons.Material.Filled.Block" Disabled>Вас заблокировали</MudMenuItem>
+                                                    }
                                                 }
                                                 else 
                                                 {
                                                     <MudMenuItem Icon="@Icons.Material.Filled.DoneAll" IconColor="Color.Primary" Disabled="@(!(message.ReadDate == null && CurrentState.Account.Id == message.Recipient?.Id))" OnClick="() => MarkAsReadAsync(message.Id)">Пометить сообщение прочитанным</MudMenuItem>
                                                     <MudMenuItem Icon="@Icons.Material.Filled.ChecklistRtl" IconColor="Color.Primary" Disabled="@(message.UnreadMessages == 0)" OnClick="() => MarkAllAsReadAsync(message.Id)">Пометить все прочитанными</MudMenuItem>
-                                                    <MudMenuItem Icon="@Icons.Material.Filled.Clear" IconColor="Color.Error" Disabled="@(message.UnreadMessages == 0)" OnClick="() => DeleteAllMessagesAsync(message.Id)">Удалить всю переписку</MudMenuItem>
+                                                    <MudMenuItem Icon="@Icons.Material.Filled.Clear" IconColor="Color.Error" Disabled="@(message.TotalMessages == 0)" OnClick="() => DeleteAllMessagesAsync(message.Id)">Удалить всю переписку</MudMenuItem>
                                                     <MudMenuItem Icon="@Icons.Material.Filled.Block" IconColor="Color.Error" OnClick="() => BlockAccountAsync(message.Id)">Заблокировать собеседника</MudMenuItem>
                                                 }
                                             </MudMenu>
