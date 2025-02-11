@@ -22,77 +22,81 @@
 
                     if (accountsViewDto != null)
                     {
-                        @* Заблокирован ли один из собеседников? *@
-                        var blocker = CurrentState.Account.GetBlockInfo(message.Sender, message.Recipient);
+                        @* Есть ли блокировка между двумя собеседниками? *@
+                        var blocker = CurrentState.Account.GetRelationsInfo(EnumRelations.Blocked, message.Sender, message.Recipient);
+                        if (blocker != null) 
+                        {
+                            <tr style=@(blocker.Item1 ? "background-color:#fff2f2" : null)>
+                                <td>
+                                    <div class="d-flex align-center gap-3">
+                                        <div @onclick="@(() => ShowDialogs.AccountInfoCardDialogAsync(accountsViewDto))" style="cursor:pointer">
+                                            <ImageAvatar Account="@accountsViewDto" Class="d-none d-sm-block avatar" Size="EnumImageSize.s64x64" />
+                                            <ImageAvatar Account="@accountsViewDto" Class="d-xs-block d-sm-none avatar" Style="width:45px; height:45px" Size="EnumImageSize.s64x64" />
+                                        </div>
 
-                        <tr style=@(blocker.Item1 ? "background-color:#fff2f2" : null)>
-                            <td>
-                                <div class="d-flex align-center gap-3" >
-                                    <div @onclick="@(() => ShowDialogs.AccountInfoCardDialogAsync(accountsViewDto))" style="cursor:pointer">
-                                        <ImageAvatar Account="@accountsViewDto" Class="d-none d-sm-block avatar" Size="EnumImageSize.s64x64" />
-                                        <ImageAvatar Account="@accountsViewDto" Class="d-xs-block d-sm-none avatar" Style="width:45px; height:45px" Size="EnumImageSize.s64x64" />
-                                    </div>
-
-                                    <div class="d-flex flex-column gap-0" @onclick="@(() => ShowDialogs.MessagesDialogAsync(accountsViewDto))" style="cursor:pointer; width:100%">
-                                        <div style="text-align:end">
-                                            <MudMenu Dense Icon="@Icons.Material.Filled.MoreVert" Size="Size.Small" AnchorOrigin="Origin.TopLeft" TransformOrigin="Origin.TopRight">
-                                                @if (blocker.Item1)
-                                                {
-                                                    @if (blocker.Item2.Id == CurrentState.Account.Id) 
+                                        <div class="d-flex flex-column gap-0" @onclick="@(() => ShowDialogs.MessagesDialogAsync(accountsViewDto))" style="cursor:pointer; width:100%">
+                                            <div style="text-align:end">
+                                                <MudMenu Dense Icon="@Icons.Material.Filled.MoreVert" Size="Size.Small" AnchorOrigin="Origin.TopLeft" TransformOrigin="Origin.TopRight">
+                                                    @* Есть ли блокировка у обеих пользователей? *@
+                                                    @if (blocker.Item1)
                                                     {
-                                                        <MudMenuItem Icon="@Icons.Material.Filled.Done" IconColor="Color.Success" OnClick="() => BlockAccountAsync(message.Id)">Разблокировать собеседника</MudMenuItem>
+                                                        @* Инициатор текущий пользователь? *@
+                                                        @if (blocker.Item2?.Id == CurrentState.Account.Id)
+                                                        {
+                                                            <MudMenuItem Icon="@Icons.Material.Filled.Done" IconColor="Color.Success" OnClick="() => BlockAccountAsync(message.Id)">Разблокировать собеседника</MudMenuItem>
+                                                        }
+                                                        else
+                                                        {
+                                                            <MudMenuItem Icon="@Icons.Material.Filled.Block" Disabled>Собеседник Вас заблокировал</MudMenuItem>
+                                                        }
                                                     }
                                                     else
                                                     {
-                                                        <MudMenuItem Icon="@Icons.Material.Filled.Block" Disabled>Собеседник Вас заблокировал</MudMenuItem>
+                                                        <MudMenuItem Icon="@Icons.Material.Filled.DoneAll" IconColor="Color.Primary" Disabled="@(!(message.ReadDate == null && CurrentState.Account.Id == message.Recipient?.Id))" OnClick="() => MarkAsReadAsync(message.Id)">Пометить сообщение прочитанным</MudMenuItem>
+                                                        <MudMenuItem Icon="@Icons.Material.Filled.ChecklistRtl" IconColor="Color.Primary" Disabled="@(message.UnreadMessages == 0)" OnClick="() => MarkAllAsReadAsync(message.Id)">Пометить все прочитанными</MudMenuItem>
+                                                        <MudMenuItem Icon="@Icons.Material.Filled.Clear" IconColor="Color.Error" Disabled="@(message.TotalMessages == 0)" OnClick="() => DeleteAllMessagesAsync(message.Id)">Удалить всю переписку</MudMenuItem>
+                                                        <MudMenuItem Icon="@Icons.Material.Filled.Block" IconColor="Color.Error" OnClick="() => BlockAccountAsync(message.Id)">Заблокировать собеседника</MudMenuItem>
                                                     }
-                                                }
-                                                else 
-                                                {
-                                                    <MudMenuItem Icon="@Icons.Material.Filled.DoneAll" IconColor="Color.Primary" Disabled="@(!(message.ReadDate == null && CurrentState.Account.Id == message.Recipient?.Id))" OnClick="() => MarkAsReadAsync(message.Id)">Пометить сообщение прочитанным</MudMenuItem>
-                                                    <MudMenuItem Icon="@Icons.Material.Filled.ChecklistRtl" IconColor="Color.Primary" Disabled="@(message.UnreadMessages == 0)" OnClick="() => MarkAllAsReadAsync(message.Id)">Пометить все прочитанными</MudMenuItem>
-                                                    <MudMenuItem Icon="@Icons.Material.Filled.Clear" IconColor="Color.Error" Disabled="@(message.TotalMessages == 0)" OnClick="() => DeleteAllMessagesAsync(message.Id)">Удалить всю переписку</MudMenuItem>
-                                                    <MudMenuItem Icon="@Icons.Material.Filled.Block" IconColor="Color.Error" OnClick="() => BlockAccountAsync(message.Id)">Заблокировать собеседника</MudMenuItem>
-                                                }
-                                            </MudMenu>
-                                        </div>
-
-                                        <div class="d-flex align-center">
-                                            <div class="d-none d-sm-block flex-grow-1">
-                                                <MessageTextComponent Message="message" MaxTextLength="120" MarkAsReadCallback="MarkAsReadAsync" MarkAsReadId="@message.Id" />
-                                            </div>
-                                            <div class="d-xs-block d-sm-none flex-grow-1">
-                                                <MessageTextComponent Message="message" MaxTextLength="50" MarkAsReadCallback="MarkAsReadAsync" MarkAsReadId="@message.Id" />
+                                                </MudMenu>
                                             </div>
 
-                                            @if (message.UnreadMessages > 0)
-                                            {
-                                                <div class="flex-grow-0" title="Непрочитанные сообщения"><MudAvatar Size="Size.Small" Color="Color.Primary">@message.UnreadMessages</MudAvatar></div>
-                                            }
-                                        </div>
+                                            <div class="d-flex align-center">
+                                                <div class="d-none d-sm-block flex-grow-1">
+                                                    <MessageTextComponent Message="message" MaxTextLength="120" MarkAsReadCallback="MarkAsReadAsync" MarkAsReadId="@message.Id" />
+                                                </div>
+                                                <div class="d-xs-block d-sm-none flex-grow-1">
+                                                    <MessageTextComponent Message="message" MaxTextLength="50" MarkAsReadCallback="MarkAsReadAsync" MarkAsReadId="@message.Id" />
+                                                </div>
 
-                                        <div class="d-flex justify-end align-center" style="font-size:12px; height:29px">
-                                            <p class="d-none d-sm-block" style="color:darkgrey">@message.CreateDate.ToMyString()</p>
-                                            <p class="d-sx-block d-sm-none" style="color:darkgrey" title="Отправлено: @message.CreateDate.ToMyString()">@message.CreateDate.ToMyPastShortString()</p>
-
-                                            <p class="ml-2 mr-1"><MudIcon Icon="@(CurrentState.Account.Id == message.Sender?.Id ? @Icons.Material.Filled.ArrowForward : @Icons.Material.Filled.ArrowBack)" Style="font-size:11px; margin-top:3px" /></p>
-
-                                            <p @onclick="@(() => ShowDialogs.AccountInfoCardDialogAsync(accountsViewDto))" @onclick:stopPropagation="true" class="mud-primary-text" style="cursor:pointer; font-weight:500">@accountsViewDto.Name</p>
-                                            <p>
-                                                @if (message.ReadDate == null)
+                                                @if (message.UnreadMessages > 0)
                                                 {
-                                                    <MudIcon Icon="@Icons.Material.Filled.Done" Color="Color.Default" Style="font-size:15px; margin: 3px 0 0 5px" />
+                                                    <div class="flex-grow-0" title="Непрочитанные сообщения"><MudAvatar Size="Size.Small" Color="Color.Primary">@message.UnreadMessages</MudAvatar></div>
                                                 }
-                                                else
-                                                {
-                                                    <MudIcon Icon="@Icons.Material.Filled.DoneAll" Color="Color.Primary" Style="font-size:15px; margin: 3px 0 0 5px" />
-                                                }
-                                            </p>
+                                            </div>
+
+                                            <div class="d-flex justify-end align-center" style="font-size:12px; height:29px">
+                                                <p class="d-none d-sm-block" style="color:darkgrey">@message.CreateDate.ToMyString()</p>
+                                                <p class="d-sx-block d-sm-none" style="color:darkgrey" title="Отправлено: @message.CreateDate.ToMyString()">@message.CreateDate.ToMyPastShortString()</p>
+
+                                                <p class="ml-2 mr-1"><MudIcon Icon="@(CurrentState.Account.Id == message.Sender?.Id ? @Icons.Material.Filled.ArrowForward : @Icons.Material.Filled.ArrowBack)" Style="font-size:11px; margin-top:3px" /></p>
+
+                                                <p @onclick="@(() => ShowDialogs.AccountInfoCardDialogAsync(accountsViewDto))" @onclick:stopPropagation="true" class="mud-primary-text" style="cursor:pointer; font-weight:500">@accountsViewDto.Name</p>
+                                                <p>
+                                                    @if (message.ReadDate == null)
+                                                    {
+                                                        <MudIcon Icon="@Icons.Material.Filled.Done" Color="Color.Default" Style="font-size:15px; margin: 3px 0 0 5px" />
+                                                    }
+                                                    else
+                                                    {
+                                                        <MudIcon Icon="@Icons.Material.Filled.DoneAll" Color="Color.Primary" Style="font-size:15px; margin: 3px 0 0 5px" />
+                                                    }
+                                                </p>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            </td>
-                        </tr>
+                                </td>
+                            </tr>
+                        }
                     }
                 }
             </tbody>

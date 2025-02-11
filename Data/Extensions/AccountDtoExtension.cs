@@ -1,4 +1,5 @@
 ﻿using Data.Dto;
+using Data.Dto.Sp;
 using Data.Dto.Views;
 using Data.Enums;
 using Data.Models;
@@ -75,15 +76,23 @@ namespace Data.Extensions
         /// Получить информацию о блокировке пользователей
         /// </summary>
         /// <returns>Item1 (bool) - есть ли блокировка, Item2 - отправитель блокировки, Item3 - получатель блокировки</returns>
-        public static Tuple<bool, AccountsViewDto, AccountsViewDto> GetBlockInfo(this AccountsViewDto currentAccount, AccountsViewDto? account1, AccountsViewDto? account2)
+        public static Tuple<bool, AccountsViewDto?, AccountsViewDto?>? GetRelationsInfo(this AccountsViewDto currentAccount, EnumRelations relation, AccountsViewDto? account1, AccountsViewDto? account2)
         {
+            if (account1 == null || account2 == null)
+                return null;
+
             var blockingInfo = currentAccount.Relations?
-                .FirstOrDefault(x => x.Type == (short)EnumRelations.Blocked && ((x.SenderId == account1?.Id && x.RecipientId == account2?.Id) || (x.RecipientId == account1?.Id && x.SenderId == account2?.Id)));
+                .FirstOrDefault(x => x.Type == relation && ((x.SenderId == account1.Id && x.RecipientId == account2.Id) || (x.RecipientId == account1.Id && x.SenderId == account2.Id)));
 
-            var isBlocked = blockingInfo == null ? false : true;
-
-            var result = new Tuple<bool, AccountsViewDto, AccountsViewDto>(isBlocked, new AccountsViewDto(), new AccountsViewDto());
-            return result;
+            if (blockingInfo != null)
+            {
+                if (blockingInfo.SenderId == account1.Id)
+                    return new Tuple<bool, AccountsViewDto?, AccountsViewDto?>(true, account1, account2);
+                else
+                    return new Tuple<bool, AccountsViewDto?, AccountsViewDto?>(true, account2, account1);
+            }
+            else
+                return new Tuple<bool, AccountsViewDto?, AccountsViewDto?>(false, null, null);
         }
     }
 }

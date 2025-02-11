@@ -140,27 +140,6 @@ namespace Shared.Components.Pages.Messages
         {
         }
 
-        /// <summary>
-        /// Возвращает Id аккаунта, который является инициатором блокировки, иначе - null
-        /// </summary>
-        public int? GetBlockerId(LastMessagesForAccountSpDto message)
-        {
-            var blockingInfo = CurrentState.Account?.Relations?
-                .FirstOrDefault(x => x.Type == (short)EnumRelations.Blocked && ((x.SenderId == message.Sender?.Id && x.RecipientId == message.Recipient?.Id) || (x.RecipientId == message.Sender?.Id && x.SenderId == message.Recipient?.Id)));
-                
-            return blockingInfo == null ? null : blockingInfo.SenderId;
-        }
-
-        //public Tuple<bool, int?> BlockInfo(AccountsViewDto account1, AccountsViewDto account2)
-        //{
-        //    var blockingInfo = account1.Relations?
-        //        .FirstOrDefault(x => x.Type == (short)EnumRelations.Blocked && ((x.SenderId == account1.Id && x.RecipientId == message.Recipient?.Id) || (x.RecipientId == message.Sender?.Id && x.SenderId == message.Recipient?.Id)));
-
-        //    return blockingInfo == null ? null : blockingInfo.SenderId;
-
-        //    var result = new Tuple<bool, int?>();
-        //}
-
         public void Dispose() =>
             OnMessagesUpdatedHandler?.Dispose();
     }
