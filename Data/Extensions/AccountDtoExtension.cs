@@ -1,9 +1,7 @@
 ﻿using Data.Dto;
-using Data.Dto.Sp;
 using Data.Dto.Views;
 using Data.Enums;
 using Data.Models;
-using Data.State;
 using System.Text;
 
 namespace Data.Extensions
@@ -69,30 +67,6 @@ namespace Data.Extensions
         {
             var photo = account.Avatar;
             return photo != null ? $"/images/AccountsPhotos/{account.Id}/{photo.Guid}/{size}.jpg" : $"/images/AccountsPhotos/no-avatar/{size}.jpg";
-        }
-
-
-        /// <summary>
-        /// Получить информацию о блокировке пользователей
-        /// </summary>
-        /// <returns>Item1 (bool) - есть ли блокировка, Item2 - отправитель блокировки, Item3 - получатель блокировки</returns>
-        public static Tuple<bool, AccountsViewDto?, AccountsViewDto?>? GetRelationsInfo(this AccountsViewDto currentAccount, EnumRelations relation, AccountsViewDto? account1, AccountsViewDto? account2)
-        {
-            if (account1 == null || account2 == null)
-                return null;
-
-            var blockingInfo = currentAccount.Relations?
-                .FirstOrDefault(x => x.Type == relation && ((x.SenderId == account1.Id && x.RecipientId == account2.Id) || (x.RecipientId == account1.Id && x.SenderId == account2.Id)));
-
-            if (blockingInfo != null)
-            {
-                if (blockingInfo.SenderId == account1.Id)
-                    return new Tuple<bool, AccountsViewDto?, AccountsViewDto?>(true, account1, account2);
-                else
-                    return new Tuple<bool, AccountsViewDto?, AccountsViewDto?>(true, account2, account1);
-            }
-            else
-                return new Tuple<bool, AccountsViewDto?, AccountsViewDto?>(false, null, null);
         }
     }
 }
