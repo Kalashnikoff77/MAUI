@@ -23,6 +23,16 @@
         /// <summary>
         /// Запрос на добавление в друзья отклонён
         /// </summary>
-        RequestForFrendshipDeclined
+        RequestForFrendshipDeclined,
+
+        /// <summary>
+        /// Все сообщения удалены
+        /// </summary>
+        AllMessagesDeleted,
+
+        /// <summary>
+        /// Блокировка пользователя
+        /// </summary>
+        AccountBlocked
     }
 }

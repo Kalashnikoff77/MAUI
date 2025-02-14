@@ -53,10 +53,6 @@ namespace Shared.Components.Pages.Messages
                     if (response.UpdateMessage && response.MessageId.HasValue)
                         await _JSModule.InvokeVoidAsync("UpdateMessage", response.MessageId);
 
-                    // Удаление всей переписки в диалогах двух пользователей в MessagesDialog
-                    if (response.DeleteMessages)
-                        await InvokeAsync(MudDialog.Close);
-
                     // Пометить сообщения как прочитанные
                     if (response.MarkMessagesAsRead)
                     {
@@ -76,6 +72,25 @@ namespace Shared.Components.Pages.Messages
                         }
                     }
 
+                    // Удаление всей переписки в диалогах двух пользователей в MessagesDialog
+                    if (response.DeleteMessages)
+                    {
+                        // Удалим все сообщения в MessagesDialog
+                        await _JSModule.InvokeVoidAsync("DeleteMessages");
+                        // Добавим сообщение обоим пользователям об удалении всей переписки
+                        text = StaticData.NotificationTypes[EnumMessages.AllMessagesDeleted].Text;
+                        await SubmitMessageAsync(EnumMessages.AllMessagesDeleted);
+                    }
+
+                    // Блокировка пользователя
+                    if (response.BlockAccount)
+                    {
+                        // Добавим сообщение обоим пользователям о блокировке
+                        text = StaticData.NotificationTypes[EnumMessages.AccountBlocked].Text;
+                        await SubmitMessageAsync(EnumMessages.AccountBlocked);
+
+                        await InvokeAsync(StateHasChanged);
+                    }
                 });
 
                 _dotNetReference = DotNetObjectReference.Create(this);
@@ -224,6 +239,9 @@ namespace Shared.Components.Pages.Messages
             await CurrentState.SignalRServerAsync(reloadAccountRequest);
         }
 
+        /// <summary>
+        /// Отклоняем дружбу
+        /// </summary>
         [JSInvokable]
         public async Task DeclineFriendshipAsync(int messageId)
         {
@@ -252,6 +270,9 @@ namespace Shared.Components.Pages.Messages
             await CurrentState.SignalRServerAsync(onMessagesUpdatedRequest);
         }
 
+        /// <summary>
+        /// Отменяем запрос на дружбу
+        /// </summary>
         [JSInvokable]
         public async Task CancelFriendshipAsync(int messageId)
         {

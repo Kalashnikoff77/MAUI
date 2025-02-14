@@ -108,8 +108,14 @@ namespace Shared.Components.Pages.Messages
                 var accountReloadRequest = new SignalGlobalRequest { OnReloadAccountRequest = new OnReloadAccountRequest { AdditionalAccountId = blockingUserId } };
                 await CurrentState.SignalRServerAsync(accountReloadRequest);
 
-                // Обновим список последних сообщений на странице /messages
-                var onMessagesUpdatedRequest = new SignalGlobalRequest { OnMessagesUpdatedRequest = new OnMessagesUpdatedRequest { RecipientId = blockingUserId } };
+                var onMessagesUpdatedRequest = new SignalGlobalRequest
+                {
+                    OnMessagesUpdatedRequest = new OnMessagesUpdatedRequest
+                    {
+                        BlockAccount = true,
+                        RecipientId = blockingUserId
+                    }
+                };
                 await CurrentState.SignalRServerAsync(onMessagesUpdatedRequest);
             }
         }

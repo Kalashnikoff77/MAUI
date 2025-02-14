@@ -28,5 +28,10 @@ namespace Data.Models.SignalR
         /// Пометить сообщения как прочитанные
         /// </summary>
         public bool MarkMessagesAsRead { get; set; }
+
+        /// <summary>
+        /// Блокировка пользователя
+        /// </summary>
+        public bool BlockAccount { get; set; }
     }
 }

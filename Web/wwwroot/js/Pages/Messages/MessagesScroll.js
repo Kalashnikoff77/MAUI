@@ -37,7 +37,13 @@ export function MarkMessageAsRead(id, htmlItem) {
     $('#messageid_' + id).replaceWith(htmlItem);
 }
 
-// Обновление или удаление сообщения
+// Обновление сообщения
 export function UpdateMessage(id) {
     $('#messageid_' + id).remove();
+}
+
+// Удаление всех сообщений
+export function DeleteMessages() {
+    $('#ScrollMessages').off('scroll'); // Отключим прокрутку
+    $('#ScrollMessages').empty(); // Очистим все сообщения
 }

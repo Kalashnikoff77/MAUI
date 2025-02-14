@@ -67,6 +67,11 @@ namespace Data.Models.SignalR
         /// Удалить одно или несколько сообщений
         /// </summary>
         public bool DeleteMessages { get; set; }
+
+        /// <summary>
+        /// Блокировка пользователя
+        /// </summary>
+        public bool BlockAccount { get; set; }
     }
 }
 

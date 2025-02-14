@@ -12,12 +12,19 @@
             <div id="ScrollMessages" style="max-height:450px; overflow:auto" />
 
             @* Форма отправки сообщения *@
-            <div class="d-flex flex-wrap gap-1 justify-end align-center">
-                <ImageAvatar Account="CurrentState.Account" Size="EnumImageSize.s64x64" Class="avatar s50" />
-                <MudTextField @bind-Value="@text" T="string" Label="Ваше сообщение" Variant="Variant.Outlined" Lines="1" MaxLines="5" AutoGrow MaxLength="1024" Clearable Class="mt-2" />
-                <MudFlexBreak />
-                <MudButton Disabled="@sending" OnClick="() => SubmitMessageAsync(EnumMessages.Message)" Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Send" Size="Size.Small">Отправить</MudButton>
-            </div>
+            @{
+                var blocker = CurrentState.Account.Relations?.GetRelationInfo(EnumRelations.Blocked, CurrentState.Account, Recipient);
+                if (blocker == null)
+                {
+                    <div class="d-flex flex-wrap gap-1 justify-end align-center">
+                        <ImageAvatar Account="CurrentState.Account" Size="EnumImageSize.s64x64" Class="avatar s50" />
+                        <MudTextField @bind-Value="@text" T="string" Label="Ваше сообщение" Variant="Variant.Outlined" Lines="1" MaxLines="5" AutoGrow MaxLength="1024" Clearable Class="mt-2" />
+                        <MudFlexBreak />
+                        <MudButton Disabled="@sending" OnClick="() => SubmitMessageAsync(EnumMessages.Message)" Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Send" Size="Size.Small">Отправить</MudButton>
+                    </div>
+                }
+            }
+
         </DialogContent>
     </MudDialog>
 }

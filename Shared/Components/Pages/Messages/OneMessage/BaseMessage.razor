@@ -36,6 +36,14 @@
             {
                 <Shared.Components.Pages.Messages.OneMessage.Sender.RequestForFrendshipDeclined Message="Message" />
             }
+            else if (Message.Type == EnumMessages.AllMessagesDeleted)
+            {
+                <Shared.Components.Pages.Messages.OneMessage.Sender.AllMessagesDeleted Message="Message" />
+            }
+            else if (Message.Type == EnumMessages.AccountBlocked)
+            {
+                <Shared.Components.Pages.Messages.OneMessage.Sender.AccountBlocked Message="Message" />
+            }
         </div>
     }
 }
@@ -66,6 +74,14 @@ else
             else if (Message.Type == EnumMessages.RequestForFrendshipDeclined)
             {
                 <Shared.Components.Pages.Messages.OneMessage.Recipient.RequestForFrendshipDeclined Message="Message" />
+            }
+            else if (Message.Type == EnumMessages.AllMessagesDeleted)
+            {
+                <Shared.Components.Pages.Messages.OneMessage.Recipient.AllMessagesDeleted Message="Message" />
+            }
+            else if (Message.Type == EnumMessages.AccountBlocked)
+            {
+                <Shared.Components.Pages.Messages.OneMessage.Recipient.AccountBlocked Message="Message" />
             }
         </div>
     }

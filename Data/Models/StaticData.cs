@@ -61,7 +61,9 @@ namespace Data.Models
         {
             { EnumMessages.RequestForFrendshipSent, new NotificationType { SenderMessage = "Вы отправили запрос на добавление в друзья.", RecipientMessage = "Вы получили запрос на добавление в друзья.", Text = "Запрос в друзья." } },
             { EnumMessages.RequestForFrendshipAccepted, new NotificationType { SenderMessage = "Ваш запрос на добавление в друзья принят.", RecipientMessage = "Вы приняли запрос на добавление в друзья.", Text = "Вы теперь друзья." } },
-            { EnumMessages.RequestForFrendshipDeclined, new NotificationType { SenderMessage = "Ваш запрос на добавление в друзья отклонён.", RecipientMessage = "Вы отклонили запрос на добавление в друзья.", Text = "Запрос в друзья отклонён." } }
+            { EnumMessages.RequestForFrendshipDeclined, new NotificationType { SenderMessage = "Ваш запрос на добавление в друзья отклонён.", RecipientMessage = "Вы отклонили запрос на добавление в друзья.", Text = "Запрос в друзья отклонён." } },
+            { EnumMessages.AllMessagesDeleted, new NotificationType { SenderMessage = "Вы удалили всю переписку.", RecipientMessage = "Собеседник удалил всю переписку.", Text = "Вся переписка удалена." } },
+            { EnumMessages.AccountBlocked, new NotificationType { SenderMessage = "Вы заблокировали пользователя.", RecipientMessage = "Собеседник заблокировал Вас.", Text = "Блокировка пользователя." } },
         };
         public class NotificationType
         {
