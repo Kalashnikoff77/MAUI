@@ -48,6 +48,8 @@ namespace Data.Models.SignalR
         public int? MessageId { get; set; }
         public IEnumerable<int>? MessagesIds { get; set; }
 
+        public bool ShouldUpdateDatabase { get; set; }
+
         /// <summary>
         /// Добавление сообщения в диалог двух пользователей в MessagesDialog
         /// </summary>
@@ -62,6 +64,11 @@ namespace Data.Models.SignalR
         /// Пометить сообщения как прочитанные
         /// </summary>
         public bool MarkMessagesAsRead { get; set; }
+
+        /// <summary>
+        /// Пометить сообщения как прочитанные
+        /// </summary>
+        public bool MarkAllMessagesAsRead { get; set; }
 
         /// <summary>
         /// Удалить одно или несколько сообщений

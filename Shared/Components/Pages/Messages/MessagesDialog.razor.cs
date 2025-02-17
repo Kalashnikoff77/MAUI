@@ -72,6 +72,24 @@ namespace Shared.Components.Pages.Messages
                         }
                     }
 
+                    // Пометить сообщения как прочитанные
+                    if (response.MarkAllMessagesAsRead)
+                    {
+                        response.MessagesIds = messages.Where(x => x.RecipientId == Recipient.Id && x.ReadDate == null).Select(x => x.Id);
+
+                        foreach (var messageId in response.MessagesIds)
+                        {
+                            var index = messages.FindIndex(x => x.Id == messageId && x.ReadDate == null);
+                            if (index >= 0)
+                            {
+                                messages[index].ReadDate = DateTime.Now;
+                                var html = await _renderer.RenderAsync(new Dictionary<string, object?> { { "AccountId", CurrentState.Account?.Id }, { "Message", messages[index] } });
+                                await _JSModule.InvokeVoidAsync("MarkMessageAsRead", messageId, html);
+                            }
+                        }
+                    }
+
+                    // СРАБОТАЕТ У ОБОИХ ПОЛЬЗОВАТЕЛЕЙ
                     // Удаление всей переписки в диалогах двух пользователей в MessagesDialog
                     if (response.DeleteMessages)
                     {
@@ -79,9 +97,10 @@ namespace Shared.Components.Pages.Messages
                         await _JSModule.InvokeVoidAsync("DeleteMessages");
                         // Добавим сообщение обоим пользователям об удалении всей переписки
                         text = StaticData.NotificationTypes[EnumMessages.AllMessagesDeleted].Text;
-                        await SubmitMessageAsync(EnumMessages.AllMessagesDeleted);
+                        await SubmitMessageAsync(EnumMessages.AllMessagesDeleted); // СРАБОТАЕТ У ОБОИХ ПОЛЬЗОВАТЕЛЕЙ
                     }
 
+                    // СРАБОТАЕТ У ОБОИХ ПОЛЬЗОВАТЕЛЕЙ
                     // Блокировка пользователя
                     if (response.BlockAccount)
                     {
@@ -119,7 +138,15 @@ namespace Shared.Components.Pages.Messages
             var messagesIds = apiResponse.Response.Messages.Where(x => x.SenderId == Recipient.Id).Select(s => s.Id);
             if (messagesIds.Count() > 0)
             {
-                var onMessagesUpdatedRequest = new SignalGlobalRequest { OnMessagesUpdatedRequest = new OnMessagesUpdatedRequest { MarkMessagesAsRead = true, RecipientId = Recipient.Id, MessagesIds = messagesIds } };
+                var onMessagesUpdatedRequest = new SignalGlobalRequest
+                {
+                    OnMessagesUpdatedRequest = new OnMessagesUpdatedRequest
+                    {
+                        MarkMessagesAsRead = true,
+                        RecipientId = Recipient.Id,
+                        MessagesIds = messagesIds
+                    }
+                };
                 await CurrentState.SignalRServerAsync(onMessagesUpdatedRequest);
             }
 

@@ -108,9 +108,11 @@ namespace WebAPI.Controllers
                     {
                         // Пометим в базе
                         await _unitOfWork.SqlConnection.ExecuteAsync($"UPDATE Messages SET {nameof(MessagesEntity.ReadDate)} = getdate() " +
-                            $"WHERE Id IN ({ids.Aggregate((a, b) => a + ", " + b)})");
-                        // Пометим в ответе
-                        response.Messages.ForEach(m => m.ReadDate = DateTime.Now);
+                            $"WHERE Id IN ({ids.Aggregate((a, b) => a + "," + b)})");
+                        // Пометим как прочитанное в ответе
+                        response.Messages.Where(w => w.RecipientId == _unitOfWork.AccountId && w.ReadDate == null)
+                            .ToList()
+                            .ForEach(w => w.ReadDate = DateTime.Now);
                     }
                 }
             }
@@ -155,22 +157,22 @@ namespace WebAPI.Controllers
             var senderId = currentMessage.SenderId == _unitOfWork.AccountId ? currentMessage.RecipientId : currentMessage.SenderId;
 
             // Помечаем все сообщения с этим пользователем как прочитанные
-            if (request.MarkAllAsRead)
+            if (request.MarkAllMessagesAsRead)
             {
-                sql = $"UPDATE Messages SET {nameof(MessagesEntity.ReadDate)} = @CurrentDate " +
+                sql = $"UPDATE Messages SET {nameof(MessagesEntity.ReadDate)} = getdate() " +
                     $"WHERE {nameof(MessagesEntity.RecipientId)} = @AccountId AND {nameof(MessagesEntity.SenderId)} = @senderId " +
                     $"AND {nameof(MessagesEntity.ReadDate)} IS NULL";
-                await _unitOfWork.SqlConnection.ExecuteAsync(sql, new { CurrentDate = DateTime.Now, _unitOfWork.AccountId, senderId });
+                await _unitOfWork.SqlConnection.ExecuteAsync(sql, new { _unitOfWork.AccountId, senderId });
             }
             // Помечаем одно сообщение с этим пользователем как прочитанное
             else
             {
-                sql = $"UPDATE Messages SET {nameof(MessagesEntity.ReadDate)} = @CurrentDate " +
+                sql = $"UPDATE Messages SET {nameof(MessagesEntity.ReadDate)} = getdate() " +
                     $"WHERE Id = @MessageId AND " +
                     $"{nameof(MessagesEntity.RecipientId)} = @AccountId AND " +
                     $"{nameof(MessagesEntity.SenderId)} = @senderId AND " +
                     $"{nameof(MessagesEntity.ReadDate)} IS NULL";
-                await _unitOfWork.SqlConnection.ExecuteAsync(sql, new { CurrentDate = DateTime.Now, request.MessageId, _unitOfWork.AccountId, senderId });
+                await _unitOfWork.SqlConnection.ExecuteAsync(sql, new { request.MessageId, _unitOfWork.AccountId, senderId });
             }
 
             return new ResponseDtoBase();

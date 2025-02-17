@@ -6,6 +6,6 @@
 
         public int? MessageId { get; set; }
 
-        public bool MarkAllAsRead { get; set; } = false;
+        public bool MarkAllMessagesAsRead { get; set; } = false;
     }
 }

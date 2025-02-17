@@ -48,20 +48,18 @@ namespace Shared.Components.Pages.Messages
             }
         }
 
-        async Task MarkAsReadAsync(int messageId)
+        async Task MarkMessagesAsReadAsync(int messageId)
         {
             var index = LastMessagesList.FindIndex(x => x.Id == messageId);
             // Проверим, помечено ли сообщение как прочитанное и адресовано ли нам?
             if (index >= 0 && LastMessagesList[index].Recipient?.Id == CurrentState.Account?.Id && LastMessagesList[index].Sender != null && LastMessagesList[index].ReadDate == null)
             {
-                // Помечаем сообщение как прочитанное в БД
-                var apiResponse = await _markMessagesAsRead.HttpPostAsync(new MarkMessagesAsReadRequestDto { MessageId = messageId, MarkAllAsRead = false, Token = CurrentState.Account?.Token });
-
                 var onMessagesUpdatedRequest = new SignalGlobalRequest 
-                { 
+                {
                     OnMessagesUpdatedRequest = new OnMessagesUpdatedRequest 
-                    { 
-                        MarkMessagesAsRead = true, 
+                    {
+                        MarkMessagesAsRead = true,
+                        ShouldUpdateDatabase = true,
                         RecipientId = LastMessagesList[index].Sender!.Id, 
                         MessagesIds = new List<int> { LastMessagesList[index].Id }
                     } 
@@ -70,20 +68,18 @@ namespace Shared.Components.Pages.Messages
             }
         }
 
-        async Task MarkAllAsReadAsync(int messageId)
+        async Task MarkAllMessagesAsReadAsync(int messageId)
         {
             var index = LastMessagesList.FindIndex(x => x.Id == messageId);
             if (index >= 0 && LastMessagesList[index].Sender != null)
-            {
-                var apiResponse = await _markMessagesAsRead.HttpPostAsync(new MarkMessagesAsReadRequestDto { MessageId = messageId, MarkAllAsRead = true, Token = CurrentState.Account?.Token });
-
+            {   
                 var onMessagesUpdatedRequest = new SignalGlobalRequest
                 {
                     OnMessagesUpdatedRequest = new OnMessagesUpdatedRequest
                     {
-                        MarkMessagesAsRead = true,
+                        MarkAllMessagesAsRead = true,
                         RecipientId = LastMessagesList[index].Sender!.Id,
-                        MessagesIds = null
+                        MessageId = messageId
                     }
                 };
                 await CurrentState.SignalRServerAsync(onMessagesUpdatedRequest);

@@ -2,6 +2,7 @@
 using Data.Dto.Responses;
 using Data.Models.SignalR;
 using Data.Services;
+using Data.State;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using SignalR.Models;
@@ -96,12 +97,40 @@ namespace SignalR
         {
             if (GetAccountDetails(out AccountDetails accountDetails, Context.UserIdentifier))
             {
+                // Помечаем выбранные сообщения как прочитанные в БД
+                if (request.MarkMessagesAsRead && request.ShouldUpdateDatabase && request.MessagesIds != null)
+                {
+                    var service = _serviceProvider.GetService<IRepository<MarkMessagesAsReadRequestDto, ResponseDtoBase>>()!;
+                    foreach(var messageId in request.MessagesIds)
+                    {
+                        var apiResult = await service.HttpPostAsync(new MarkMessagesAsReadRequestDto
+                        {
+                            MessageId = messageId,
+                            MarkAllMessagesAsRead = false,
+                            Token = accountDetails.Token
+                        });
+                    }
+                }
+
+                // Помечаем все сообщения как прочитанные в БД
+                if (request.MarkAllMessagesAsRead)
+                {
+                    var service = _serviceProvider.GetService<IRepository<MarkMessagesAsReadRequestDto, ResponseDtoBase>>()!;
+                    var apiResult = await service.HttpPostAsync(new MarkMessagesAsReadRequestDto 
+                    { 
+                        MessageId = request.MessageId, 
+                        MarkAllMessagesAsRead = true, 
+                        Token = accountDetails.Token 
+                    });
+                }
+
                 var response = new OnMessagesUpdatedResponse
                 {
                     MessageId = request.MessageId,
                     MessagesIds = request.MessagesIds,
                     AppendNewMessages = request.AppendNewMessages,
                     MarkMessagesAsRead = request.MarkMessagesAsRead,
+                    MarkAllMessagesAsRead = request.MarkAllMessagesAsRead,
                     UpdateMessage = request.UpdateMessage,
                     DeleteMessages = request.DeleteMessages,
                     BlockAccount = request.BlockAccount

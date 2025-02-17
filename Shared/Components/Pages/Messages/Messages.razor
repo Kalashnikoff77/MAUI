@@ -50,8 +50,8 @@
                                                 }
                                                 else
                                                 {
-                                                    <MudMenuItem Icon="@Icons.Material.Filled.DoneAll" IconColor="Color.Primary" Disabled="@(!(message.ReadDate == null && CurrentState.Account.Id == message.Recipient?.Id))" OnClick="() => MarkAsReadAsync(message.Id)">Пометить сообщение прочитанным</MudMenuItem>
-                                                    <MudMenuItem Icon="@Icons.Material.Filled.ChecklistRtl" IconColor="Color.Primary" Disabled="@(message.UnreadMessages == 0)" OnClick="() => MarkAllAsReadAsync(message.Id)">Пометить все прочитанными</MudMenuItem>
+                                                    <MudMenuItem Icon="@Icons.Material.Filled.DoneAll" IconColor="Color.Primary" Disabled="@(!(message.ReadDate == null && CurrentState.Account.Id == message.Recipient?.Id))" OnClick="() => MarkMessagesAsReadAsync(message.Id)">Пометить сообщение прочитанным</MudMenuItem>
+                                                    <MudMenuItem Icon="@Icons.Material.Filled.ChecklistRtl" IconColor="Color.Primary" Disabled="@(message.UnreadMessages == 0)" OnClick="() => MarkAllMessagesAsReadAsync(message.Id)">Пометить все прочитанными</MudMenuItem>
                                                     <MudMenuItem Icon="@Icons.Material.Filled.Clear" IconColor="Color.Error" Disabled="@(message.TotalMessages == 0)" OnClick="() => DeleteAllMessagesAsync(message.Id)">Удалить всю переписку</MudMenuItem>
                                                     <MudMenuItem Icon="@Icons.Material.Filled.Block" IconColor="Color.Error" OnClick="() => BlockAccountAsync(message.Id)">Заблокировать собеседника</MudMenuItem>
                                                 }
@@ -60,10 +60,10 @@
 
                                         <div class="d-flex align-center">
                                             <div class="d-none d-sm-block flex-grow-1">
-                                                <MessageTextComponent Message="message" MaxTextLength="120" MarkAsReadCallback="MarkAsReadAsync" MarkAsReadId="@message.Id" />
+                                                <MessageTextComponent Message="message" MaxTextLength="120" MarkAsReadCallback="MarkMessagesAsReadAsync" MarkAsReadId="@message.Id" />
                                             </div>
                                             <div class="d-xs-block d-sm-none flex-grow-1">
-                                                <MessageTextComponent Message="message" MaxTextLength="50" MarkAsReadCallback="MarkAsReadAsync" MarkAsReadId="@message.Id" />
+                                                <MessageTextComponent Message="message" MaxTextLength="50" MarkAsReadCallback="MarkMessagesAsReadAsync" MarkAsReadId="@message.Id" />
                                             </div>
 
                                             @if (message.UnreadMessages > 0)
