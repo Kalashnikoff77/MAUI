@@ -1,8 +1,10 @@
-﻿using Data.Dto.Requests;
+﻿using AutoMapper;
+using Data.Dto.Requests;
 using Data.Dto.Responses;
+using Data.Enums;
+using Data.Models;
 using Data.Models.SignalR;
 using Data.Services;
-using Data.State;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using SignalR.Models;
@@ -19,12 +21,14 @@ namespace SignalR
         IConfiguration _configuration;
         IServiceProvider _serviceProvider;
         ILogger<SignalRHub> _logger;
+        IMapper _mapper;
 
-        public SignalRHub(IServiceProvider serviceProvider, Accounts connectedAccounts, IConfiguration configuration, ILogger<SignalRHub> logger)
+        public SignalRHub(IServiceProvider serviceProvider, Accounts connectedAccounts, IConfiguration configuration, IMapper mapper, ILogger<SignalRHub> logger)
         {
             _serviceProvider = serviceProvider;
             _configuration = configuration;
             _logger = logger;
+            _mapper = mapper;
             Accounts = connectedAccounts;
         }
 
@@ -98,43 +102,70 @@ namespace SignalR
             if (GetAccountDetails(out AccountDetails accountDetails, Context.UserIdentifier))
             {
                 // Помечаем выбранные сообщения как прочитанные в БД
-                if (request.MarkMessagesAsRead && request.ShouldUpdateDatabase && request.MessagesIds != null)
+                if (request.MarkMessagesAsRead && request.MessagesIds != null && request.RecipientId != null)
                 {
                     var service = _serviceProvider.GetService<IRepository<MarkMessagesAsReadRequestDto, ResponseDtoBase>>()!;
-                    foreach(var messageId in request.MessagesIds)
+                    var apiResult = await service.HttpPostAsync(new MarkMessagesAsReadRequestDto
                     {
-                        var apiResult = await service.HttpPostAsync(new MarkMessagesAsReadRequestDto
-                        {
-                            MessageId = messageId,
-                            MarkAllMessagesAsRead = false,
-                            Token = accountDetails.Token
-                        });
-                    }
+                        MarkAllMessagesAsRead = false,
+                        SenderId = request.RecipientId.Value,
+                        MessagesIds = request.MessagesIds,
+                        Token = accountDetails.Token
+                    });
                 }
 
                 // Помечаем все сообщения как прочитанные в БД
-                if (request.MarkAllMessagesAsRead)
+                if (request.MarkAllMessagesAsRead && request.MessageId != null && request.RecipientId != null)
                 {
                     var service = _serviceProvider.GetService<IRepository<MarkMessagesAsReadRequestDto, ResponseDtoBase>>()!;
                     var apiResult = await service.HttpPostAsync(new MarkMessagesAsReadRequestDto 
-                    { 
-                        MessageId = request.MessageId, 
-                        MarkAllMessagesAsRead = true, 
+                    {
+                        MarkAllMessagesAsRead = true,
+                        SenderId = request.RecipientId.Value,
                         Token = accountDetails.Token 
                     });
                 }
 
-                var response = new OnMessagesUpdatedResponse
+                // Блокируем пользователя
+                if (request.BlockAccount && request.RecipientId != null)
                 {
-                    MessageId = request.MessageId,
-                    MessagesIds = request.MessagesIds,
-                    AppendNewMessages = request.AppendNewMessages,
-                    MarkMessagesAsRead = request.MarkMessagesAsRead,
-                    MarkAllMessagesAsRead = request.MarkAllMessagesAsRead,
-                    UpdateMessage = request.UpdateMessage,
-                    DeleteMessages = request.DeleteMessages,
-                    BlockAccount = request.BlockAccount
-                };
+                    var service = _serviceProvider.GetService<IRepository<AddMessageRequestDto, AddMessageResponseDto>>()!;
+                    var apiResult = await service.HttpPostAsync(new AddMessageRequestDto
+                    {
+                        Type = EnumMessages.AccountBlocked,
+                        RecipientId = request.RecipientId.Value,
+                        Text = StaticData.NotificationTypes[EnumMessages.AccountBlocked].Text,
+                        Token = accountDetails.Token
+                    });
+                }
+
+                // Разблокируем пользователя
+                if (request.UnblockAccount && request.RecipientId != null)
+                {
+                    var service = _serviceProvider.GetService<IRepository<AddMessageRequestDto, AddMessageResponseDto>>()!;
+                    var apiResult = await service.HttpPostAsync(new AddMessageRequestDto
+                    {
+                        Type = EnumMessages.AccountUnblocked,
+                        RecipientId = request.RecipientId.Value,
+                        Text = StaticData.NotificationTypes[EnumMessages.AccountUnblocked].Text,
+                        Token = accountDetails.Token
+                    });
+                }
+
+                // Удаляем всю переписку
+                if (request.DeleteMessages && request.RecipientId != null)
+                {
+                    var service = _serviceProvider.GetService<IRepository<AddMessageRequestDto, AddMessageResponseDto>>()!;
+                    var apiResult = await service.HttpPostAsync(new AddMessageRequestDto
+                    {
+                        Type = EnumMessages.AllMessagesDeleted,
+                        RecipientId = request.RecipientId.Value,
+                        Text = StaticData.NotificationTypes[EnumMessages.AllMessagesDeleted].Text,
+                        Token = accountDetails.Token
+                    });
+                }
+
+                var response = _mapper.Map<OnMessagesUpdatedResponse>(request);
 
                 await Clients.Caller.SendAsync(response.EnumSignalRHandlersClient.ToString(), response);
 

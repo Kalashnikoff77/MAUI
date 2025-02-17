@@ -319,7 +319,7 @@ namespace WebAPI.Controllers
             var model = new UpdateRelationModel
             {
                 Conn = _unitOfWork.SqlConnection,
-                Response = new ResponseDtoBase()
+                Response = new UpdateRelationResponseDto()
             };
 
             var sql = "SELECT TOP 1 Id FROM Accounts WHERE Id = @AccountId";

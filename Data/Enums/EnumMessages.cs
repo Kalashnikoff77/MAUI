@@ -33,6 +33,11 @@
         /// <summary>
         /// Блокировка пользователя
         /// </summary>
-        AccountBlocked
+        AccountBlocked,
+
+        /// <summary>
+        /// Разблокировка пользователя
+        /// </summary>
+        AccountUnblocked
     }
 }

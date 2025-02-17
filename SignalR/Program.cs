@@ -39,6 +39,11 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
+builder.Services.AddAutoMapper((cfg) =>
+{
+    cfg.AllowNullCollections = true;
+}, typeof(Mapping));
+
 builder.Services.AddScoped(typeof(IRepository<,>), typeof(Repository<,>));
 
 var app = builder.Build();

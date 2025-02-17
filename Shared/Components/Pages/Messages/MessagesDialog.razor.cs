@@ -53,13 +53,9 @@ namespace Shared.Components.Pages.Messages
                     if (response.UpdateMessage && response.MessageId.HasValue)
                         await _JSModule.InvokeVoidAsync("UpdateMessage", response.MessageId);
 
-                    // Пометить сообщения как прочитанные
-                    if (response.MarkMessagesAsRead)
+                    // Пометить одно или несколько сообщений как прочитанные
+                    if (response.MarkMessagesAsRead && response.MessagesIds != null)
                     {
-                        // Если MessagesIds = null, то помечаем прочитанными все сообщения
-                        if (response.MessagesIds == null)
-                            response.MessagesIds = messages.Where(x => x.RecipientId == Recipient.Id && x.ReadDate == null).Select(x => x.Id);
-
                         foreach (var messageId in response.MessagesIds)
                         {
                             var index = messages.FindIndex(x => x.Id == messageId && x.ReadDate == null);
@@ -72,7 +68,7 @@ namespace Shared.Components.Pages.Messages
                         }
                     }
 
-                    // Пометить сообщения как прочитанные
+                    // Пометить все сообщения как прочитанные
                     if (response.MarkAllMessagesAsRead)
                     {
                         response.MessagesIds = messages.Where(x => x.RecipientId == Recipient.Id && x.ReadDate == null).Select(x => x.Id);
@@ -89,24 +85,37 @@ namespace Shared.Components.Pages.Messages
                         }
                     }
 
-                    // СРАБОТАЕТ У ОБОИХ ПОЛЬЗОВАТЕЛЕЙ
                     // Удаление всей переписки в диалогах двух пользователей в MessagesDialog
                     if (response.DeleteMessages)
                     {
                         // Удалим все сообщения в MessagesDialog
                         await _JSModule.InvokeVoidAsync("DeleteMessages");
-                        // Добавим сообщение обоим пользователям об удалении всей переписки
-                        text = StaticData.NotificationTypes[EnumMessages.AllMessagesDeleted].Text;
-                        await SubmitMessageAsync(EnumMessages.AllMessagesDeleted); // СРАБОТАЕТ У ОБОИХ ПОЛЬЗОВАТЕЛЕЙ
+
+                        var onMessagesUpdatedRequest = new SignalGlobalRequest
+                        {
+                            OnMessagesUpdatedRequest = new OnMessagesUpdatedRequest
+                            {
+                                AppendNewMessages = true,
+                                RecipientId = Recipient.Id
+                            }
+                        };
+                        await CurrentState.SignalRServerAsync(onMessagesUpdatedRequest);
+
+                        await InvokeAsync(StateHasChanged);
                     }
 
-                    // СРАБОТАЕТ У ОБОИХ ПОЛЬЗОВАТЕЛЕЙ
                     // Блокировка пользователя
                     if (response.BlockAccount)
                     {
-                        // Добавим сообщение обоим пользователям о блокировке
-                        text = StaticData.NotificationTypes[EnumMessages.AccountBlocked].Text;
-                        await SubmitMessageAsync(EnumMessages.AccountBlocked);
+                        var onMessagesUpdatedRequest = new SignalGlobalRequest
+                        {
+                            OnMessagesUpdatedRequest = new OnMessagesUpdatedRequest
+                            {
+                                AppendNewMessages = true,
+                                RecipientId = Recipient.Id
+                            }
+                        };
+                        await CurrentState.SignalRServerAsync(onMessagesUpdatedRequest);
 
                         await InvokeAsync(StateHasChanged);
                     }
@@ -127,7 +136,6 @@ namespace Shared.Components.Pages.Messages
             {
                 RecipientId = Recipient.Id,
                 GetPreviousFromId = messages.Count > 0 ? messages.Min(m => m.Id) : null,
-                MarkAsRead = true,
                 Take = StaticData.MESSAGES_PER_BLOCK,
                 Token = CurrentState.Account?.Token
             };
@@ -160,7 +168,6 @@ namespace Shared.Components.Pages.Messages
             {
                 RecipientId = Recipient.Id,
                 GetNextAfterId = messages.Count > 0 ? messages.Max(m => m.Id) : null,
-                MarkAsRead = true,
                 Take = StaticData.MESSAGES_PER_BLOCK,
                 Token = CurrentState.Account?.Token
             };

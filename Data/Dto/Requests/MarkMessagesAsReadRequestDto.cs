@@ -4,7 +4,9 @@
     {
         public override string Uri => "/messages/MarkAsRead";
 
-        public int? MessageId { get; set; }
+        public int SenderId { get; set; }
+
+        public IEnumerable<int>? MessagesIds { get; set; }
 
         public bool MarkAllMessagesAsRead { get; set; } = false;
     }

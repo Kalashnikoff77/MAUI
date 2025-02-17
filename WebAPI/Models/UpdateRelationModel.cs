@@ -1,11 +1,8 @@
-﻿using Data.Dto.Responses;
-using Data.Enums;
-using Dapper;
+﻿using Dapper;
+using Data.Dto.Responses;
 using Data.Entities;
+using Data.Enums;
 using System.Data.Common;
-using Azure.Core;
-using System.Reflection;
-using WebAPI.Exceptions;
 
 namespace WebAPI.Models
 {
@@ -16,7 +13,7 @@ namespace WebAPI.Models
 
         public DbConnection Conn { get; set; } = null!;
 
-        public ResponseDtoBase Response { get; set; } = null!;
+        public UpdateRelationResponseDto Response { get; set; } = null!;
 
         /// <summary>
         /// Удаление всех связей
@@ -61,6 +58,11 @@ namespace WebAPI.Models
                     $"VALUES " +
                     $"(@{nameof(RelationsForAccountsEntity.SenderId)}, @{nameof(RelationsForAccountsEntity.RecipientId)}, {(short)EnumRelations.Blocked}, 1)";
                 await Conn.ExecuteAsync(sql, new { SenderId, RecipientId });
+                Response.IsRelationAdded = true;
+            }
+            else
+            {
+                Response.IsRelationAdded = false;
             }
         }
 
@@ -84,12 +86,14 @@ namespace WebAPI.Models
                     $"VALUES " +
                     $"(@{nameof(RelationsForAccountsEntity.RecipientId)}, @{nameof(RelationsForAccountsEntity.SenderId)}, {(short)EnumRelations.Friend}, 1)";
                 await Conn.ExecuteAsync(sql, new { SenderId, RecipientId });
+                Response.IsRelationAdded = true;
             }
             // Иначе связь удаляем
             else
             {
                 sql = $"DELETE FROM RelationsForAccounts WHERE Id = @Id";
                 await Conn.ExecuteAsync(sql, new { currentRelation.Id });
+                Response.IsRelationAdded = false;
             }
         }
     }

@@ -13,7 +13,5 @@
 
         public int? GetPreviousFromId { get; set; }
         public int? GetNextAfterId { get; set; }
-
-        public bool MarkAsRead { get; set; } = false;
     }
 }

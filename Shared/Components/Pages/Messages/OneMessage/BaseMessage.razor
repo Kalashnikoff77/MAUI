@@ -44,6 +44,10 @@
             {
                 <Shared.Components.Pages.Messages.OneMessage.Sender.AccountBlocked Message="Message" />
             }
+            else if (Message.Type == EnumMessages.AccountUnblocked)
+            {
+                <Shared.Components.Pages.Messages.OneMessage.Sender.AccountUnblocked Message="Message" />
+            }
         </div>
     }
 }

@@ -48,8 +48,6 @@ namespace Data.Models.SignalR
         public int? MessageId { get; set; }
         public IEnumerable<int>? MessagesIds { get; set; }
 
-        public bool ShouldUpdateDatabase { get; set; }
-
         /// <summary>
         /// Добавление сообщения в диалог двух пользователей в MessagesDialog
         /// </summary>
@@ -79,6 +77,11 @@ namespace Data.Models.SignalR
         /// Блокировка пользователя
         /// </summary>
         public bool BlockAccount { get; set; }
+
+        /// <summary>
+        /// Разблокировка пользователя
+        /// </summary>
+        public bool UnblockAccount { get; set; }
     }
 }
 

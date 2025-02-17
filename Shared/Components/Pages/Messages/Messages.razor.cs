@@ -1,8 +1,6 @@
-﻿using Data.Dto;
-using Data.Dto.Requests;
+﻿using Data.Dto.Requests;
 using Data.Dto.Responses;
 using Data.Dto.Sp;
-using Data.Dto.Views;
 using Data.Enums;
 using Data.Models.SignalR;
 using Data.Services;
@@ -16,9 +14,8 @@ namespace Shared.Components.Pages.Messages
     {
         [CascadingParameter] public CurrentState CurrentState { get; set; } = null!;
         [Inject] IRepository<GetLastMessagesListRequestDto, GetLastMessagesListResponseDto> _repoGetLastMessagesList { get; set; } = null!;
-        [Inject] IRepository<MarkMessagesAsReadRequestDto, ResponseDtoBase> _markMessagesAsRead { get; set; } = null!;
         [Inject] IRepository<DeleteMessagesRequestDto, ResponseDtoBase> _deleteMessages { get; set; } = null!;
-        [Inject] IRepository<UpdateRelationRequestDto, ResponseDtoBase> _repoUpdateRelation { get; set; } = null!;
+        [Inject] IRepository<UpdateRelationRequestDto, UpdateRelationResponseDto> _repoUpdateRelation { get; set; } = null!;
         [Inject] ShowDialogs ShowDialogs { get; set; } = null!;
 
         IDisposable? OnMessagesUpdatedHandler;
@@ -51,16 +48,17 @@ namespace Shared.Components.Pages.Messages
         async Task MarkMessagesAsReadAsync(int messageId)
         {
             var index = LastMessagesList.FindIndex(x => x.Id == messageId);
+
             // Проверим, помечено ли сообщение как прочитанное и адресовано ли нам?
             if (index >= 0 && LastMessagesList[index].Recipient?.Id == CurrentState.Account?.Id && LastMessagesList[index].Sender != null && LastMessagesList[index].ReadDate == null)
             {
+                var recipientId = CurrentState.Account?.Id == LastMessagesList[index].Recipient?.Id ? LastMessagesList[index].Sender?.Id : LastMessagesList[index].Recipient?.Id;
                 var onMessagesUpdatedRequest = new SignalGlobalRequest 
                 {
                     OnMessagesUpdatedRequest = new OnMessagesUpdatedRequest 
                     {
                         MarkMessagesAsRead = true,
-                        ShouldUpdateDatabase = true,
-                        RecipientId = LastMessagesList[index].Sender!.Id, 
+                        RecipientId = recipientId,
                         MessagesIds = new List<int> { LastMessagesList[index].Id }
                     } 
                 };
@@ -71,14 +69,16 @@ namespace Shared.Components.Pages.Messages
         async Task MarkAllMessagesAsReadAsync(int messageId)
         {
             var index = LastMessagesList.FindIndex(x => x.Id == messageId);
-            if (index >= 0 && LastMessagesList[index].Sender != null)
-            {   
+
+            var recipientId = CurrentState.Account?.Id == LastMessagesList[index].Recipient?.Id ? LastMessagesList[index].Sender?.Id : LastMessagesList[index].Recipient?.Id;
+            if (index >= 0 && LastMessagesList[index].Sender != null && recipientId != null)
+            {
                 var onMessagesUpdatedRequest = new SignalGlobalRequest
                 {
                     OnMessagesUpdatedRequest = new OnMessagesUpdatedRequest
                     {
                         MarkAllMessagesAsRead = true,
-                        RecipientId = LastMessagesList[index].Sender!.Id,
+                        RecipientId = recipientId,
                         MessageId = messageId
                     }
                 };
@@ -89,48 +89,59 @@ namespace Shared.Components.Pages.Messages
         async Task BlockAccountAsync(int messageId)
         {
             var index = LastMessagesList.FindIndex(x => x.Id == messageId);
-            if (index >= 0 && LastMessagesList[index].Sender != null)
-            {
-                int blockingUserId = LastMessagesList[index].Sender!.Id == CurrentState.Account!.Id ? LastMessagesList[index].Recipient!.Id : LastMessagesList[index].Sender!.Id;
 
+            var recipientId = LastMessagesList[index].Sender?.Id == CurrentState.Account?.Id ? LastMessagesList[index].Recipient?.Id : LastMessagesList[index].Sender?.Id;
+            if (index >= 0 && LastMessagesList[index].Sender != null && recipientId != null)
+            {
+                // Добавим связь блокировки в БД
                 var apiUpdateResponse = await _repoUpdateRelation.HttpPostAsync(new UpdateRelationRequestDto
                 {
-                    RecipientId = blockingUserId,
+                    RecipientId = recipientId.Value,
                     EnumRelation = EnumRelations.Blocked,
                     Token = CurrentState.Account?.Token
                 });
 
                 // Обновим состояния у обоих пользователей
-                var accountReloadRequest = new SignalGlobalRequest { OnReloadAccountRequest = new OnReloadAccountRequest { AdditionalAccountId = blockingUserId } };
+                var accountReloadRequest = new SignalGlobalRequest 
+                {
+                    OnReloadAccountRequest = new OnReloadAccountRequest 
+                    { 
+                        AdditionalAccountId = recipientId 
+                    } 
+                };
                 await CurrentState.SignalRServerAsync(accountReloadRequest);
 
-                var onMessagesUpdatedRequest = new SignalGlobalRequest
-                {
-                    OnMessagesUpdatedRequest = new OnMessagesUpdatedRequest
-                    {
-                        BlockAccount = true,
-                        RecipientId = blockingUserId
-                    }
-                };
+                // Сообщим обоим пользователям о блокировке
+                var onMessagesUpdatedRequest = new SignalGlobalRequest { OnMessagesUpdatedRequest = new OnMessagesUpdatedRequest { RecipientId = recipientId } };
+                if (apiUpdateResponse.Response.IsRelationAdded)
+                    onMessagesUpdatedRequest.OnMessagesUpdatedRequest.BlockAccount = true;
+                else
+                    onMessagesUpdatedRequest.OnMessagesUpdatedRequest.UnblockAccount = true;
                 await CurrentState.SignalRServerAsync(onMessagesUpdatedRequest);
+
             }
         }
 
         async Task DeleteAllMessagesAsync(int messageId)
         {
             var index = LastMessagesList.FindIndex(x => x.Id == messageId);
-            if (index >= 0 && LastMessagesList[index].Sender != null)
-            {
-                int deletingAccountMessages = LastMessagesList[index].Sender!.Id == CurrentState.Account!.Id ? LastMessagesList[index].Recipient!.Id : LastMessagesList[index].Sender!.Id;
 
-                var apiResponse = await _deleteMessages.HttpPostAsync(new DeleteMessagesRequestDto { DeleteAll = true, RecipientId = deletingAccountMessages, Token = CurrentState.Account?.Token });
+            var recipientId = LastMessagesList[index].Sender?.Id == CurrentState.Account?.Id ? LastMessagesList[index].Recipient?.Id : LastMessagesList[index].Sender?.Id;
+            if (index >= 0 && LastMessagesList[index].Sender != null && recipientId != null)
+            {
+                var apiResponse = await _deleteMessages.HttpPostAsync(new DeleteMessagesRequestDto 
+                { 
+                    DeleteAll = true, 
+                    RecipientId = recipientId.Value,
+                    Token = CurrentState.Account?.Token 
+                });
 
                 var onMessagesUpdatedRequest = new SignalGlobalRequest
                 {
                     OnMessagesUpdatedRequest = new OnMessagesUpdatedRequest
                     {
                         DeleteMessages = true,
-                        RecipientId = deletingAccountMessages,
+                        RecipientId = recipientId.Value,
                         MessagesIds = null
                     }
                 };
