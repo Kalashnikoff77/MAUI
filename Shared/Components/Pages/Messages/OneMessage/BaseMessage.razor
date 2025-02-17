@@ -87,6 +87,10 @@ else
             {
                 <Shared.Components.Pages.Messages.OneMessage.Recipient.AccountBlocked Message="Message" />
             }
+            else if (Message.Type == EnumMessages.AccountUnblocked)
+            {
+                <Shared.Components.Pages.Messages.OneMessage.Recipient.AccountUnblocked Message="Message" />
+            }
         </div>
     }
 }

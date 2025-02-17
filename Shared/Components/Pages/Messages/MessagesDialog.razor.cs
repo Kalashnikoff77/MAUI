@@ -100,7 +100,6 @@ namespace Shared.Components.Pages.Messages
                             }
                         };
                         await CurrentState.SignalRServerAsync(onMessagesUpdatedRequest);
-
                         await InvokeAsync(StateHasChanged);
                     }
 
@@ -116,7 +115,21 @@ namespace Shared.Components.Pages.Messages
                             }
                         };
                         await CurrentState.SignalRServerAsync(onMessagesUpdatedRequest);
+                        await InvokeAsync(StateHasChanged);
+                    }
 
+                    // Разблокировка пользователя
+                    if (response.UnblockAccount)
+                    {
+                        var onMessagesUpdatedRequest = new SignalGlobalRequest
+                        {
+                            OnMessagesUpdatedRequest = new OnMessagesUpdatedRequest
+                            {
+                                AppendNewMessages = true,
+                                RecipientId = Recipient.Id
+                            }
+                        };
+                        await CurrentState.SignalRServerAsync(onMessagesUpdatedRequest);
                         await InvokeAsync(StateHasChanged);
                     }
                 });

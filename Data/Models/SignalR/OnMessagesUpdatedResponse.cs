@@ -38,5 +38,10 @@ namespace Data.Models.SignalR
         /// Блокировка пользователя
         /// </summary>
         public bool BlockAccount { get; set; }
+
+        /// <summary>
+        /// Разблокировка пользователя
+        /// </summary>
+        public bool UnblockAccount { get; set; }
     }
 }
