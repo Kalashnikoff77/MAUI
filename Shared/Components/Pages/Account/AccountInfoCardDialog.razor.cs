@@ -6,6 +6,7 @@ using Data.Services;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using Data.State;
+using Shared.Components.Dialogs;
 
 namespace Shared.Components.Pages.Account
 {
@@ -13,6 +14,8 @@ namespace Shared.Components.Pages.Account
     {
         [CascadingParameter] CurrentState CurrentState { get; set; } = null!;
         [CascadingParameter] MudDialogInstance MudDialog { get; set; } = null!;
+        [Inject] ShowDialogs ShowDialogs { get; set; } = null!;
+
         [Parameter, EditorRequired] public AccountsViewDto Account { get; set; } = null!;
 
         [Inject] IRepository<GetAccountsRequestDto, GetAccountsResponseDto> _repoGetAccount { get; set; } = null!;
