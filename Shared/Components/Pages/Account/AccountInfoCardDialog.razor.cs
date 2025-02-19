@@ -2,10 +2,11 @@
 using Data.Dto.Requests;
 using Data.Dto.Responses;
 using Data.Dto.Views;
+using Data.Models.SignalR;
 using Data.Services;
+using Data.State;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
-using Data.State;
 using Shared.Components.Dialogs;
 
 namespace Shared.Components.Pages.Account
@@ -23,6 +24,7 @@ namespace Shared.Components.Pages.Account
         MudCarousel<PhotosForEventsDto> Carousel = null!;
 
         IDisposable? OnAccountDiscussionAddedHandler;
+        IDisposable? OnMessagesUpdatedHandler;
 
         protected override async Task OnInitializedAsync()
         {
@@ -42,6 +44,14 @@ namespace Shared.Components.Pages.Account
 
         protected override void OnAfterRender(bool firstRender)
         {
+            if (!firstRender)
+            {
+                OnMessagesUpdatedHandler = OnMessagesUpdatedHandler.SignalRClient<OnMessagesUpdatedResponse>(CurrentState, async (response) =>
+                {
+                    await InvokeAsync(StateHasChanged);
+                });
+            }
+
             //OnAccountDiscussionAddedHandler = OnAccountDiscussionAddedHandler.SignalRClient<OnScheduleChangedResponse>(CurrentState, async (response) =>
             //{
             //    var apiResponse = await _repoGetSchedules.HttpPostAsync(new GetSchedulesRequestDto { ScheduleId = response.ScheduleId });

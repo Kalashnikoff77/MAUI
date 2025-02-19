@@ -304,7 +304,7 @@ namespace WebAPI.Controllers
                     throw new BadRequestException($"Неверно указан тип взаимосвязи: {request.Relation}!");
             }
 
-            var result = await _unitOfWork.SqlConnection.QueryAsync<AccountsViewEntity>(sql, new { request.AccountId, Relation = (int)request.Relation });
+            var result = await _unitOfWork.SqlConnection.QueryAsync<AccountsViewEntity>(sql, new { request.AccountId, Relation = (short)request.Relation });
             response.Accounts = _unitOfWork.Mapper.Map<List<AccountsViewDto>>(result);
 
             return response;

@@ -26,12 +26,31 @@
                     <MudIcon Icon="@Icons.Material.Outlined.LocationOn" Style="font-size:20px" />
                     <MudText Typo="Typo.body2">@Account.ToRegionString()</MudText>
                 </div>
-                <div class="mt-2">
-                    <MudButtonGroup Variant="Variant.Outlined" Color="Color.Primary">
-                        <MudIconButton onclick="@(() => ShowDialogs.MessagesDialogAsync(Account))" Icon="@Icons.Material.Filled.Message" Color="Color.Primary" title="Общение с пользователем" />
-                        <MudIconButton onclick="@(() => ShowDialogs.MessagesDialogAsync(Account))" Icon="@Icons.Material.Filled.Done" Color="Color.Success" title="Пользователь разблокирован" />
-                    </MudButtonGroup>
-                </div>
+                @if (CurrentState.Account != null)
+                {
+                    var hasBlockRelation = CurrentState.Account.Relations?.GetRelationInfo(EnumRelations.Blocked, CurrentState.Account, Account);
+                    <div class="mt-2">
+                        <MudButtonGroup Variant="Variant.Outlined" Color="Color.Primary">
+                            <MudIconButton onclick="@(() => ShowDialogs.MessagesDialogAsync(Account))" Icon="@Icons.Material.Filled.Message" Color="Color.Primary" title="В переписку" />
+                            @if (hasBlockRelation == null)
+                            {
+                                <MudIconButton onclick="@(() => ShowDialogs.BlockAccountDialogAsync(CurrentState.Account, Account))" Icon="@Icons.Material.Filled.Done" Color="Color.Success" title="Пользователь разблокирован" />
+                            }
+                            else
+                            {
+                                @* Инициатор текущий пользователь? *@
+                                @if (hasBlockRelation.Item1.Id == CurrentState.Account.Id)
+                                {
+                                    <MudIconButton onclick="@(() => ShowDialogs.BlockAccountDialogAsync(CurrentState.Account, Account))" Icon="@Icons.Material.Filled.Block" Color="Color.Error" title="@($"Вы заблокировали {Account.Name}")" />
+                                }
+                                else
+                                {
+                                    <MudIconButton Icon="@Icons.Material.Filled.Block" Color="Color.Error" Style="cursor:default" title="Пользователь Вас заблокировал" />
+                                }
+                            }
+                        </MudButtonGroup>
+                    </div>
+                }
             </div>
 
             <MudDivider Class="mt-4" />

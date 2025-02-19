@@ -1,7 +1,6 @@
 ﻿using Data.Dto.Requests;
 using Data.Dto.Responses;
 using Data.Dto.Sp;
-using Data.Enums;
 using Data.Models.SignalR;
 using Data.Services;
 using Data.State;
@@ -14,8 +13,6 @@ namespace Shared.Components.Pages.Messages
     {
         [CascadingParameter] public CurrentState CurrentState { get; set; } = null!;
         [Inject] IRepository<GetLastMessagesListRequestDto, GetLastMessagesListResponseDto> _repoGetLastMessagesList { get; set; } = null!;
-        [Inject] IRepository<DeleteMessagesRequestDto, ResponseDtoBase> _deleteMessages { get; set; } = null!;
-        [Inject] IRepository<UpdateRelationRequestDto, UpdateRelationResponseDto> _repoUpdateRelation { get; set; } = null!;
         [Inject] ShowDialogs ShowDialogs { get; set; } = null!;
 
         IDisposable? OnMessagesUpdatedHandler;
@@ -80,69 +77,6 @@ namespace Shared.Components.Pages.Messages
                         MarkAllMessagesAsRead = true,
                         RecipientId = recipientId,
                         MessageId = messageId
-                    }
-                };
-                await CurrentState.SignalRServerAsync(onMessagesUpdatedRequest);
-            }
-        }
-
-        async Task BlockAccountAsync(int messageId)
-        {
-            var index = LastMessagesList.FindIndex(x => x.Id == messageId);
-
-            var recipientId = LastMessagesList[index].Sender?.Id == CurrentState.Account?.Id ? LastMessagesList[index].Recipient?.Id : LastMessagesList[index].Sender?.Id;
-            if (index >= 0 && LastMessagesList[index].Sender != null && recipientId != null)
-            {
-                // Добавим связь блокировки в БД
-                var apiUpdateResponse = await _repoUpdateRelation.HttpPostAsync(new UpdateRelationRequestDto
-                {
-                    RecipientId = recipientId.Value,
-                    EnumRelation = EnumRelations.Blocked,
-                    Token = CurrentState.Account?.Token
-                });
-
-                // Обновим состояния у обоих пользователей
-                var accountReloadRequest = new SignalGlobalRequest 
-                {
-                    OnReloadAccountRequest = new OnReloadAccountRequest 
-                    { 
-                        AdditionalAccountId = recipientId 
-                    } 
-                };
-                await CurrentState.SignalRServerAsync(accountReloadRequest);
-
-                // Сообщим обоим пользователям о блокировке
-                var onMessagesUpdatedRequest = new SignalGlobalRequest { OnMessagesUpdatedRequest = new OnMessagesUpdatedRequest { RecipientId = recipientId } };
-                if (apiUpdateResponse.Response.IsRelationAdded)
-                    onMessagesUpdatedRequest.OnMessagesUpdatedRequest.BlockAccount = true;
-                else
-                    onMessagesUpdatedRequest.OnMessagesUpdatedRequest.UnblockAccount = true;
-                await CurrentState.SignalRServerAsync(onMessagesUpdatedRequest);
-
-            }
-        }
-
-        async Task DeleteAllMessagesAsync(int messageId)
-        {
-            var index = LastMessagesList.FindIndex(x => x.Id == messageId);
-
-            var recipientId = LastMessagesList[index].Sender?.Id == CurrentState.Account?.Id ? LastMessagesList[index].Recipient?.Id : LastMessagesList[index].Sender?.Id;
-            if (index >= 0 && LastMessagesList[index].Sender != null && recipientId != null)
-            {
-                var apiResponse = await _deleteMessages.HttpPostAsync(new DeleteMessagesRequestDto 
-                { 
-                    DeleteAll = true, 
-                    RecipientId = recipientId.Value,
-                    Token = CurrentState.Account?.Token 
-                });
-
-                var onMessagesUpdatedRequest = new SignalGlobalRequest
-                {
-                    OnMessagesUpdatedRequest = new OnMessagesUpdatedRequest
-                    {
-                        DeleteMessages = true,
-                        RecipientId = recipientId.Value,
-                        MessagesIds = null
                     }
                 };
                 await CurrentState.SignalRServerAsync(onMessagesUpdatedRequest);
