@@ -126,6 +126,19 @@ namespace SignalR
                     });
                 }
 
+                // Отправить запрос на дружбу
+                if (request.FriendshipRequest && request.RecipientId != null)
+                {
+                    var service = _serviceProvider.GetService<IRepository<AddMessageRequestDto, AddMessageResponseDto>>()!;
+                    var apiResult = await service.HttpPostAsync(new AddMessageRequestDto
+                    {
+                        Type = EnumMessages.RequestForFrendshipSent,
+                        RecipientId = request.RecipientId.Value,
+                        Text = StaticData.NotificationTypes[EnumMessages.RequestForFrendshipSent].Text,
+                        Token = accountDetails.Token
+                    });
+                }
+
                 // Блокируем пользователя
                 if (request.BlockAccount && request.RecipientId != null)
                 {

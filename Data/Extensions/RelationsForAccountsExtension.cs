@@ -1,6 +1,7 @@
 ﻿using Data.Dto;
 using Data.Dto.Views;
 using Data.Enums;
+using Data.Models;
 
 namespace Data.Extensions
 {
@@ -13,8 +14,8 @@ namespace Data.Extensions
         /// <param name="relationType">Тип связи</param>
         /// <param name="account1">Первый аккаунт</param>
         /// <param name="account2">Второй аккаунт</param>
-        /// <returns>null - связи нет, Item1 - отправитель связи, Item2 - получатель связи</returns>
-        public static Tuple<AccountsViewDto, AccountsViewDto>? GetRelationInfo(this List<RelationsForAccountsDto> relations, EnumRelations relationType, AccountsViewDto? account1, AccountsViewDto? account2)
+        /// <returns>Null - связи нет, иначе RelationInfo</returns>
+        public static RelationInfo? GetRelationInfo(this List<RelationsForAccountsDto> relations, EnumRelations relationType, AccountsViewDto? account1, AccountsViewDto? account2)
         {
             if (account1 == null || account2 == null)
                 return null;
@@ -25,7 +26,22 @@ namespace Data.Extensions
             if (blockingInfo == null)
                 return null;
 
-            return blockingInfo.SenderId == account1.Id ? new Tuple<AccountsViewDto, AccountsViewDto>(account1, account2) : new Tuple<AccountsViewDto, AccountsViewDto>(account2, account1);
+            var result = new RelationInfo();
+
+            if (blockingInfo.SenderId == account1.Id)
+            {
+                result.Sender = account1;
+                result.Recipient = account2;
+            }
+            else
+            {
+                result.Sender = account2;
+                result.Recipient = account1;
+            }
+
+            result.IsConfirmed = blockingInfo.IsConfirmed;
+
+            return result;
         }
     }
 }

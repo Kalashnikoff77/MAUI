@@ -84,14 +84,18 @@ namespace WebAPI.Models
             {
                 sql = $"INSERT INTO RelationsForAccounts ({nameof(RelationsForAccountsEntity.SenderId)}, {nameof(RelationsForAccountsEntity.RecipientId)}, {nameof(RelationsForAccountsEntity.Type)}, {nameof(RelationsForAccountsEntity.IsConfirmed)}) " +
                     $"VALUES " +
-                    $"(@{nameof(RelationsForAccountsEntity.RecipientId)}, @{nameof(RelationsForAccountsEntity.SenderId)}, {(short)EnumRelations.Friend}, 1)";
+                    $"(@{nameof(RelationsForAccountsEntity.RecipientId)}, @{nameof(RelationsForAccountsEntity.SenderId)}, {(short)EnumRelations.Friend}, 0)";
                 await Conn.ExecuteAsync(sql, new { SenderId, RecipientId });
                 Response.IsRelationAdded = true;
             }
-            // Иначе связь удаляем
             else
             {
-                sql = $"DELETE FROM RelationsForAccounts WHERE Id = @Id";
+                // Если связь подтверждена, то удаляем
+                if (currentRelation.IsConfirmed)
+                    sql = $"DELETE FROM RelationsForAccounts WHERE Id = @Id";
+                // Иначе связь подтверждаем
+                else
+                    sql = $"UPDATE RelationsForAccounts SET IsConfirmed = 1 WHERE Id = @Id";
                 await Conn.ExecuteAsync(sql, new { currentRelation.Id });
                 Response.IsRelationAdded = false;
             }

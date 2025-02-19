@@ -28,18 +28,45 @@
                 </div>
                 @if (CurrentState.Account != null)
                 {
-                    var hasBlockRelation = CurrentState.Account.Relations?.GetRelationInfo(EnumRelations.Blocked, CurrentState.Account, Account);
                     <div class="mt-2">
                         <MudButtonGroup Variant="Variant.Outlined" Color="Color.Primary">
                             <MudIconButton onclick="@(() => ShowDialogs.MessagesDialogAsync(Account))" Icon="@Icons.Material.Filled.Message" Color="Color.Primary" title="В переписку" />
-                            @if (hasBlockRelation == null)
+                            @* Есть ли блокировка? *@
+                            @{var isBlocked = CurrentState.Account.Relations?.GetRelationInfo(EnumRelations.Blocked, CurrentState.Account, Account);}
+                            @if (isBlocked == null)
                             {
                                 <MudIconButton onclick="@(() => ShowDialogs.BlockAccountDialogAsync(CurrentState.Account, Account))" Icon="@Icons.Material.Filled.Done" Color="Color.Success" title="Пользователь разблокирован" />
+                                @* Есть ли дружба? *@
+                                var hasFriendship = CurrentState.Account.Relations?.GetRelationInfo(EnumRelations.Friend, CurrentState.Account, Account);
+                                if (hasFriendship != null)
+                                {
+                                    @* Дружба подтверждена? *@
+                                    if (hasFriendship.IsConfirmed)
+                                    {
+                                        <MudIconButton onclick="@(() => ShowDialogs.FriendshipDialogAsync(CurrentState.Account, Account))" Icon="@Icons.Material.Filled.Favorite" Color="Color.Success" title="Вы друзья" />
+                                    }
+                                    else
+                                    {
+                                        @* Кто инициатор дружбы? *@
+                                        @if (hasFriendship.Sender.Id == CurrentState.Account.Id)
+                                        {
+                                            <MudIconButton Icon="@Icons.Material.Filled.Favorite" Color="Color.Warning" Style="cursor:default" title="Запрос на дружбу отправлен" />
+                                        }
+                                        else
+                                        {
+                                            <MudIconButton Icon="@Icons.Material.Filled.Favorite" Color="Color.Warning" Style="cursor:default" title="Вам отправлен запрос на дружбу" />
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    <MudIconButton onclick="@(() => ShowDialogs.FriendshipDialogAsync(CurrentState.Account, Account))" Icon="@Icons.Material.Filled.FavoriteBorder" Color="Color.Success" title="Добавить в друзья" />
+                                }
                             }
                             else
                             {
-                                @* Инициатор текущий пользователь? *@
-                                @if (hasBlockRelation.Item1.Id == CurrentState.Account.Id)
+                                @* Пользователь заблокирован. Инициатор текущий пользователь? *@
+                                @if (isBlocked.Sender.Id == CurrentState.Account.Id)
                                 {
                                     <MudIconButton onclick="@(() => ShowDialogs.BlockAccountDialogAsync(CurrentState.Account, Account))" Icon="@Icons.Material.Filled.Block" Color="Color.Error" title="@($"Вы заблокировали {Account.Name}")" />
                                 }

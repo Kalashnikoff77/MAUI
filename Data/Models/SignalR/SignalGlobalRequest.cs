@@ -74,6 +74,11 @@ namespace Data.Models.SignalR
         public bool DeleteMessages { get; set; }
 
         /// <summary>
+        /// Подружиться
+        /// </summary>
+        public bool FriendshipRequest{ get; set; }
+
+        /// <summary>
         /// Блокировка пользователя
         /// </summary>
         public bool BlockAccount { get; set; }

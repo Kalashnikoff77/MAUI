@@ -23,8 +23,8 @@
                     if (accountsViewDto != null)
                     {
                         @* Есть ли блокировка между двумя собеседниками? *@
-                        var hasBlockRelation = CurrentState.Account.Relations?.GetRelationInfo(EnumRelations.Blocked, message.Sender, message.Recipient);
-                        <tr style=@(hasBlockRelation != null ? "background-color:#fff2f2" : null)>
+                        var block = CurrentState.Account.Relations?.GetRelationInfo(EnumRelations.Blocked, message.Sender, message.Recipient);
+                        <tr style=@(block != null ? "background-color:#fff2f2" : null)>
                             <td>
                                 <div class="d-flex align-center gap-3">
                                     <div @onclick="@(() => ShowDialogs.AccountInfoCardDialogAsync(accountsViewDto))" style="cursor:pointer">
@@ -36,10 +36,10 @@
                                         <div style="text-align:end">
                                             <MudMenu Dense Icon="@Icons.Material.Filled.MoreVert" Size="Size.Small" AnchorOrigin="Origin.TopLeft" TransformOrigin="Origin.TopRight">
                                                 @* Есть ли блокировка у обеих пользователей? *@
-                                                @if (hasBlockRelation != null)
+                                                @if (block != null)
                                                 {
                                                     @* Инициатор текущий пользователь? *@
-                                                    @if (hasBlockRelation.Item1.Id == CurrentState.Account.Id)
+                                                    @if (block.Sender.Id == CurrentState.Account.Id)
                                                     {
                                                         <MudMenuItem Icon="@Icons.Material.Filled.Done" IconColor="Color.Success" OnClick="() => ShowDialogs.BlockAccountDialogAsync(message.Sender, message.Recipient)">Разблокировать собеседника</MudMenuItem>
                                                     }

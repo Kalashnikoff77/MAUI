@@ -132,6 +132,82 @@ namespace Shared.Components.Dialogs
         }
 
 
+        /// <summary>
+        /// Принять в друзья или отменить дружбу
+        /// </summary>
+        public async Task FriendshipDialogAsync(AccountsViewDto? account1, AccountsViewDto? account2)
+        {
+            if (CurrentState.Account != null && account1 != null && account2 != null)
+            {
+                var hasFriendshipRelation = CurrentState.Account.Relations?.GetRelationInfo(EnumRelations.Friend, account1, account2);
+
+                string dialogText;
+                Color buttonColor;
+
+                if (hasFriendshipRelation == null)
+                {
+                    dialogText = "Отправить приглашение к дружбе?";
+                    buttonColor = Color.Success;
+                }
+                else
+                {
+                    if (hasFriendshipRelation.IsConfirmed)
+                    {
+                        dialogText = "Вы хотите прекратить дружбу?";
+                        buttonColor = Color.Error;
+                    }
+                    else
+                    {
+                        dialogText = "Вы согласны принять дружбу?";
+                        buttonColor = Color.Success;
+                    }
+                }
+
+                    var parameters = new DialogParameters<ConfirmDialog>
+                    {
+                        { x => x.ContentText, dialogText },
+                        { x => x.ButtonText, "Да" },
+                        { x => x.Color, buttonColor }
+                    };
+                var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.Small };
+                var resultDialog = await _dialogService.ShowAsync<ConfirmDialog>($"Подтверждение", parameters, options);
+                var result = await resultDialog.Result;
+
+                if (result != null && result.Canceled == false)
+                {
+                    var recipientId = account1.Id == CurrentState.Account.Id ? account2.Id : account1.Id;
+                    await FriendshipAccountAsync(recipientId);
+                }
+            }
+        }
+
+        async Task FriendshipAccountAsync(int recipientId)
+        {
+            var _repoUpdateRelation = _serviceProvider.GetService<IRepository<UpdateRelationRequestDto, UpdateRelationResponseDto>>()!;
+            // Добавим связь дружбы в БД
+            var apiUpdateResponse = await _repoUpdateRelation.HttpPostAsync(new UpdateRelationRequestDto
+            {
+                RecipientId = recipientId,
+                EnumRelation = EnumRelations.Friend,
+                Token = CurrentState.Account?.Token
+            });
+
+            // Обновим состояния у обоих пользователей
+            var accountReloadRequest = new SignalGlobalRequest
+            {
+                OnReloadAccountRequest = new OnReloadAccountRequest
+                {
+                    AdditionalAccountId = recipientId
+                }
+            };
+            await CurrentState.SignalRServerAsync(accountReloadRequest);
+
+            // Сообщим обоим пользователям о запросе дружбы
+            var onMessagesUpdatedRequest = new SignalGlobalRequest { OnMessagesUpdatedRequest = new OnMessagesUpdatedRequest { RecipientId = recipientId } };
+            onMessagesUpdatedRequest.OnMessagesUpdatedRequest.FriendshipRequest = true;
+            await CurrentState.SignalRServerAsync(onMessagesUpdatedRequest);
+        }
+
         #region /// БЛОКИРОВКА ПОЛЬЗОВАТЕЛЯ ///
         /// <summary>
         /// Блокировка пользователя
