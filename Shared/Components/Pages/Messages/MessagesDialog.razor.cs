@@ -10,6 +10,7 @@ using Data.State;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using MudBlazor;
+using Shared.Components.Dialogs;
 using Shared.Components.Pages.Messages.OneMessage;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
@@ -25,7 +26,9 @@ namespace Shared.Components.Pages.Messages
         [Inject] IRepository<GetMessagesRequestDto, GetMessagesResponseDto> _repoGetMessages { get; set; } = null!;
         [Inject] IRepository<AddMessageRequestDto, AddMessageResponseDto> _repoAddMessage { get; set; } = null!;
         [Inject] IRepository<DeleteMessagesRequestDto, ResponseDtoBase> _repoDeleteMessage { get; set; } = null!;
-        [Inject] IRepository<UpdateRelationRequestDto, ResponseDtoBase> _repoUpdateRelation { get; set; } = null!;
+        [Inject] IRepository<UpdateRelationRequestDto, UpdateRelationResponseDto> _repoUpdateRelation { get; set; } = null!;
+        [Inject] IRepository<DeleteRelationRequestDto, ResponseDtoBase> _repoDeleteRelation { get; set; } = null!;
+        [Inject] ShowDialogs _showDialogs { get; set; } = null!;
         [Inject] IJSRuntime _JSRuntime { get; set; } = null!;
         [Inject] IComponentRenderer<BaseMessage> _renderer { get; set; } = null!;
 
@@ -45,7 +48,7 @@ namespace Shared.Components.Pages.Messages
             {
                 OnMessagesUpdatedHandler = OnMessagesUpdatedHandler.SignalRClient<OnMessagesUpdatedResponse>(CurrentState, async (response) =>
                 {
-                    // Добавление сообщения в диалог двух пользователей в MessagesDialog
+                    // Добавление новых сообщений в диалог двух пользователей в MessagesDialog
                     if (response.AppendNewMessages)
                         await _JSModule.InvokeVoidAsync("AppendNewMessages", await GetNewMessages());
 
@@ -244,54 +247,22 @@ namespace Shared.Components.Pages.Messages
         }
 
         /// <summary>
-        /// Принимаем дружбу
+        /// Принятие дружбы
         /// </summary>
         [JSInvokable]
-        public async Task AcceptFriendshipAsync(int messageId)
-        {
-            // Обновим данные о дружбе в БД
-            var apiUpdateResponse = await _repoUpdateRelation.HttpPostAsync(new UpdateRelationRequestDto 
-            {
-                RecipientId = Recipient.Id,
-                EnumRelation = EnumRelations.Friend, 
-                Token = CurrentState.Account?.Token 
-            });
-
-            // Удалим сообщение о запросе дружбы из БД
-            var apiDeleteResponse = await _repoDeleteMessage.HttpPostAsync(new DeleteMessagesRequestDto
-            {
-                MessageId = messageId,
-                RecipientId = Recipient.Id,
-                Token = CurrentState.Account?.Token
-            });
-
-            // Добавим сообщение обоим пользователям о принятии дружбы
-            text = StaticData.NotificationTypes[EnumMessages.RequestForFrendshipAccepted].Text;
-            await SubmitMessageAsync(EnumMessages.RequestForFrendshipAccepted);
-
-            // Удалим сообщение с запросом дружбы из UI у обоих пользователей
-            var onMessagesUpdatedRequest = new SignalGlobalRequest
-            {
-                OnMessagesUpdatedRequest = new OnMessagesUpdatedRequest
-                {
-                    UpdateMessage = true,
-                    MessageId = messageId,
-                    RecipientId = Recipient.Id
-                }
-            };
-            await CurrentState.SignalRServerAsync(onMessagesUpdatedRequest);
-
-            // Обновим состояние у обоих пользователей
-            var reloadAccountRequest = new SignalGlobalRequest { OnReloadAccountRequest = new OnReloadAccountRequest { AdditionalAccountId = Recipient.Id } };
-            await CurrentState.SignalRServerAsync(reloadAccountRequest);
-        }
+        public async Task AcceptFriendshipRequestAsync(int messageId) =>
+            await _showDialogs.AcceptFriendshipRequestDialogAsync(CurrentState.Account, Recipient);
 
         /// <summary>
-        /// Отклоняем дружбу
+        /// Отказ принятия дружбы
         /// </summary>
         [JSInvokable]
-        public async Task DeclineFriendshipAsync(int messageId)
+        public async Task DeclineFriendshipRequestAsync(int messageId)
         {
+            await _showDialogs.DeclineFriendshipRequestDialogAsync(CurrentState.Account, Recipient);
+
+            return;
+
             // Удалим сообщение из БД
             var request = new DeleteMessagesRequestDto
             {
@@ -309,7 +280,7 @@ namespace Shared.Components.Pages.Messages
             {
                 OnMessagesUpdatedRequest = new OnMessagesUpdatedRequest
                 {
-                    UpdateMessage = true,
+                    DeleteMessage = true,
                     MessageId = messageId,
                     RecipientId = Recipient.Id
                 }
@@ -318,31 +289,36 @@ namespace Shared.Components.Pages.Messages
         }
 
         /// <summary>
-        /// Отменяем запрос на дружбу
+        /// Отмена запроса инициатором на добавление в друзья
         /// </summary>
         [JSInvokable]
-        public async Task CancelFriendshipAsync(int messageId)
+        public async Task AbortFriendshipRequestAsync(int messageId)
         {
-            // Удалим сообщение из БД
-            var request = new DeleteMessagesRequestDto
-            {
-                MessageId = messageId,
-                RecipientId = Recipient.Id,
-                Token = CurrentState.Account?.Token
-            };
-            var apiResponse = await _repoDeleteMessage.HttpPostAsync(request);
+            await _showDialogs.AbortFriendshipRequestDialogAsync(CurrentState.Account, Recipient);
 
-            // Удалим сообщение с запросом дружбы из UI у обоих пользователей
-            var onMessagesUpdatedRequest = new SignalGlobalRequest
-            {
-                OnMessagesUpdatedRequest = new OnMessagesUpdatedRequest
-                {
-                    UpdateMessage = true,
-                    MessageId = messageId,
-                    RecipientId = Recipient.Id
-                }
-            };
-            await CurrentState.SignalRServerAsync(onMessagesUpdatedRequest);
+            return;
+
+            ////ShowDialogs.FriendshipDialogAsync(CurrentState.Account, Account);
+
+            //// Удалим данные о запросе дружбы в БД
+            //var apiUpdateResponse = await _repoDeleteRelation.HttpPostAsync(new DeleteRelationRequestDto
+            //{
+            //    RecipientId = Recipient.Id,
+            //    EnumRelation = EnumRelations.Friend,
+            //    Token = CurrentState.Account?.Token
+            //});
+
+            //// Удалим сообщение с запросом дружбы из БД и UI у обоих пользователей
+            //var onMessagesUpdatedRequest = new SignalGlobalRequest
+            //{
+            //    OnMessagesUpdatedRequest = new OnMessagesUpdatedRequest
+            //    {
+            //        DeleteMessage = true,
+            //        MessageId = messageId,
+            //        RecipientId = Recipient.Id
+            //    }
+            //};
+            //await CurrentState.SignalRServerAsync(onMessagesUpdatedRequest);
         }
 
         public async ValueTask DisposeAsync()

@@ -6,9 +6,9 @@
 
     <div class="d-flex gap-1 justify-end align-center mt-1 mb-1">
         <MudIcon Icon="@Icons.Material.Filled.Check" Size="Size.Small" Style="color:#479119; margin-bottom:2px" />
-        <p onclick="_dotNetReference.invokeMethodAsync('AcceptFriendshipAsync', parseInt(@Message.Id))" style="cursor:pointer; color:#479119; font-weight:600" class="mr-2">Принять</p>
+        <p onclick="_dotNetReference.invokeMethodAsync('AcceptFriendshipRequestAsync', parseInt(@Message.Id))" style="cursor:pointer; color:#479119; font-weight:600" class="mr-2">Принять</p>
         <MudIcon Icon="@Icons.Material.Filled.Close" Size="Size.Small" Style="color:#f74040; margin-bottom:2px" />
-        <p onclick="_dotNetReference.invokeMethodAsync('DeclineFriendshipAsync', parseInt(@Message.Id))" style="cursor:pointer; color:#f74040">Отклонить</p>
+        <p onclick="_dotNetReference.invokeMethodAsync('DeclineFriendshipRequestAsync', parseInt(@Message.Id))" style="cursor:pointer; color:#f74040">Отклонить</p>
     </div>
 
     <p class="d-flex justify-end" style="color:#90d665; text-align:left; font-size:12px">@Message.CreateDate.ToMyString()</p>

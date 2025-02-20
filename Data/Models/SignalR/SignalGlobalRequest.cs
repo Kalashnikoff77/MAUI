@@ -56,7 +56,7 @@ namespace Data.Models.SignalR
         /// <summary>
         /// Обновление или удаление сообщения в диалогах двух пользователей в MessagesDialog
         /// </summary>
-        public bool UpdateMessage { get; set; }
+        public bool DeleteMessage { get; set; }
 
         /// <summary>
         /// Пометить сообщения как прочитанные

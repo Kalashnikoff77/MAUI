@@ -35,6 +35,11 @@ namespace Data.Models.SignalR
         public bool MarkAllMessagesAsRead { get; set; }
 
         /// <summary>
+        /// Подружиться
+        /// </summary>
+        public bool FriendshipRequest { get; set; }
+
+        /// <summary>
         /// Блокировка пользователя
         /// </summary>
         public bool BlockAccount { get; set; }

@@ -42,24 +42,24 @@
                                     @* Дружба подтверждена? *@
                                     if (hasFriendship.IsConfirmed)
                                     {
-                                        <MudIconButton onclick="@(() => ShowDialogs.FriendshipDialogAsync(CurrentState.Account, Account))" Icon="@Icons.Material.Filled.Favorite" Color="Color.Success" title="Вы друзья" />
+                                        <MudIconButton onclick="@(() => ShowDialogs.CancelFriendshipDialogAsync(CurrentState.Account, Account))" Icon="@Icons.Material.Filled.Favorite" Color="Color.Success" title="Вы друзья" />
                                     }
                                     else
                                     {
                                         @* Кто инициатор дружбы? *@
                                         @if (hasFriendship.Sender.Id == CurrentState.Account.Id)
                                         {
-                                            <MudIconButton Icon="@Icons.Material.Filled.Favorite" Color="Color.Warning" Style="cursor:default" title="Запрос на дружбу отправлен" />
+                                            <MudIconButton Icon="@Icons.Material.Filled.Favorite" Color="Color.Warning" Style="cursor:default" title="Вы отправили запрос на дружбу" />
                                         }
                                         else
                                         {
-                                            <MudIconButton Icon="@Icons.Material.Filled.Favorite" Color="Color.Warning" Style="cursor:default" title="Вам отправлен запрос на дружбу" />
+                                            <MudIconButton onclick="@(() => ShowDialogs.AcceptFriendshipRequestDialogAsync(CurrentState.Account, Account))" Icon="@Icons.Material.Filled.Favorite" Color="Color.Warning" title="Вам отправлен запрос на дружбу" />
                                         }
                                     }
                                 }
                                 else
                                 {
-                                    <MudIconButton onclick="@(() => ShowDialogs.FriendshipDialogAsync(CurrentState.Account, Account))" Icon="@Icons.Material.Filled.FavoriteBorder" Color="Color.Success" title="Добавить в друзья" />
+                                    <MudIconButton onclick="@(() => ShowDialogs.SendFriendshipRequestDialogAsync(CurrentState.Account, Account))" Icon="@Icons.Material.Filled.FavoriteBorder" Color="Color.Success" title="Добавить в друзья" />
                                 }
                                 <MudIconButton onclick="@(() => ShowDialogs.BlockAccountDialogAsync(CurrentState.Account, Account))" Icon="@Icons.Material.Filled.Block" Color="Color.Success" title="Заблокировать пользователя" />
                             }

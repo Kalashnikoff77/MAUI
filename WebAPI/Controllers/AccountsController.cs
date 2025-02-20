@@ -312,7 +312,7 @@ namespace WebAPI.Controllers
 
 
         [Route("UpdateRelation"), HttpPost, Authorize]
-        public async Task<ResponseDtoBase> UpdateRelationAsync(UpdateRelationRequestDto request)
+        public async Task<UpdateRelationResponseDto> UpdateRelationAsync(UpdateRelationRequestDto request)
         {
             AuthenticateUser();
 
@@ -341,6 +341,19 @@ namespace WebAPI.Controllers
             }
 
             return model.Response;
+        }
+
+        [Route("DeleteRelation"), HttpPost, Authorize]
+        public async Task<ResponseDtoBase> DeleteRelationAsync(DeleteRelationRequestDto request)
+        {
+            AuthenticateUser();
+
+            var sql = $"DELETE FROM RelationsForAccounts " +
+                $"WHERE {nameof(RelationsForAccountsEntity.SenderId)} = @AccountId AND {nameof(RelationsForAccountsEntity.RecipientId)} = @RecipientId AND {nameof(RelationsForAccountsEntity.Type)} = @EnumRelation";
+            await _unitOfWork.SqlConnection.ExecuteAsync(sql, new { _unitOfWork.AccountId, request.RecipientId, request.EnumRelation });
+
+            var response = new ResponseDtoBase();
+            return response;
         }
 
 

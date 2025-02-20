@@ -5,6 +5,7 @@ using Data.Enums;
 using Data.Models;
 using Data.Models.SignalR;
 using Data.Services;
+using Data.State;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using SignalR.Models;
@@ -129,14 +130,6 @@ namespace SignalR
                 // Отправить запрос на дружбу
                 if (request.FriendshipRequest && request.RecipientId != null)
                 {
-                    var service = _serviceProvider.GetService<IRepository<AddMessageRequestDto, AddMessageResponseDto>>()!;
-                    var apiResult = await service.HttpPostAsync(new AddMessageRequestDto
-                    {
-                        Type = EnumMessages.RequestForFrendshipSent,
-                        RecipientId = request.RecipientId.Value,
-                        Text = StaticData.NotificationTypes[EnumMessages.RequestForFrendshipSent].Text,
-                        Token = accountDetails.Token
-                    });
                 }
 
                 // Блокируем пользователя
@@ -161,6 +154,18 @@ namespace SignalR
                         Type = EnumMessages.AccountUnblocked,
                         RecipientId = request.RecipientId.Value,
                         Text = StaticData.NotificationTypes[EnumMessages.AccountUnblocked].Text,
+                        Token = accountDetails.Token
+                    });
+                }
+
+                // Удалим одно сообщение
+                if (request.DeleteMessage && request.RecipientId != null && request.MessageId != null)
+                {
+                    var service = _serviceProvider.GetService<IRepository<DeleteMessagesRequestDto, ResponseDtoBase>>()!;
+                    var apiResult = await service.HttpPostAsync(new DeleteMessagesRequestDto
+                    {
+                        MessageId = request.MessageId.Value,
+                        RecipientId = request.RecipientId.Value,
                         Token = accountDetails.Token
                     });
                 }

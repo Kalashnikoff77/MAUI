@@ -84,7 +84,7 @@ namespace WebAPI.Models
             {
                 sql = $"INSERT INTO RelationsForAccounts ({nameof(RelationsForAccountsEntity.SenderId)}, {nameof(RelationsForAccountsEntity.RecipientId)}, {nameof(RelationsForAccountsEntity.Type)}, {nameof(RelationsForAccountsEntity.IsConfirmed)}) " +
                     $"VALUES " +
-                    $"(@{nameof(RelationsForAccountsEntity.RecipientId)}, @{nameof(RelationsForAccountsEntity.SenderId)}, {(short)EnumRelations.Friend}, 0)";
+                    $"(@{nameof(RelationsForAccountsEntity.SenderId)}, @{nameof(RelationsForAccountsEntity.RecipientId)}, {(short)EnumRelations.Friend}, 0)";
                 await Conn.ExecuteAsync(sql, new { SenderId, RecipientId });
                 Response.IsRelationAdded = true;
             }

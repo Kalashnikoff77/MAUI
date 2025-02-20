@@ -4,6 +4,7 @@ using Data.Dto.Sp;
 using Data.Dto.Views;
 using Data.Enums;
 using Data.Extensions;
+using Data.Models;
 using Data.Models.SignalR;
 using Data.Services;
 using Data.State;
@@ -131,82 +132,232 @@ namespace Shared.Components.Dialogs
             }
         }
 
-
         /// <summary>
-        /// Принять в друзья или отменить дружбу
+        /// Запрос на добавление в друзья
         /// </summary>
-        public async Task FriendshipDialogAsync(AccountsViewDto? account1, AccountsViewDto? account2)
+        public async Task SendFriendshipRequestDialogAsync(AccountsViewDto? sender, AccountsViewDto? recipient)
         {
-            if (CurrentState.Account != null && account1 != null && account2 != null)
+            if (CurrentState.Account != null && sender != null && recipient != null)
             {
-                var hasFriendshipRelation = CurrentState.Account.Relations?.GetRelationInfo(EnumRelations.Friend, account1, account2);
-
-                string dialogText;
-                Color buttonColor;
-
-                if (hasFriendshipRelation == null)
+                var parameters = new DialogParameters<ConfirmDialog>
                 {
-                    dialogText = "Отправить приглашение к дружбе?";
-                    buttonColor = Color.Success;
-                }
-                else
-                {
-                    if (hasFriendshipRelation.IsConfirmed)
-                    {
-                        dialogText = "Вы хотите прекратить дружбу?";
-                        buttonColor = Color.Error;
-                    }
-                    else
-                    {
-                        dialogText = "Вы согласны принять дружбу?";
-                        buttonColor = Color.Success;
-                    }
-                }
-
-                    var parameters = new DialogParameters<ConfirmDialog>
-                    {
-                        { x => x.ContentText, dialogText },
-                        { x => x.ButtonText, "Да" },
-                        { x => x.Color, buttonColor }
-                    };
+                    { x => x.ContentText, "Отправить приглашение к дружбе?" },
+                    { x => x.ButtonText, "Да" },
+                    { x => x.Color, Color.Success }
+                };
                 var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.Small };
                 var resultDialog = await _dialogService.ShowAsync<ConfirmDialog>($"Подтверждение", parameters, options);
                 var result = await resultDialog.Result;
 
                 if (result != null && result.Canceled == false)
                 {
-                    var recipientId = account1.Id == CurrentState.Account.Id ? account2.Id : account1.Id;
-                    await FriendshipAccountAsync(recipientId);
+                    // 1. Добавим связь в RelationsForAccounts
+                    var _repoUpdateRelation = _serviceProvider.GetService<IRepository<UpdateRelationRequestDto, UpdateRelationResponseDto>>()!;
+                    var apiUpdateResponse = await _repoUpdateRelation.HttpPostAsync(new UpdateRelationRequestDto
+                    {
+                        RecipientId = recipient.Id,
+                        EnumRelation = EnumRelations.Friend,
+                        Token = CurrentState.Account.Token
+                    });
+
+                    // 2. Обновим CurrentState у обоих пользователей
+                    var accountReloadRequest = new SignalGlobalRequest
+                    {
+                        OnReloadAccountRequest = new OnReloadAccountRequest { AdditionalAccountId = recipient.Id } 
+                    };
+                    await CurrentState.SignalRServerAsync(accountReloadRequest);
+
+                    // 3. Добавим информационное сообщение в Messages
+                    var service = _serviceProvider.GetService<IRepository<AddMessageRequestDto, AddMessageResponseDto>>()!;
+                    var apiResult = await service.HttpPostAsync(new AddMessageRequestDto
+                    {
+                        Type = EnumMessages.RequestForFrendshipSent,
+                        RecipientId = recipient.Id,
+                        Text = StaticData.NotificationTypes[EnumMessages.RequestForFrendshipSent].Text,
+                        Token = CurrentState.Account.Token
+                    });
+
+                    // 4. Сообщим обоим пользователям о запросе дружбы
+                    var onMessagesUpdatedRequest = new SignalGlobalRequest { OnMessagesUpdatedRequest = new OnMessagesUpdatedRequest { RecipientId = recipient.Id, FriendshipRequest = true } };
+                    await CurrentState.SignalRServerAsync(onMessagesUpdatedRequest);
                 }
             }
         }
 
-        async Task FriendshipAccountAsync(int recipientId)
+        /// <summary>
+        /// Принятие запроса на добавления в друзья
+        /// </summary>
+        public async Task AcceptFriendshipRequestDialogAsync(AccountsViewDto? sender, AccountsViewDto? recipient)
         {
-            var _repoUpdateRelation = _serviceProvider.GetService<IRepository<UpdateRelationRequestDto, UpdateRelationResponseDto>>()!;
-            // Добавим связь дружбы в БД
-            var apiUpdateResponse = await _repoUpdateRelation.HttpPostAsync(new UpdateRelationRequestDto
+            if (CurrentState.Account != null && sender != null && recipient != null)
             {
-                RecipientId = recipientId,
-                EnumRelation = EnumRelations.Friend,
-                Token = CurrentState.Account?.Token
-            });
-
-            // Обновим состояния у обоих пользователей
-            var accountReloadRequest = new SignalGlobalRequest
-            {
-                OnReloadAccountRequest = new OnReloadAccountRequest
+                var parameters = new DialogParameters<ConfirmDialog>
                 {
-                    AdditionalAccountId = recipientId
-                }
-            };
-            await CurrentState.SignalRServerAsync(accountReloadRequest);
+                    { x => x.ContentText, "Вы согласны принять дружбу?" },
+                    { x => x.ButtonText, "Да" },
+                    { x => x.Color, Color.Success }
+                };
+                var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.Small };
+                var resultDialog = await _dialogService.ShowAsync<ConfirmDialog>($"Подтверждение", parameters, options);
+                var result = await resultDialog.Result;
 
-            // Сообщим обоим пользователям о запросе дружбы
-            var onMessagesUpdatedRequest = new SignalGlobalRequest { OnMessagesUpdatedRequest = new OnMessagesUpdatedRequest { RecipientId = recipientId } };
-            onMessagesUpdatedRequest.OnMessagesUpdatedRequest.FriendshipRequest = true;
-            await CurrentState.SignalRServerAsync(onMessagesUpdatedRequest);
+                if (result != null && result.Canceled == false)
+                {
+                    var recipientId = sender.Id == CurrentState.Account.Id ? recipient.Id : sender.Id;
+                    var _repoUpdateRelation = _serviceProvider.GetService<IRepository<UpdateRelationRequestDto, UpdateRelationResponseDto>>()!;
+                    // Добавим связь дружбы в БД
+                    var apiUpdateResponse = await _repoUpdateRelation.HttpPostAsync(new UpdateRelationRequestDto
+                    {
+                        RecipientId = recipientId,
+                        EnumRelation = EnumRelations.Friend,
+                        Token = CurrentState.Account?.Token
+                    });
+
+                    // Обновим состояния у обоих пользователей
+                    var accountReloadRequest = new SignalGlobalRequest
+                    {
+                        OnReloadAccountRequest = new OnReloadAccountRequest { AdditionalAccountId = recipientId }
+                    };
+                    await CurrentState.SignalRServerAsync(accountReloadRequest);
+
+                    // Сообщим обоим пользователям о запросе дружбы
+                    var onMessagesUpdatedRequest = new SignalGlobalRequest { OnMessagesUpdatedRequest = new OnMessagesUpdatedRequest { RecipientId = recipientId } };
+                    onMessagesUpdatedRequest.OnMessagesUpdatedRequest.FriendshipRequest = true;
+                    await CurrentState.SignalRServerAsync(onMessagesUpdatedRequest);
+                }
+            }
         }
+
+        /// <summary>
+        /// Отмена запроса инициатором на добавление в друзья
+        /// </summary>
+        public async Task AbortFriendshipRequestDialogAsync(AccountsViewDto? sender, AccountsViewDto? recipient)
+        {
+        }
+
+        /// <summary>
+        /// Отказ принятия дружбы
+        /// </summary>
+        public async Task DeclineFriendshipRequestDialogAsync(AccountsViewDto? sender, AccountsViewDto? recipient)
+        {
+            if (CurrentState.Account != null && sender != null && recipient != null)
+            {
+                var hasFriendshipRelation = CurrentState.Account.Relations?.GetRelationInfo(EnumRelations.Friend, sender, recipient);
+
+                var parameters = new DialogParameters<ConfirmDialog>
+                {
+                    { x => x.ContentText, "Вы хотите отказаться от предложения дружбы?" },
+                    { x => x.ButtonText, "Да" },
+                    { x => x.Color, Color.Error }
+                };
+                var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.Small };
+                var resultDialog = await _dialogService.ShowAsync<ConfirmDialog>($"Подтверждение", parameters, options);
+                var result = await resultDialog.Result;
+
+                if (result != null && result.Canceled == false)
+                {
+                    var recipientId = sender.Id == CurrentState.Account.Id ? recipient.Id : sender.Id;
+
+                    //var request = new DeleteMessagesRequestDto
+                    //{
+                    //    MessageId = messageId,
+                    //    RecipientId = Recipient.Id,
+                    //    Token = CurrentState.Account?.Token
+                    //};
+                    //var apiResponse = await _repoDeleteMessage.HttpPostAsync(request);
+
+                    //text = StaticData.NotificationTypes[EnumMessages.RequestForFrendshipDeclined].Text;
+                    //await SubmitMessageAsync(EnumMessages.RequestForFrendshipDeclined);
+
+                    //// Удалим сообщение с запросом дружбы из UI у обоих пользователей
+                    //var onMessagesUpdatedRequest = new SignalGlobalRequest
+                    //{
+                    //    OnMessagesUpdatedRequest = new OnMessagesUpdatedRequest
+                    //    {
+                    //        DeleteMessage = true,
+                    //        MessageId = messageId,
+                    //        RecipientId = Recipient.Id
+                    //    }
+                    //};
+                    //await CurrentState.SignalRServerAsync(onMessagesUpdatedRequest);
+
+
+                    var _repoUpdateRelation = _serviceProvider.GetService<IRepository<UpdateRelationRequestDto, UpdateRelationResponseDto>>()!;
+                    // Добавим связь дружбы в БД
+                    var apiUpdateResponse = await _repoUpdateRelation.HttpPostAsync(new UpdateRelationRequestDto
+                    {
+                        RecipientId = recipientId,
+                        EnumRelation = EnumRelations.Friend,
+                        Token = CurrentState.Account?.Token
+                    });
+
+                    // Обновим состояния у обоих пользователей
+                    var accountReloadRequest = new SignalGlobalRequest
+                    {
+                        OnReloadAccountRequest = new OnReloadAccountRequest
+                        {
+                            AdditionalAccountId = recipientId
+                        }
+                    };
+                    await CurrentState.SignalRServerAsync(accountReloadRequest);
+
+                    // Сообщим обоим пользователям об отказе от принятия дружбы
+                    var onMessagesUpdatedRequest = new SignalGlobalRequest { OnMessagesUpdatedRequest = new OnMessagesUpdatedRequest { RecipientId = recipientId } };
+                    onMessagesUpdatedRequest.OnMessagesUpdatedRequest.FriendshipRequest = true;
+                    await CurrentState.SignalRServerAsync(onMessagesUpdatedRequest);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Прекращение дружбы
+        /// </summary>
+        public async Task CancelFriendshipDialogAsync(AccountsViewDto? sender, AccountsViewDto? recipient)
+        {
+            if (CurrentState.Account != null && sender != null && recipient != null)
+            {
+                var hasFriendshipRelation = CurrentState.Account.Relations?.GetRelationInfo(EnumRelations.Friend, sender, recipient);
+
+                var parameters = new DialogParameters<ConfirmDialog>
+                {
+                    { x => x.ContentText, "Вы хотите прекратить дружбу?" },
+                    { x => x.ButtonText, "Да" },
+                    { x => x.Color, Color.Error }
+                };
+                var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.Small };
+                var resultDialog = await _dialogService.ShowAsync<ConfirmDialog>($"Подтверждение", parameters, options);
+                var result = await resultDialog.Result;
+
+                if (result != null && result.Canceled == false)
+                {
+                    var recipientId = sender.Id == CurrentState.Account.Id ? recipient.Id : sender.Id;
+                    var _repoUpdateRelation = _serviceProvider.GetService<IRepository<UpdateRelationRequestDto, UpdateRelationResponseDto>>()!;
+                    // Добавим связь дружбы в БД
+                    var apiUpdateResponse = await _repoUpdateRelation.HttpPostAsync(new UpdateRelationRequestDto
+                    {
+                        RecipientId = recipientId,
+                        EnumRelation = EnumRelations.Friend,
+                        Token = CurrentState.Account?.Token
+                    });
+
+                    // Обновим состояния у обоих пользователей
+                    var accountReloadRequest = new SignalGlobalRequest
+                    {
+                        OnReloadAccountRequest = new OnReloadAccountRequest
+                        {
+                            AdditionalAccountId = recipientId
+                        }
+                    };
+                    await CurrentState.SignalRServerAsync(accountReloadRequest);
+
+                    // Сообщим обоим пользователям о запросе дружбы
+                    var onMessagesUpdatedRequest = new SignalGlobalRequest { OnMessagesUpdatedRequest = new OnMessagesUpdatedRequest { RecipientId = recipientId } };
+                    onMessagesUpdatedRequest.OnMessagesUpdatedRequest.FriendshipRequest = true;
+                    await CurrentState.SignalRServerAsync(onMessagesUpdatedRequest);
+                }
+            }
+        }
+
 
         #region /// БЛОКИРОВКА ПОЛЬЗОВАТЕЛЯ ///
         /// <summary>
