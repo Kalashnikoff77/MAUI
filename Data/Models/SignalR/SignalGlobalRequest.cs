@@ -76,7 +76,12 @@ namespace Data.Models.SignalR
         /// <summary>
         /// Подружиться
         /// </summary>
-        public bool FriendshipRequest{ get; set; }
+        public bool FriendshipRequest { get; set; }
+
+        /// <summary>
+        /// Принятие запроса на добавления в друзья
+        /// </summary>
+        public bool AcceptFriendshipRequest { get; set; }
 
         /// <summary>
         /// Блокировка пользователя

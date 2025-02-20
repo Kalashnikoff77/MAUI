@@ -48,6 +48,14 @@ namespace Shared.Components.Pages.Messages
             {
                 OnMessagesUpdatedHandler = OnMessagesUpdatedHandler.SignalRClient<OnMessagesUpdatedResponse>(CurrentState, async (response) =>
                 {
+                    // Запрос на добавление в друзья
+                    if (response.FriendshipRequest)
+                        await _JSModule.InvokeVoidAsync("AppendNewMessages", await GetNewMessages());
+
+                    // Принятие запроса на добавления в друзья
+                    if (response.AcceptFriendshipRequest)
+                        await _JSModule.InvokeVoidAsync("AppendNewMessages", await GetNewMessages());
+
                     // Добавление новых сообщений в диалог двух пользователей в MessagesDialog
                     if (response.AppendNewMessages)
                         await _JSModule.InvokeVoidAsync("AppendNewMessages", await GetNewMessages());

@@ -16,7 +16,7 @@ using Shared.Components.Pages.Messages;
 
 namespace Shared.Components.Dialogs
 {
-    public class ShowDialogs
+    public partial class ShowDialogs
     {
         public CurrentState CurrentState { get; set; } = null!;
 
@@ -88,51 +88,6 @@ namespace Shared.Components.Dialogs
         }
 
         /// <summary>
-        /// Подтверждение удаления всей переписки
-        /// </summary>
-        public async Task DeleteAllMessagesDialogAsync(List<LastMessagesForAccountSpDto> lastMessagesList, int messageId)
-        {
-            var parameters = new DialogParameters<ConfirmDialog>
-            {
-                { x => x.ContentText, $"Удалить всю переписку?" },
-                { x => x.ButtonText, "Удалить" },
-                { x => x.Color, Color.Error }
-            };
-            var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.Small };
-            var resultDialog = await _dialogService.ShowAsync<ConfirmDialog>($"Подтверждение", parameters, options);
-            var result = await resultDialog.Result;
-
-            if (result != null && result.Canceled == false)
-            {
-                var index = lastMessagesList.FindIndex(x => x.Id == messageId);
-
-                var recipientId = lastMessagesList[index].Sender?.Id == CurrentState.Account?.Id ? lastMessagesList[index].Recipient?.Id : lastMessagesList[index].Sender?.Id;
-                if (index >= 0 && lastMessagesList[index].Sender != null && recipientId != null)
-                {
-                    var _deleteMessages = _serviceProvider.GetService<IRepository<DeleteMessagesRequestDto, ResponseDtoBase>>()!;
-
-                    var apiResponse = await _deleteMessages.HttpPostAsync(new DeleteMessagesRequestDto
-                    {
-                        DeleteAll = true,
-                        RecipientId = recipientId.Value,
-                        Token = CurrentState.Account?.Token
-                    });
-
-                    var onMessagesUpdatedRequest = new SignalGlobalRequest
-                    {
-                        OnMessagesUpdatedRequest = new OnMessagesUpdatedRequest
-                        {
-                            DeleteMessages = true,
-                            RecipientId = recipientId.Value,
-                            MessagesIds = null
-                        }
-                    };
-                    await CurrentState.SignalRServerAsync(onMessagesUpdatedRequest);
-                }
-            }
-        }
-
-        /// <summary>
         /// Запрос на добавление в друзья
         /// </summary>
         public async Task SendFriendshipRequestDialogAsync(AccountsViewDto? sender, AccountsViewDto? recipient)
@@ -151,7 +106,7 @@ namespace Shared.Components.Dialogs
 
                 if (result != null && result.Canceled == false)
                 {
-                    // 1. Добавим связь в RelationsForAccounts
+                    // 1. Добавим связь в таблицу RelationsForAccounts
                     var _repoUpdateRelation = _serviceProvider.GetService<IRepository<UpdateRelationRequestDto, UpdateRelationResponseDto>>()!;
                     var apiUpdateResponse = await _repoUpdateRelation.HttpPostAsync(new UpdateRelationRequestDto
                     {
@@ -163,7 +118,7 @@ namespace Shared.Components.Dialogs
                     // 2. Обновим CurrentState у обоих пользователей
                     var accountReloadRequest = new SignalGlobalRequest
                     {
-                        OnReloadAccountRequest = new OnReloadAccountRequest { AdditionalAccountId = recipient.Id } 
+                        OnReloadAccountRequest = new OnReloadAccountRequest { AdditionalAccountId = recipient.Id }
                     };
                     await CurrentState.SignalRServerAsync(accountReloadRequest);
 
@@ -177,8 +132,15 @@ namespace Shared.Components.Dialogs
                         Token = CurrentState.Account.Token
                     });
 
-                    // 4. Сообщим обоим пользователям о запросе дружбы
-                    var onMessagesUpdatedRequest = new SignalGlobalRequest { OnMessagesUpdatedRequest = new OnMessagesUpdatedRequest { RecipientId = recipient.Id, FriendshipRequest = true } };
+                    // 4. Сообщим обоим пользователям о событии
+                    var onMessagesUpdatedRequest = new SignalGlobalRequest
+                    {
+                        OnMessagesUpdatedRequest = new OnMessagesUpdatedRequest
+                        {
+                            RecipientId = recipient.Id,
+                            FriendshipRequest = true
+                        }
+                    };
                     await CurrentState.SignalRServerAsync(onMessagesUpdatedRequest);
                 }
             }
@@ -203,27 +165,101 @@ namespace Shared.Components.Dialogs
 
                 if (result != null && result.Canceled == false)
                 {
-                    var recipientId = sender.Id == CurrentState.Account.Id ? recipient.Id : sender.Id;
+                    // 1. Добавим связь дружбы в БД
                     var _repoUpdateRelation = _serviceProvider.GetService<IRepository<UpdateRelationRequestDto, UpdateRelationResponseDto>>()!;
-                    // Добавим связь дружбы в БД
                     var apiUpdateResponse = await _repoUpdateRelation.HttpPostAsync(new UpdateRelationRequestDto
                     {
-                        RecipientId = recipientId,
+                        RecipientId = recipient.Id,
                         EnumRelation = EnumRelations.Friend,
-                        Token = CurrentState.Account?.Token
+                        Token = CurrentState.Account.Token
                     });
 
-                    // Обновим состояния у обоих пользователей
+                    // 2. Обновим CurrentState у обоих пользователей
                     var accountReloadRequest = new SignalGlobalRequest
                     {
-                        OnReloadAccountRequest = new OnReloadAccountRequest { AdditionalAccountId = recipientId }
+                        OnReloadAccountRequest = new OnReloadAccountRequest { AdditionalAccountId = recipient.Id }
                     };
                     await CurrentState.SignalRServerAsync(accountReloadRequest);
 
-                    // Сообщим обоим пользователям о запросе дружбы
-                    var onMessagesUpdatedRequest = new SignalGlobalRequest { OnMessagesUpdatedRequest = new OnMessagesUpdatedRequest { RecipientId = recipientId } };
-                    onMessagesUpdatedRequest.OnMessagesUpdatedRequest.FriendshipRequest = true;
+                    // 3. Добавим информационное сообщение в Messages
+                    var service = _serviceProvider.GetService<IRepository<AddMessageRequestDto, AddMessageResponseDto>>()!;
+                    var apiResult = await service.HttpPostAsync(new AddMessageRequestDto
+                    {
+                        Type = EnumMessages.RequestForFrendshipAccepted,
+                        RecipientId = recipient.Id,
+                        Text = StaticData.NotificationTypes[EnumMessages.RequestForFrendshipAccepted].Text,
+                        Token = CurrentState.Account.Token
+                    });
+
+                    // 4. Сообщим обоим пользователям о событии
+                    var onMessagesUpdatedRequest = new SignalGlobalRequest 
+                    { 
+                        OnMessagesUpdatedRequest = new OnMessagesUpdatedRequest 
+                        {
+                            AcceptFriendshipRequest = true,
+                            RecipientId = recipient.Id
+                        } 
+                    };
                     await CurrentState.SignalRServerAsync(onMessagesUpdatedRequest);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Подтверждение удаления всей переписки
+        /// </summary>
+        public async Task DeleteAllMessagesDialogAsync(List<LastMessagesForAccountSpDto> lastMessagesList, int messageId)
+        {
+            if (CurrentState.Account != null)
+            {
+                var parameters = new DialogParameters<ConfirmDialog>
+                {
+                    { x => x.ContentText, $"Удалить всю переписку?" },
+                    { x => x.ButtonText, "Удалить" },
+                    { x => x.Color, Color.Error }
+                };
+                var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.Small };
+                var resultDialog = await _dialogService.ShowAsync<ConfirmDialog>($"Подтверждение", parameters, options);
+                var result = await resultDialog.Result;
+
+                if (result != null && result.Canceled == false)
+                {
+                    var index = lastMessagesList.FindIndex(x => x.Id == messageId);
+                    var recipientId = lastMessagesList[index].Sender?.Id == CurrentState.Account.Id ? lastMessagesList[index].Recipient?.Id : lastMessagesList[index].Sender?.Id;
+
+                    if (index >= 0 && lastMessagesList[index].Sender != null && recipientId != null)
+                    {
+                        // 1. Удалим все сообщения в таблице Messages
+                        var _deleteMessages = _serviceProvider.GetService<IRepository<DeleteMessagesRequestDto, ResponseDtoBase>>()!;
+                        var apiResponse = await _deleteMessages.HttpPostAsync(new DeleteMessagesRequestDto
+                        {
+                            DeleteAll = true,
+                            RecipientId = recipientId.Value,
+                            Token = CurrentState.Account.Token
+                        });
+
+                        // 2. Добавим информационное сообщение в Messages
+                        var _addMessages = _serviceProvider.GetService<IRepository<AddMessageRequestDto, AddMessageResponseDto>>()!;
+                        var apiResult = await _addMessages.HttpPostAsync(new AddMessageRequestDto
+                        {
+                            Type = EnumMessages.AllMessagesDeleted,
+                            RecipientId = recipientId.Value,
+                            Text = StaticData.NotificationTypes[EnumMessages.AllMessagesDeleted].Text,
+                            Token = CurrentState.Account.Token
+                        });
+
+                        // 3. Сообщим обоим пользователям о событии
+                        var onMessagesUpdatedRequest = new SignalGlobalRequest
+                        {
+                            OnMessagesUpdatedRequest = new OnMessagesUpdatedRequest
+                            {
+                                DeleteMessages = true,
+                                RecipientId = recipientId.Value,
+                                MessagesIds = null
+                            }
+                        };
+                        await CurrentState.SignalRServerAsync(onMessagesUpdatedRequest);
+                    }
                 }
             }
         }

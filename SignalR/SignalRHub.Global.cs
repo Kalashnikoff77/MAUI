@@ -102,6 +102,21 @@ namespace SignalR
         {
             if (GetAccountDetails(out AccountDetails accountDetails, Context.UserIdentifier))
             {
+                // Запрос на добавление в друзья
+                if (request.FriendshipRequest && request.RecipientId != null)
+                {
+                }
+
+                // Принятие запроса на добавления в друзья
+                if (request.AcceptFriendshipRequest && request.RecipientId != null)
+                {
+                }
+
+                // Удаление всей переписки
+                if (request.DeleteMessages && request.RecipientId != null)
+                {
+                }
+
                 // Помечаем выбранные сообщения как прочитанные в БД
                 if (request.MarkMessagesAsRead && request.MessagesIds != null && request.RecipientId != null)
                 {
@@ -125,11 +140,6 @@ namespace SignalR
                         SenderId = request.RecipientId.Value,
                         Token = accountDetails.Token 
                     });
-                }
-
-                // Отправить запрос на дружбу
-                if (request.FriendshipRequest && request.RecipientId != null)
-                {
                 }
 
                 // Блокируем пользователя
@@ -158,7 +168,7 @@ namespace SignalR
                     });
                 }
 
-                // Удалим одно сообщение
+                // Удаляем одно сообщение
                 if (request.DeleteMessage && request.RecipientId != null && request.MessageId != null)
                 {
                     var service = _serviceProvider.GetService<IRepository<DeleteMessagesRequestDto, ResponseDtoBase>>()!;
@@ -166,19 +176,6 @@ namespace SignalR
                     {
                         MessageId = request.MessageId.Value,
                         RecipientId = request.RecipientId.Value,
-                        Token = accountDetails.Token
-                    });
-                }
-
-                // Удаляем всю переписку
-                if (request.DeleteMessages && request.RecipientId != null)
-                {
-                    var service = _serviceProvider.GetService<IRepository<AddMessageRequestDto, AddMessageResponseDto>>()!;
-                    var apiResult = await service.HttpPostAsync(new AddMessageRequestDto
-                    {
-                        Type = EnumMessages.AllMessagesDeleted,
-                        RecipientId = request.RecipientId.Value,
-                        Text = StaticData.NotificationTypes[EnumMessages.AllMessagesDeleted].Text,
                         Token = accountDetails.Token
                     });
                 }

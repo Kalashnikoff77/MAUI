@@ -49,11 +49,11 @@
                                         @* Кто инициатор дружбы? *@
                                         @if (hasFriendship.Sender.Id == CurrentState.Account.Id)
                                         {
-                                            <MudIconButton Icon="@Icons.Material.Filled.Favorite" Color="Color.Warning" Style="cursor:default" title="Вы отправили запрос на дружбу" />
+                                            <MudIconButton Icon="@Icons.Material.Filled.FavoriteBorder" Color="Color.Warning" Style="cursor:default" title="Вы отправили запрос на дружбу" />
                                         }
                                         else
                                         {
-                                            <MudIconButton onclick="@(() => ShowDialogs.AcceptFriendshipRequestDialogAsync(CurrentState.Account, Account))" Icon="@Icons.Material.Filled.Favorite" Color="Color.Warning" title="Вам отправлен запрос на дружбу" />
+                                            <MudIconButton onclick="@(() => ShowDialogs.AcceptFriendshipRequestDialogAsync(CurrentState.Account, Account))" Icon="@Icons.Material.Filled.FavoriteBorder" Color="Color.Warning" title="Вам отправлен запрос на дружбу" />
                                         }
                                     }
                                 }
