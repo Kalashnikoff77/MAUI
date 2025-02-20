@@ -43,12 +43,12 @@ namespace WebAPI.Models
             // Удалим все связи обоих пользователей
             await RemoveAllRelationsAsync();
 
-            // Удалим все уведомления у обоих пользователей
+            // Удалим все уведомления (кроме уведомлений о блокировке) у обоих пользователей
             sql = $"UPDATE Messages SET {nameof(MessagesEntity.IsDeleted)} = 1 WHERE " +
                 $"(({nameof(RelationsForAccountsEntity.SenderId)} = @SenderId AND {nameof(RelationsForAccountsEntity.RecipientId)} = @RecipientId) " +
                 $"OR " +
                 $"({nameof(RelationsForAccountsEntity.SenderId)} = @RecipientId AND {nameof(RelationsForAccountsEntity.RecipientId)} = @SenderId)) " +
-                $"AND {nameof(MessagesEntity.Type)} > 0";
+                $"AND {nameof(MessagesEntity.Type)} NOT IN ({(short)EnumMessages.Message},{(short)EnumMessages.AccountBlocked},{(short)EnumMessages.AccountUnblocked})";
             await Conn.ExecuteAsync(sql, new { SenderId, RecipientId });
 
             // Добавим связь "Заблокирован"
