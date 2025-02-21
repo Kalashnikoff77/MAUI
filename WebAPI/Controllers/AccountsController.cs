@@ -349,11 +349,13 @@ namespace WebAPI.Controllers
             AuthenticateUser();
 
             var sql = $"DELETE FROM RelationsForAccounts " +
-                $"WHERE {nameof(RelationsForAccountsEntity.SenderId)} = @AccountId AND {nameof(RelationsForAccountsEntity.RecipientId)} = @RecipientId AND {nameof(RelationsForAccountsEntity.Type)} = @EnumRelation";
-            await _unitOfWork.SqlConnection.ExecuteAsync(sql, new { _unitOfWork.AccountId, request.RecipientId, request.EnumRelation });
+                $"WHERE (({nameof(MessagesEntity.SenderId)} = @{nameof(MessagesEntity.SenderId)} AND {nameof(MessagesEntity.RecipientId)} = @{nameof(MessagesEntity.RecipientId)}) " +
+                $"OR ({nameof(MessagesEntity.SenderId)} = @{nameof(MessagesEntity.RecipientId)} AND {nameof(MessagesEntity.RecipientId)} = @{nameof(MessagesEntity.SenderId)})) " +
+                $"AND {nameof(RelationsForAccountsEntity.Type)} = @EnumRelation";
 
-            var response = new ResponseDtoBase();
-            return response;
+            await _unitOfWork.SqlConnection.ExecuteAsync(sql, new { SenderId = _unitOfWork.AccountId, request.RecipientId, request.EnumRelation });
+
+            return new ResponseDtoBase();
         }
 
 

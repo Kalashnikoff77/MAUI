@@ -22,7 +22,6 @@ namespace WebAPI.Controllers
     {
         public MessagesController(IMapper mapper, IConfiguration configuration, IMemoryCache cache) : base(configuration, mapper, cache) { }
 
-
         // Получить одно или все сообщения
         [Route("Get"), HttpPost, Authorize]
         public async Task<GetMessagesResponseDto> GetAsync(GetMessagesRequestDto request)
@@ -196,6 +195,7 @@ namespace WebAPI.Controllers
 
             return response;
         }
+
 
         [Route("Delete"), HttpPost, Authorize]
         public async Task<ResponseDtoBase> DeleteAsync(DeleteMessagesRequestDto request)

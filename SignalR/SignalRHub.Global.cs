@@ -122,6 +122,11 @@ namespace SignalR
                 {
                 }
 
+                // Прекращение дружбы
+                if (request.CancelFriendship && request.RecipientId != null)
+                {
+                }
+
                 // Помечаем выбранные сообщения как прочитанные в БД
                 if (request.MarkMessagesAsRead && request.MessagesIds != null && request.RecipientId != null)
                 {

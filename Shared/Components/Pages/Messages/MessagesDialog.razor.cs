@@ -56,7 +56,6 @@ namespace Shared.Components.Pages.Messages
                         var requestMessages = messages.Where(x => x.Type == EnumMessages.RequestForFriendshipSent);
                         foreach (var message in requestMessages)
                             await _JSModule.InvokeVoidAsync("DeleteMessage", message.Id);
-
                         await _JSModule.InvokeVoidAsync("AppendNewMessages", await GetNewMessages());
                     }
 
@@ -67,6 +66,19 @@ namespace Shared.Components.Pages.Messages
                         foreach (var message in requestMessages)
                             await _JSModule.InvokeVoidAsync("DeleteMessage", message.Id);
                     }
+
+                    // Отклонение получателем запроса на добавление в друзья
+                    if (response.DeclineFriendshipRequest)
+                    {
+                        var requestMessages = messages.Where(x => x.Type == EnumMessages.RequestForFriendshipSent);
+                        foreach (var message in requestMessages)
+                            await _JSModule.InvokeVoidAsync("DeleteMessage", message.Id);
+                        await _JSModule.InvokeVoidAsync("AppendNewMessages", await GetNewMessages());
+                    }
+
+                    // Прекращение дружбы
+                    if (response.CancelFriendship)
+                        await _JSModule.InvokeVoidAsync("AppendNewMessages", await GetNewMessages());
 
                     // Добавление новых сообщений в диалог двух пользователей в MessagesDialog
                     if (response.AppendNewMessages)

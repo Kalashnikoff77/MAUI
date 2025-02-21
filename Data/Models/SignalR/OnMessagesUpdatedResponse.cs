@@ -50,6 +50,16 @@ namespace Data.Models.SignalR
         public bool AbortFriendshipRequest { get; set; }
 
         /// <summary>
+        /// Отклонение получателем запроса на добавление в друзья
+        /// </summary>
+        public bool DeclineFriendshipRequest { get; set; }
+
+        /// <summary>
+        /// Прекращение дружбы
+        /// </summary>
+        public bool CancelFriendship { get; set; }
+
+        /// <summary>
         /// Блокировка пользователя
         /// </summary>
         public bool BlockAccount { get; set; }

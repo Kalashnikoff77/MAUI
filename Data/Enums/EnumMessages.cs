@@ -26,6 +26,11 @@
         RequestForFriendshipDeclined,
 
         /// <summary>
+        /// Дружба прекращена
+        /// </summary>
+        FriendshipCancelled,
+
+        /// <summary>
         /// Все сообщения удалены
         /// </summary>
         AllMessagesDeleted,

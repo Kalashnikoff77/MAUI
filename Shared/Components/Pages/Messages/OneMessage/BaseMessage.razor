@@ -36,6 +36,10 @@
             {
                 <Shared.Components.Pages.Messages.OneMessage.Sender.RequestForFrendshipDeclined Message="Message" />
             }
+            else if (Message.Type == EnumMessages.FriendshipCancelled)
+            {
+                <Shared.Components.Pages.Messages.OneMessage.Sender.FriendshipCancelled Message="Message" />
+            }
             else if (Message.Type == EnumMessages.AllMessagesDeleted)
             {
                 <Shared.Components.Pages.Messages.OneMessage.Sender.AllMessagesDeleted Message="Message" />
@@ -78,6 +82,10 @@ else
             else if (Message.Type == EnumMessages.RequestForFriendshipDeclined)
             {
                 <Shared.Components.Pages.Messages.OneMessage.Recipient.RequestForFrendshipDeclined Message="Message" />
+            }
+            else if (Message.Type == EnumMessages.FriendshipCancelled)
+            {
+                <Shared.Components.Pages.Messages.OneMessage.Recipient.FriendshipCancelled Message="Message" />
             }
             else if (Message.Type == EnumMessages.AllMessagesDeleted)
             {
