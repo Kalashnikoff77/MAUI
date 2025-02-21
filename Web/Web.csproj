@@ -9,14 +9,14 @@
   <ItemGroup>
     <Content Remove="wwwroot\js\DivMessagesFrame.js" />
     <Content Remove="wwwroot\js\Layout\NavMenu.js" />
-    <Content Remove="wwwroot\js\Pages\Events\EventsScroll.js" />
+    <Content Remove="wwwroot\js\Pages\Events\Events.js" />
   </ItemGroup>
 
   <ItemGroup>
     <None Include="wwwroot\js\Layout\NavMenu.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="wwwroot\js\Pages\Events\EventsScroll.js">
+    <None Include="wwwroot\js\Pages\Events\Events.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

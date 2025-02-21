@@ -117,6 +117,11 @@ namespace SignalR
                 {
                 }
 
+                // Отмена запроса инициатором на добавление в друзья
+                if (request.AbortFriendshipRequest && request.RecipientId != null)
+                {
+                }
+
                 // Помечаем выбранные сообщения как прочитанные в БД
                 if (request.MarkMessagesAsRead && request.MessagesIds != null && request.RecipientId != null)
                 {

@@ -31,14 +31,15 @@ namespace WebAPI.Controllers
 
             var response = new GetMessagesResponseDto();
 
-            if (request.MessageId.HasValue && request.MessageId.Value > 0)
+            // Получить сообщение с указанным типом
+            if (request.Type != null)
             {
                 MessagesEntity? result;
                 var sql = $"SELECT * FROM Messages " +
                     $"WHERE (({nameof(MessagesEntity.SenderId)} = @AccountId AND {nameof(MessagesEntity.RecipientId)} = @RecipientId) " +
                     $"OR ({nameof(MessagesEntity.SenderId)} = @RecipientId AND {nameof(MessagesEntity.RecipientId)} = @AccountId)) " +
-                    $"AND IsDeleted = 0";
-                result = await _unitOfWork.SqlConnection.QueryFirstOrDefaultAsync<MessagesEntity>(sql, new { _unitOfWork.AccountId, request.RecipientId });
+                    $"AND Type = @Type AND IsDeleted = 0";
+                result = await _unitOfWork.SqlConnection.QueryFirstOrDefaultAsync<MessagesEntity>(sql, new { _unitOfWork.AccountId, request.RecipientId, request.Type });
                 response.Message = _unitOfWork.Mapper.Map<MessagesDto>(result);
             }
             else
@@ -219,7 +220,9 @@ namespace WebAPI.Controllers
             else
             {
                 sql = $"UPDATE Messages SET {nameof(MessagesEntity.IsDeleted)} = 1 " +
-                    $"WHERE Id = @MessageId AND {nameof(MessagesEntity.SenderId)} = @{nameof(MessagesEntity.SenderId)} AND {nameof(MessagesEntity.RecipientId)} = @{nameof(MessagesEntity.RecipientId)}";
+                    $"WHERE Id = @MessageId AND " +
+                    $"(({nameof(MessagesEntity.SenderId)} = @{nameof(MessagesEntity.SenderId)} AND {nameof(MessagesEntity.RecipientId)} = @{nameof(MessagesEntity.RecipientId)}) " +
+                    $"OR ({nameof(MessagesEntity.SenderId)} = @{nameof(MessagesEntity.RecipientId)} AND {nameof(MessagesEntity.RecipientId)} = @{nameof(MessagesEntity.SenderId)}))";
                 await _unitOfWork.SqlConnection.ExecuteAsync(sql, new { request.MessageId, SenderId = _unitOfWork.AccountId, request.RecipientId });
             }
 

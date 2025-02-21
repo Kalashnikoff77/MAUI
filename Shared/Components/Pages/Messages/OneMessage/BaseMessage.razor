@@ -24,15 +24,15 @@
     else
     {
         <div id="messageid_@Message.Id" class="d-flex justify-end pa-2">
-            @if (Message.Type == EnumMessages.RequestForFrendshipSent) 
+            @if (Message.Type == EnumMessages.RequestForFriendshipSent) 
             {
                 <Shared.Components.Pages.Messages.OneMessage.Sender.RequestForFrendshipSent Message="Message" />
             }
-            else if (Message.Type == EnumMessages.RequestForFrendshipAccepted)
+            else if (Message.Type == EnumMessages.RequestForFriendshipAccepted)
             {
                 <Shared.Components.Pages.Messages.OneMessage.Sender.RequestForFrendshipAccepted Message="Message" />
             }
-            else if (Message.Type == EnumMessages.RequestForFrendshipDeclined)
+            else if (Message.Type == EnumMessages.RequestForFriendshipDeclined)
             {
                 <Shared.Components.Pages.Messages.OneMessage.Sender.RequestForFrendshipDeclined Message="Message" />
             }
@@ -67,15 +67,15 @@ else
     else
     {
         <div id="messageid_@Message.Id" class="d-flex pa-2">
-            @if (Message.Type == EnumMessages.RequestForFrendshipSent) 
+            @if (Message.Type == EnumMessages.RequestForFriendshipSent) 
             {
                 <Shared.Components.Pages.Messages.OneMessage.Recipient.RequestForFrendshipSent Message="Message" />
             }
-            else if (Message.Type == EnumMessages.RequestForFrendshipAccepted)
+            else if (Message.Type == EnumMessages.RequestForFriendshipAccepted)
             {
                 <Shared.Components.Pages.Messages.OneMessage.Recipient.RequestForFrendshipAccepted Message="Message" />
             }
-            else if (Message.Type == EnumMessages.RequestForFrendshipDeclined)
+            else if (Message.Type == EnumMessages.RequestForFriendshipDeclined)
             {
                 <Shared.Components.Pages.Messages.OneMessage.Recipient.RequestForFrendshipDeclined Message="Message" />
             }

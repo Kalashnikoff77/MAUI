@@ -26,8 +26,6 @@ namespace Shared.Components.Pages.Messages
         [Inject] IRepository<GetMessagesRequestDto, GetMessagesResponseDto> _repoGetMessages { get; set; } = null!;
         [Inject] IRepository<AddMessageRequestDto, AddMessageResponseDto> _repoAddMessage { get; set; } = null!;
         [Inject] IRepository<DeleteMessagesRequestDto, ResponseDtoBase> _repoDeleteMessage { get; set; } = null!;
-        [Inject] IRepository<UpdateRelationRequestDto, UpdateRelationResponseDto> _repoUpdateRelation { get; set; } = null!;
-        [Inject] IRepository<DeleteRelationRequestDto, ResponseDtoBase> _repoDeleteRelation { get; set; } = null!;
         [Inject] ShowDialogs _showDialogs { get; set; } = null!;
         [Inject] IJSRuntime _JSRuntime { get; set; } = null!;
         [Inject] IComponentRenderer<BaseMessage> _renderer { get; set; } = null!;
@@ -54,7 +52,21 @@ namespace Shared.Components.Pages.Messages
 
                     // Принятие запроса на добавления в друзья
                     if (response.AcceptFriendshipRequest)
+                    {
+                        var requestMessages = messages.Where(x => x.Type == EnumMessages.RequestForFriendshipSent);
+                        foreach (var message in requestMessages)
+                            await _JSModule.InvokeVoidAsync("DeleteMessage", message.Id);
+
                         await _JSModule.InvokeVoidAsync("AppendNewMessages", await GetNewMessages());
+                    }
+
+                    // Отмена запроса инициатором на добавление в друзья
+                    if (response.AbortFriendshipRequest)
+                    {
+                        var requestMessages = messages.Where(x => x.Type == EnumMessages.RequestForFriendshipSent);
+                        foreach (var message in requestMessages)
+                            await _JSModule.InvokeVoidAsync("DeleteMessage", message.Id);
+                    }
 
                     // Добавление новых сообщений в диалог двух пользователей в MessagesDialog
                     if (response.AppendNewMessages)
@@ -146,7 +158,7 @@ namespace Shared.Components.Pages.Messages
                 });
 
                 _dotNetReference = DotNetObjectReference.Create(this);
-                _JSModule = await _JSRuntime.InvokeAsync<IJSObjectReference>("import", "./js/Pages/Messages/MessagesScroll.js");
+                _JSModule = await _JSRuntime.InvokeAsync<IJSObjectReference>("import", "./js/Pages/Messages/Messages.js");
                 await _JSModule.InvokeVoidAsync("Initialize", _dotNetReference);
                 await _JSModule.InvokeVoidAsync("LoadItems");
                 await _JSModule.InvokeVoidAsync("ScrollDivToBottom");
@@ -254,12 +266,20 @@ namespace Shared.Components.Pages.Messages
             }
         }
 
+
         /// <summary>
         /// Принятие дружбы
         /// </summary>
         [JSInvokable]
         public async Task AcceptFriendshipRequestAsync(int messageId) =>
             await _showDialogs.AcceptFriendshipRequestDialogAsync(CurrentState.Account, Recipient);
+
+        /// <summary>
+        /// Отмена запроса инициатором на добавление в друзья
+        /// </summary>
+        [JSInvokable]
+        public async Task AbortFriendshipRequestAsync(int messageId) =>
+            await _showDialogs.AbortFriendshipRequestDialogAsync(CurrentState.Account, Recipient);
 
         /// <summary>
         /// Отказ принятия дружбы
@@ -280,8 +300,8 @@ namespace Shared.Components.Pages.Messages
             };
             var apiResponse = await _repoDeleteMessage.HttpPostAsync(request);
 
-            text = StaticData.NotificationTypes[EnumMessages.RequestForFrendshipDeclined].Text;
-            await SubmitMessageAsync(EnumMessages.RequestForFrendshipDeclined);
+            text = StaticData.NotificationTypes[EnumMessages.RequestForFriendshipDeclined].Text;
+            await SubmitMessageAsync(EnumMessages.RequestForFriendshipDeclined);
 
             // Удалим сообщение с запросом дружбы из UI у обоих пользователей
             var onMessagesUpdatedRequest = new SignalGlobalRequest
@@ -294,39 +314,6 @@ namespace Shared.Components.Pages.Messages
                 }
             };
             await CurrentState.SignalRServerAsync(onMessagesUpdatedRequest);
-        }
-
-        /// <summary>
-        /// Отмена запроса инициатором на добавление в друзья
-        /// </summary>
-        [JSInvokable]
-        public async Task AbortFriendshipRequestAsync(int messageId)
-        {
-            await _showDialogs.AbortFriendshipRequestDialogAsync(CurrentState.Account, Recipient);
-
-            return;
-
-            ////ShowDialogs.FriendshipDialogAsync(CurrentState.Account, Account);
-
-            //// Удалим данные о запросе дружбы в БД
-            //var apiUpdateResponse = await _repoDeleteRelation.HttpPostAsync(new DeleteRelationRequestDto
-            //{
-            //    RecipientId = Recipient.Id,
-            //    EnumRelation = EnumRelations.Friend,
-            //    Token = CurrentState.Account?.Token
-            //});
-
-            //// Удалим сообщение с запросом дружбы из БД и UI у обоих пользователей
-            //var onMessagesUpdatedRequest = new SignalGlobalRequest
-            //{
-            //    OnMessagesUpdatedRequest = new OnMessagesUpdatedRequest
-            //    {
-            //        DeleteMessage = true,
-            //        MessageId = messageId,
-            //        RecipientId = Recipient.Id
-            //    }
-            //};
-            //await CurrentState.SignalRServerAsync(onMessagesUpdatedRequest);
         }
 
         public async ValueTask DisposeAsync()

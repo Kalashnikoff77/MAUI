@@ -84,6 +84,11 @@ namespace Data.Models.SignalR
         public bool AcceptFriendshipRequest { get; set; }
 
         /// <summary>
+        /// Отмена запроса инициатором на добавление в друзья
+        /// </summary>
+        public bool AbortFriendshipRequest { get; set; }
+
+        /// <summary>
         /// Блокировка пользователя
         /// </summary>
         public bool BlockAccount { get; set; }

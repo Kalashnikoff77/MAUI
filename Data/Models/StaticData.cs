@@ -59,9 +59,9 @@ namespace Data.Models
         /// </summary>
         public static Dictionary<EnumMessages, NotificationType> NotificationTypes = new()
         {
-            { EnumMessages.RequestForFrendshipSent, new NotificationType { SenderMessage = "Вы отправили запрос на добавление в друзья.", RecipientMessage = "Вы получили запрос на добавление в друзья.", Text = "Запрос в друзья." } },
-            { EnumMessages.RequestForFrendshipAccepted, new NotificationType { SenderMessage = "Ваш запрос на добавление в друзья принят.", RecipientMessage = "Вы приняли запрос на добавление в друзья.", Text = "Вы теперь друзья." } },
-            { EnumMessages.RequestForFrendshipDeclined, new NotificationType { SenderMessage = "Ваш запрос на добавление в друзья отклонён.", RecipientMessage = "Вы отклонили запрос на добавление в друзья.", Text = "Запрос в друзья отклонён." } },
+            { EnumMessages.RequestForFriendshipSent, new NotificationType { SenderMessage = "Вы отправили запрос на добавление в друзья.", RecipientMessage = "Вы получили запрос на добавление в друзья.", Text = "Запрос в друзья." } },
+            { EnumMessages.RequestForFriendshipAccepted, new NotificationType { SenderMessage = "Ваш запрос на добавление в друзья принят.", RecipientMessage = "Вы приняли запрос на добавление в друзья.", Text = "Вы теперь друзья." } },
+            { EnumMessages.RequestForFriendshipDeclined, new NotificationType { SenderMessage = "Ваш запрос на добавление в друзья отклонён.", RecipientMessage = "Вы отклонили запрос на добавление в друзья.", Text = "Запрос в друзья отклонён." } },
             { EnumMessages.AllMessagesDeleted, new NotificationType { SenderMessage = "Собеседник удалил всю переписку.", RecipientMessage = "Вы удалили всю переписку.", Text = "Вся переписка удалена." } },
             { EnumMessages.AccountBlocked, new NotificationType { SenderMessage = "Собеседник заблокировал Вас.", RecipientMessage = "Вы заблокировали собеседника.", Text = "Собеседник заблокирован." } },
             { EnumMessages.AccountUnblocked, new NotificationType { SenderMessage = "Собеседник разблокировал Вас.", RecipientMessage = "Вы разблокировали собеседника.", Text = "Собеседник разблокирован." } }

@@ -1,5 +1,10 @@
 * Доработать оставшиеся события в ShowDialogs.cs
-Сейчас сделано:
+СДЕЛАНО:
 SendFriendshipRequestDialogAsync
 AcceptFriendshipRequestDialogAsync
+AbortFriendshipRequestDialogAsync
 DeleteAllMessagesDialogAsync
+
+ОСТАЛОСЬ:
+DeclineFriendshipRequestDialogAsync
+CancelFriendshipDialogAsync

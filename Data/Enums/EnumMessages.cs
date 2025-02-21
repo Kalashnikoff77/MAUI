@@ -13,17 +13,17 @@
         /// <summary>
         /// Отправлен запрос на добавление в друзья
         /// </summary>
-        RequestForFrendshipSent,
+        RequestForFriendshipSent,
         
         /// <summary>
         /// Запрос на добавление в друзья принят
         /// </summary>
-        RequestForFrendshipAccepted,
+        RequestForFriendshipAccepted,
 
         /// <summary>
         /// Запрос на добавление в друзья отклонён
         /// </summary>
-        RequestForFrendshipDeclined,
+        RequestForFriendshipDeclined,
 
         /// <summary>
         /// Все сообщения удалены

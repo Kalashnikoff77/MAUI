@@ -50,7 +50,7 @@ namespace Shared.Components.Pages.Events
             if (firstRender)
             {
                 _dotNetReference = DotNetObjectReference.Create(this);
-                _JSModule = await _JSRuntime.InvokeAsync<IJSObjectReference>("import", $"{CurrentState.WebUrl}/js/Pages/Events/EventsScroll.js");
+                _JSModule = await _JSRuntime.InvokeAsync<IJSObjectReference>("import", $"{CurrentState.WebUrl}/js/Pages/Events/Events.js");
                 await _JSModule.InvokeVoidAsync("Initialize", _dotNetReference);
                 await ReloadItemsAsync();
             }
