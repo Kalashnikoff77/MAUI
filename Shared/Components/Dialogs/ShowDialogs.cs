@@ -516,7 +516,7 @@ namespace Shared.Components.Dialogs
                 {
                     { x => x.ContentText, hasBlockRelation == null ? $"Заблокировать пользователя?" : $"Разблокировать пользователя?" },
                     { x => x.ButtonText, hasBlockRelation == null ? "Заблокировать" : "Разблокировать" },
-                    { x => x.Color, Color.Error }
+                    { x => x.Color, hasBlockRelation == null ? Color.Error : Color.Success }
                 };
                 var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.Small };
                 var resultDialog = await _dialogService.ShowAsync<ConfirmDialog>($"Подтверждение", parameters, options);

@@ -61,14 +61,14 @@
                                 {
                                     <MudIconButton onclick="@(() => ShowDialogs.SendFriendshipRequestDialogAsync(CurrentState.Account, Account))" Icon="@Icons.Material.Filled.FavoriteBorder" Color="Color.Success" title="Добавить в друзья" />
                                 }
-                                <MudIconButton onclick="@(() => ShowDialogs.BlockAccountDialogAsync(CurrentState.Account, Account))" Icon="@Icons.Material.Filled.Block" Color="Color.Success" title="Заблокировать пользователя" />
+                                <MudIconButton onclick="@(() => ShowDialogs.BlockAccountDialogAsync(CurrentState.Account, Account))" Icon="@Icons.Material.Filled.Block" Color="Color.Error" title="Заблокировать пользователя" />
                             }
                             else
                             {
                                 @* Пользователь заблокирован. Инициатор текущий пользователь? *@
                                 @if (isBlocked.Sender.Id == CurrentState.Account.Id)
                                 {
-                                    <MudIconButton onclick="@(() => ShowDialogs.BlockAccountDialogAsync(CurrentState.Account, Account))" Icon="@Icons.Material.Filled.Block" Color="Color.Error" title="@($"Вы заблокировали {Account.Name}")" />
+                                    <MudIconButton onclick="@(() => ShowDialogs.BlockAccountDialogAsync(CurrentState.Account, Account))" Icon="@Icons.Material.Filled.Block" Color="Color.Error" Style="background-color: #ffcfcf" title="@($"Вы заблокировали {Account.Name}")" />
                                 }
                                 else
                                 {
