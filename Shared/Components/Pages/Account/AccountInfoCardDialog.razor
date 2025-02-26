@@ -26,7 +26,7 @@
                     <MudIcon Icon="@Icons.Material.Outlined.LocationOn" Style="font-size:20px" />
                     <MudText Typo="Typo.body2">@Account.ToRegionString()</MudText>
                 </div>
-                @if (CurrentState.Account != null)
+                @if (CurrentState.Account != null && CurrentState.Account.Id != Account.Id)
                 {
                     <div class="mt-2">
                         <MudButtonGroup Variant="Variant.Outlined" Color="Color.Primary">

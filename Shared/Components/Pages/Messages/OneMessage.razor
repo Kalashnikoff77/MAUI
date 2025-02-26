@@ -26,31 +26,31 @@
         <div id="messageid_@Message.Id" class="d-flex justify-end pa-2">
             @if (Message.Type == EnumMessages.RequestForFriendshipSent) 
             {
-                <Shared.Components.Pages.Messages.OneMessage.Sender.RequestForFrendshipSent Message="Message" />
+                <Shared.Components.Pages.Messages.Sender.RequestForFrendshipSent Message="Message" />
             }
             else if (Message.Type == EnumMessages.RequestForFriendshipAccepted)
             {
-                <Shared.Components.Pages.Messages.OneMessage.Sender.RequestForFrendshipAccepted Message="Message" />
+                <Shared.Components.Pages.Messages.Sender.RequestForFrendshipAccepted Message="Message" />
             }
             else if (Message.Type == EnumMessages.RequestForFriendshipDeclined)
             {
-                <Shared.Components.Pages.Messages.OneMessage.Sender.RequestForFrendshipDeclined Message="Message" />
+                <Shared.Components.Pages.Messages.Sender.RequestForFrendshipDeclined Message="Message" />
             }
             else if (Message.Type == EnumMessages.FriendshipCancelled)
             {
-                <Shared.Components.Pages.Messages.OneMessage.Sender.FriendshipCancelled Message="Message" />
+                <Shared.Components.Pages.Messages.Sender.FriendshipCancelled Message="Message" />
             }
             else if (Message.Type == EnumMessages.AllMessagesDeleted)
             {
-                <Shared.Components.Pages.Messages.OneMessage.Sender.AllMessagesDeleted Message="Message" />
+                <Shared.Components.Pages.Messages.Sender.AllMessagesDeleted Message="Message" />
             }
             else if (Message.Type == EnumMessages.AccountBlocked)
             {
-                <Shared.Components.Pages.Messages.OneMessage.Sender.AccountBlocked Message="Message" />
+                <Shared.Components.Pages.Messages.Sender.AccountBlocked Message="Message" />
             }
             else if (Message.Type == EnumMessages.AccountUnblocked)
             {
-                <Shared.Components.Pages.Messages.OneMessage.Sender.AccountUnblocked Message="Message" />
+                <Shared.Components.Pages.Messages.Sender.AccountUnblocked Message="Message" />
             }
         </div>
     }

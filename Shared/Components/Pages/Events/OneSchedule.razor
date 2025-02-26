@@ -1,5 +1,5 @@
 ﻿<tr id="scheduleid_@Schedule.Id">
-    <td style="cursor:pointer" onclick="_dotNetReference.invokeMethodAsync('ScheduleInfoCardDialog', parseInt(@Schedule.Id))">
+    <td style="cursor:pointer" onclick="_dotNetReferenceEvent.invokeMethodAsync('EventInfoCardDialog', parseInt(@Schedule.Id))">
         <MudStack Wrap="Wrap.NoWrap" Class="flex-sm-row" StretchItems="StretchItems.Middle" Spacing="1" AlignItems="AlignItems.Center">
             <ImageEvent Event="Schedule.Event" Size="EnumImageSize.s150x150" Title="@Schedule.Event!.Name" Class="d-none d-sm-block mr-2" Style="border-radius:3%; border:solid; border-width:1px; border-color:lightgray; width:140px; height:140px" />
             <ImageEvent Event="Schedule.Event" Size="EnumImageSize.s150x150" Title="@Schedule.Event.Name" Class="d-xs-block d-sm-none" Style="border-radius:4%; border:solid; border-width:1px; border-color:lightgray; width:210px; height:210px" />
@@ -62,7 +62,7 @@
                 }
             </div>
 
-            <div onclick="_dotNetReference.invokeMethodAsync('AccountInfoCardDialog', parseInt(@Schedule.Id)); event.stopPropagation()" class="d-none d-sm-flex flex-column align-center gap-2" style="width:100px; min-width:100px">
+            <div onclick="_dotNetReferenceEvent.invokeMethodAsync('AccountInfoCardDialog', parseInt(@Schedule.Id)); event.stopPropagation()" class="d-none d-sm-flex flex-column align-center gap-2" style="width:100px; min-width:100px">
                 <ImageAvatar Account="Schedule.Event.Admin" Size="EnumImageSize.s64x64" Title="Организатор" class="s45" Style="border-radius:50%" />
                 <ColorizedAccountName Account="@Schedule.Event.Admin" Typo="Typo.body2" Style="font-size:12px; text-align:center" />
             </div>

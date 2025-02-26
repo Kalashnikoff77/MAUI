@@ -19,8 +19,8 @@
     </DialogContent>
 
     <DialogActions>
-        <MudButton Color="Color.Error" StartIcon="@Icons.Material.Outlined.Close" OnClick="Cancel">Отмена</MudButton>
-        <MudButton OnClick="Submit" Color="Color.Primary" Variant="Variant.Filled" StartIcon="@Icons.Material.Outlined.GroupAdd" Size="Size.Small">
+        <MudButton Color="Color.Error" StartIcon="@Icons.Material.Outlined.Close" OnClick="Cancel">Закрыть</MudButton>
+        <MudButton OnClick="Submit" Color="@(IsRegistered ? Color.Error : Color.Success)" Variant="Variant.Filled" StartIcon="@Icons.Material.Outlined.GroupAdd" Size="Size.Small">
             @(IsRegistered ? "Отменить регистрацию" : "Зарегистрироваться")
         </MudButton>
     </DialogActions>

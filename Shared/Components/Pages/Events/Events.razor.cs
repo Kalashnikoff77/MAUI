@@ -21,7 +21,7 @@ namespace Shared.Components.Pages.Events
         [Inject] IRepository<GetAdminsForEventsRequestDto, GetAdminsForEventsResponseDto> _repoGetAdmins { get; set; } = null!;
         [Inject] ShowDialogs ShowDialogs { get; set; } = null!;
         [Inject] IJSRuntime _JSRuntime { get; set; } = null!;
-        [Inject] IComponentRenderer<OneSchedule> _renderer { get; set; } = null!;
+        [Inject] IComponentRenderer<OneSchedule> _renderOneSchedule { get; set; } = null!;
 
         GetSchedulesRequestDto _request = new GetSchedulesRequestDto { Take = StaticData.SCHEDULES_PER_BLOCK };
         List<SchedulesForEventsViewDto> schedules = new List<SchedulesForEventsViewDto>();
@@ -65,7 +65,7 @@ namespace Shared.Components.Pages.Events
                         if (index >= 0)
                         {
                             schedules[index] = response.UpdatedSchedule;
-                            var htmlItem = await _renderer.RenderAsync(new Dictionary<string, object?> { { "Schedule", response.UpdatedSchedule } });
+                            var htmlItem = await _renderOneSchedule.RenderAsync(new Dictionary<string, object?> { { "Schedule", response.UpdatedSchedule } });
                             await _JSModule.InvokeVoidAsync("ReplaceItem", response.UpdatedSchedule.Id, htmlItem);
                         }
                     }
@@ -94,20 +94,23 @@ namespace Shared.Components.Pages.Events
                 schedules.AddRange(apiResponse.Response.Schedules);
                 // Ручная генерация компонентов мероприятий
                 foreach (var schedule in apiResponse.Response.Schedules)
-                    htmlItems.Append(await _renderer.RenderAsync(new Dictionary<string, object?> { { "Schedule", schedule } }));
+                    htmlItems.Append(await _renderOneSchedule.RenderAsync(new Dictionary<string, object?> { { "Schedule", schedule } }));
             }
 
             IsNotFoundVisible = schedules.Count == 0 ? true : false;
+
+            // Вызвать необходимо, чтобы отобразить уведомение "Ничего не найдено".
+            StateHasChanged();
 
             return htmlItems.ToString();
         }
 
         [JSInvokable]
-        public async Task ScheduleInfoCardDialog(int scheduleId)
+        public async Task EventInfoCardDialog(int scheduleId)
         {
             var schedule = schedules.Find(x => x.Id == scheduleId);
             if (schedule != null)
-                await ShowDialogs.ScheduleInfoCardDialogAsync(schedule);
+                await ShowDialogs.EventInfoCardDialogAsync(schedule);
         }
 
         [JSInvokable]

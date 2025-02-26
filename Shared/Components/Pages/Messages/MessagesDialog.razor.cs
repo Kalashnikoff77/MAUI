@@ -11,7 +11,6 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using MudBlazor;
 using Shared.Components.Dialogs;
-using Shared.Components.Pages.Messages.OneMessage;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 
@@ -28,7 +27,7 @@ namespace Shared.Components.Pages.Messages
         [Inject] IRepository<DeleteMessagesRequestDto, ResponseDtoBase> _repoDeleteMessage { get; set; } = null!;
         [Inject] ShowDialogs _showDialogs { get; set; } = null!;
         [Inject] IJSRuntime _JSRuntime { get; set; } = null!;
-        [Inject] IComponentRenderer<BaseMessage> _renderer { get; set; } = null!;
+        [Inject] IComponentRenderer<OneMessage> _renderOneMessage { get; set; } = null!;
 
         DotNetObjectReference<MessagesDialog> _dotNetReference { get; set; } = null!;
         IJSObjectReference _JSModule { get; set; } = null!;
@@ -97,7 +96,7 @@ namespace Shared.Components.Pages.Messages
                             if (index >= 0)
                             {
                                 messages[index].ReadDate = DateTime.Now;
-                                var html = await _renderer.RenderAsync(new Dictionary<string, object?> { { "AccountId", CurrentState.Account?.Id }, { "Message", messages[index] } });
+                                var html = await _renderOneMessage.RenderAsync(new Dictionary<string, object?> { { "AccountId", CurrentState.Account?.Id }, { "Message", messages[index] } });
                                 await _JSModule.InvokeVoidAsync("MarkMessageAsRead", messageId, html);
                             }
                         }
@@ -114,7 +113,7 @@ namespace Shared.Components.Pages.Messages
                             if (index >= 0)
                             {
                                 messages[index].ReadDate = DateTime.Now;
-                                var html = await _renderer.RenderAsync(new Dictionary<string, object?> { { "AccountId", CurrentState.Account?.Id }, { "Message", messages[index] } });
+                                var html = await _renderOneMessage.RenderAsync(new Dictionary<string, object?> { { "AccountId", CurrentState.Account?.Id }, { "Message", messages[index] } });
                                 await _JSModule.InvokeVoidAsync("MarkMessageAsRead", messageId, html);
                             }
                         }
@@ -242,7 +241,7 @@ namespace Shared.Components.Pages.Messages
             var html = new StringBuilder(5000);
 
             foreach (var message in messages)
-                html.Append(await _renderer.RenderAsync(new Dictionary<string, object?> { { "AccountId", CurrentState.Account?.Id }, { "Message", message } }));
+                html.Append(await _renderOneMessage.RenderAsync(new Dictionary<string, object?> { { "AccountId", CurrentState.Account?.Id }, { "Message", message } }));
 
             return html.ToString();
         }
@@ -297,46 +296,17 @@ namespace Shared.Components.Pages.Messages
         /// Отказ принятия дружбы
         /// </summary>
         [JSInvokable]
-        public async Task DeclineFriendshipRequestAsync(int messageId)
-        {
+        public async Task DeclineFriendshipRequestAsync(int messageId) =>
             await _showDialogs.DeclineFriendshipRequestDialogAsync(CurrentState.Account, Recipient);
-
-            return;
-
-            // Удалим сообщение из БД
-            var request = new DeleteMessagesRequestDto
-            {
-                MessageId = messageId,
-                RecipientId = Recipient.Id,
-                Token = CurrentState.Account?.Token
-            };
-            var apiResponse = await _repoDeleteMessage.HttpPostAsync(request);
-
-            text = StaticData.NotificationTypes[EnumMessages.RequestForFriendshipDeclined].Text;
-            await SubmitMessageAsync(EnumMessages.RequestForFriendshipDeclined);
-
-            // Удалим сообщение с запросом дружбы из UI у обоих пользователей
-            var onMessagesUpdatedRequest = new SignalGlobalRequest
-            {
-                OnMessagesUpdatedRequest = new OnMessagesUpdatedRequest
-                {
-                    DeleteMessage = true,
-                    MessageId = messageId,
-                    RecipientId = Recipient.Id
-                }
-            };
-            await CurrentState.SignalRServerAsync(onMessagesUpdatedRequest);
-        }
 
         public async ValueTask DisposeAsync()
         {
             try
             {
                 OnMessagesUpdatedHandler?.Dispose();
-                _dotNetReference?.Dispose();
-
                 if (_JSModule != null)
                     await _JSModule.DisposeAsync();
+                _dotNetReference?.Dispose();
             }
             // Отлов ошибки, когда соединение SignalR разорвано, но производится попытка вызвать JS. Возникает при перезагрузке страницы (F5)
             catch (JSDisconnectedException ex)

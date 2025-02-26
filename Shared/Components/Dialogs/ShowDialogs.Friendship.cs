@@ -21,7 +21,7 @@ namespace Shared.Components.Dialogs
         {
             if (CurrentState.Account != null && sender != null && recipient != null)
             {
-                var result = await ShowDialog("Отправить приглашение к дружбе?", "Да", Color.Success);
+                var result = await ShowConfirmDialog("Отправить приглашение к дружбе?", "Да", Color.Success);
 
                 if (result != null && result.Canceled == false)
                 {
@@ -68,7 +68,7 @@ namespace Shared.Components.Dialogs
         {
             if (CurrentState.Account != null && sender != null && recipient != null)
             {
-                var result = await ShowDialog("Вы согласны принять дружбу?", "Да", Color.Success);
+                var result = await ShowConfirmDialog("Вы согласны принять дружбу?", "Да", Color.Success);
 
                 if (result != null && result.Canceled == false)
                 {
@@ -136,7 +136,7 @@ namespace Shared.Components.Dialogs
         {
             if (CurrentState.Account != null && sender != null && recipient != null)
             {
-                var result = await ShowDialog("Отменить запрос на дружбу?", "Да", Color.Error);
+                var result = await ShowConfirmDialog("Отменить запрос на дружбу?", "Да", Color.Error);
 
                 if (result != null && result.Canceled == false)
                 {
@@ -194,7 +194,7 @@ namespace Shared.Components.Dialogs
         {
             if (CurrentState.Account != null && sender != null && recipient != null)
             {
-                var result = await ShowDialog("Отклонить предложение дружбы?", "Да", Color.Error);
+                var result = await ShowConfirmDialog("Отклонить предложение дружбы?", "Да", Color.Error);
 
                 if (result != null && result.Canceled == false)
                 {
@@ -264,7 +264,7 @@ namespace Shared.Components.Dialogs
             {
                 var hasFriendshipRelation = CurrentState.Account.Relations?.GetRelationInfo(EnumRelations.Friend, sender, recipient);
 
-                var result = await ShowDialog("Вы хотите прекратить дружбу?", "Да", Color.Error);
+                var result = await ShowConfirmDialog("Вы хотите прекратить дружбу?", "Да", Color.Error);
 
                 if (result != null && result.Canceled == false)
                 {

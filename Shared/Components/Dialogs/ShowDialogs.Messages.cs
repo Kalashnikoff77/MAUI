@@ -36,7 +36,7 @@ namespace Shared.Components.Dialogs
         {
             if (CurrentState.Account != null)
             {
-                var result = await ShowDialog("Удалить всю переписку?", "Да", Color.Error);
+                var result = await ShowConfirmDialog("Удалить всю переписку?", "Да", Color.Error);
 
                 if (result != null && result.Canceled == false)
                 {

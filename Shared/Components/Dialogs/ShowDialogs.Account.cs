@@ -8,11 +8,26 @@ using Data.Services;
 using Data.State;
 using Microsoft.Extensions.DependencyInjection;
 using MudBlazor;
+using Shared.Components.Pages.Account;
 
 namespace Shared.Components.Dialogs
 {
     public partial class ShowDialogs
     {
+        /// <summary>
+        /// Карточка аккаунта
+        /// </summary>
+        public async Task AccountInfoCardDialogAsync(AccountsViewDto account)
+        {
+            DialogOptions dialogOptions = new() { CloseOnEscapeKey = true, CloseButton = true, BackdropClick = true };
+
+            var dialogParams = new DialogParameters<AccountInfoCardDialog>
+            {
+                { x => x.Account, account }
+            };
+            await _dialogService.ShowAsync<AccountInfoCardDialog>(account.Name, dialogParams, dialogOptions);
+        }
+
         /// <summary>
         /// Блокировка пользователя
         /// </summary>
@@ -22,7 +37,7 @@ namespace Shared.Components.Dialogs
             {
                 var hasBlockRelation = CurrentState.Account.Relations?.GetRelationInfo(EnumRelations.Blocked, account1, account2);
 
-                var result = await ShowDialog(hasBlockRelation == null ? $"Заблокировать пользователя?" : $"Разблокировать пользователя?", hasBlockRelation == null ? "Заблокировать" : "Разблокировать", hasBlockRelation == null ? Color.Error : Color.Success);
+                var result = await ShowConfirmDialog(hasBlockRelation == null ? $"Заблокировать пользователя?" : $"Разблокировать пользователя?", hasBlockRelation == null ? "Заблокировать" : "Разблокировать", hasBlockRelation == null ? Color.Error : Color.Success);
 
                 if (result != null && result.Canceled == false)
                 {

@@ -1,7 +1,9 @@
 ﻿using Data.Dto.Requests;
 using Data.Dto.Responses;
 using Data.Dto.Views;
+using Data.Models.SignalR;
 using Data.Services;
+using Data.State;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 
@@ -31,12 +33,14 @@ namespace Shared.Components.Pages.Events
 
         protected override void OnAfterRender(bool firstRender)
         {
-            //OnScheduleChangedHandler = OnScheduleChangedHandler.SignalRClient<OnScheduleChangedResponse>(CurrentState, async (response) =>
-            //{
-            //    if (response.UpdatedSchedule != null)
-            //        ScheduleForEventView = response.UpdatedSchedule;
-            //    await InvokeAsync(StateHasChanged);
-            //});
+            OnScheduleChangedHandler = OnScheduleChangedHandler.SignalRClient<OnScheduleUpdatedResponse>(CurrentState, async (response) =>
+            {
+                if (response.UpdatedSchedule != null)
+                {
+                    ScheduleForEventView = response.UpdatedSchedule;
+                    await InvokeAsync(StateHasChanged);
+                }
+            });
         }
     }
 }
