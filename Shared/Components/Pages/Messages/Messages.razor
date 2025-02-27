@@ -52,6 +52,18 @@
                                                 {
                                                     <MudMenuItem Icon="@Icons.Material.Filled.DoneAll" IconColor="Color.Primary" Disabled="@(!(message.ReadDate == null && CurrentState.Account.Id == message.Recipient?.Id))" OnClick="() => MarkMessagesAsReadAsync(message.Id)">Пометить сообщение прочитанным</MudMenuItem>
                                                     <MudMenuItem Icon="@Icons.Material.Filled.ChecklistRtl" IconColor="Color.Primary" Disabled="@(message.UnreadMessages == 0)" OnClick="() => MarkAllMessagesAsReadAsync(message.Id)">Пометить все прочитанными</MudMenuItem>
+
+                                                    @* Есть ли дружба между двумя собеседниками? *@
+                                                    var friendship = CurrentState.Account.Relations?.GetRelationInfo(EnumRelations.Friend, message.Sender, message.Recipient);
+                                                    @if (friendship == null)
+                                                    {
+                                                        <MudMenuItem Icon="@Icons.Material.Filled.FavoriteBorder" IconColor="Color.Success" OnClick="() => ShowDialogs.SendFriendshipRequestDialogAsync(CurrentState.Account, CurrentState.Account.Id == message.Sender?.Id ? message.Recipient : message.Sender)">Добавить в друзья</MudMenuItem>
+                                                    }
+                                                    else if (friendship.IsConfirmed)
+                                                    {
+                                                        <MudMenuItem Icon="@Icons.Material.Filled.Favorite" IconColor="Color.Success" OnClick="() => ShowDialogs.CancelFriendshipDialogAsync(CurrentState.Account, CurrentState.Account.Id == message.Sender?.Id ? message.Recipient : message.Sender)">Вы друзья</MudMenuItem>
+                                                    }
+
                                                     <MudMenuItem Icon="@Icons.Material.Filled.Clear" IconColor="Color.Error" Disabled="@(message.TotalMessages == 0)" OnClick="() => ShowDialogs.DeleteAllMessagesDialogAsync(LastMessagesList, message.Id)">Удалить всю переписку</MudMenuItem>
                                                     <MudMenuItem Icon="@Icons.Material.Filled.Block" IconColor="Color.Error" OnClick="() => ShowDialogs.BlockAccountDialogAsync(message.Sender, message.Recipient)">Заблокировать собеседника</MudMenuItem>
                                                 }

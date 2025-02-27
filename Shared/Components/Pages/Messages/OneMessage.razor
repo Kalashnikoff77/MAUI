@@ -73,31 +73,31 @@ else
         <div id="messageid_@Message.Id" class="d-flex pa-2">
             @if (Message.Type == EnumMessages.RequestForFriendshipSent) 
             {
-                <Shared.Components.Pages.Messages.OneMessage.Recipient.RequestForFrendshipSent Message="Message" />
+                <Shared.Components.Pages.Messages.Recipient.RequestForFrendshipSent Message="Message" />
             }
             else if (Message.Type == EnumMessages.RequestForFriendshipAccepted)
             {
-                <Shared.Components.Pages.Messages.OneMessage.Recipient.RequestForFrendshipAccepted Message="Message" />
+                <Shared.Components.Pages.Messages.Recipient.RequestForFrendshipAccepted Message="Message" />
             }
             else if (Message.Type == EnumMessages.RequestForFriendshipDeclined)
             {
-                <Shared.Components.Pages.Messages.OneMessage.Recipient.RequestForFrendshipDeclined Message="Message" />
+                <Shared.Components.Pages.Messages.Recipient.RequestForFrendshipDeclined Message="Message" />
             }
             else if (Message.Type == EnumMessages.FriendshipCancelled)
             {
-                <Shared.Components.Pages.Messages.OneMessage.Recipient.FriendshipCancelled Message="Message" />
+                <Shared.Components.Pages.Messages.Recipient.FriendshipCancelled Message="Message" />
             }
             else if (Message.Type == EnumMessages.AllMessagesDeleted)
             {
-                <Shared.Components.Pages.Messages.OneMessage.Recipient.AllMessagesDeleted Message="Message" />
+                <Shared.Components.Pages.Messages.Recipient.AllMessagesDeleted Message="Message" />
             }
             else if (Message.Type == EnumMessages.AccountBlocked)
             {
-                <Shared.Components.Pages.Messages.OneMessage.Recipient.AccountBlocked Message="Message" />
+                <Shared.Components.Pages.Messages.Recipient.AccountBlocked Message="Message" />
             }
             else if (Message.Type == EnumMessages.AccountUnblocked)
             {
-                <Shared.Components.Pages.Messages.OneMessage.Recipient.AccountUnblocked Message="Message" />
+                <Shared.Components.Pages.Messages.Recipient.AccountUnblocked Message="Message" />
             }
         </div>
     }
