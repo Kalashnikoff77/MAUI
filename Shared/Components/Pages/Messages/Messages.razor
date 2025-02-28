@@ -54,14 +54,30 @@
                                                     <MudMenuItem Icon="@Icons.Material.Filled.ChecklistRtl" IconColor="Color.Primary" Disabled="@(message.UnreadMessages == 0)" OnClick="() => MarkAllMessagesAsReadAsync(message.Id)">Пометить все прочитанными</MudMenuItem>
 
                                                     @* Есть ли дружба между двумя собеседниками? *@
-                                                    var friendship = CurrentState.Account.Relations?.GetRelationInfo(EnumRelations.Friend, message.Sender, message.Recipient);
-                                                    @if (friendship == null)
+                                                    var hasFriendship = CurrentState.Account.Relations?.GetRelationInfo(EnumRelations.Friend, message.Sender, message.Recipient);
+                                                    @if (hasFriendship != null)
                                                     {
-                                                        <MudMenuItem Icon="@Icons.Material.Filled.FavoriteBorder" IconColor="Color.Success" OnClick="() => ShowDialogs.SendFriendshipRequestDialogAsync(CurrentState.Account, CurrentState.Account.Id == message.Sender?.Id ? message.Recipient : message.Sender)">Добавить в друзья</MudMenuItem>
+                                                        @* Дружба подтверждена? *@
+                                                        if (hasFriendship.IsConfirmed)
+                                                        {
+                                                            <MudMenuItem Icon="@Icons.Material.Filled.Favorite" IconColor="Color.Success" OnClick="() => ShowDialogs.CancelFriendshipDialogAsync(CurrentState.Account, CurrentState.Account.Id == message.Sender?.Id ? message.Recipient : message.Sender)">Вы друзья</MudMenuItem>
+                                                        }
+                                                        else
+                                                        {
+                                                            @* Кто инициатор дружбы? *@
+                                                            @if (hasFriendship.Sender.Id == CurrentState.Account.Id)
+                                                            {
+                                                                <MudMenuItem onclick="@(() => ShowDialogs.AbortFriendshipRequestDialogAsync(CurrentState.Account, CurrentState.Account.Id == message.Sender?.Id ? message.Recipient : message.Sender))" Icon="@Icons.Material.Filled.FavoriteBorder" IconColor="Color.Warning">Запрос на дружбу отправлен</MudMenuItem>
+                                                            }
+                                                            else
+                                                            {
+                                                                <MudMenuItem onclick="@(() => ShowDialogs.AcceptFriendshipRequestDialogAsync(CurrentState.Account, CurrentState.Account.Id == message.Sender?.Id ? message.Recipient : message.Sender))" Icon="@Icons.Material.Filled.FavoriteBorder" IconColor="Color.Warning">Принять дружбу</MudMenuItem>
+                                                            }
+                                                        }
                                                     }
-                                                    else if (friendship.IsConfirmed)
+                                                    else
                                                     {
-                                                        <MudMenuItem Icon="@Icons.Material.Filled.Favorite" IconColor="Color.Success" OnClick="() => ShowDialogs.CancelFriendshipDialogAsync(CurrentState.Account, CurrentState.Account.Id == message.Sender?.Id ? message.Recipient : message.Sender)">Вы друзья</MudMenuItem>
+                                                        <MudMenuItem onclick="@(() => ShowDialogs.SendFriendshipRequestDialogAsync(CurrentState.Account, CurrentState.Account.Id == message.Sender?.Id ? message.Recipient : message.Sender))" Icon="@Icons.Material.Filled.FavoriteBorder" IconColor="Color.Success">Добавить в друзья</MudMenuItem>
                                                     }
 
                                                     <MudMenuItem Icon="@Icons.Material.Filled.Clear" IconColor="Color.Error" Disabled="@(message.TotalMessages == 0)" OnClick="() => ShowDialogs.DeleteAllMessagesDialogAsync(LastMessagesList, message.Id)">Удалить всю переписку</MudMenuItem>
