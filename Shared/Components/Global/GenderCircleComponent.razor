@@ -1,0 +1,34 @@
+﻿<MudAvatar Color="color" title="@genderText">@genderLetter</MudAvatar>
+
+@code {
+    [Parameter, EditorRequired] public AccountsViewDto account { get; set; } = null!;
+
+    string genderLetter = null!;
+    string genderText = null!;
+    Color color;
+
+    protected override void OnParametersSet()
+    {
+        if (account.Users != null)
+        {
+            if (account.Users.Count > 1)
+            {
+                genderLetter = "П";
+                genderText = "Пара";
+                color = Color.Tertiary;
+            }
+            else if (account.Users.First().Gender == 0)
+            {
+                genderLetter = "М";
+                genderText = "Мужчина";
+                color = Color.Primary;
+            }
+            else
+            {
+                genderLetter = "Ж";
+                genderText = "Женщина";
+                color = Color.Error;
+            }
+        }
+    }
+}

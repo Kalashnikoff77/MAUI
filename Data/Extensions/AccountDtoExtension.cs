@@ -48,7 +48,6 @@ namespace Data.Extensions
             }
         }
 
-
         /// <summary>
         /// Конвертация страны и региона в текст
         /// </summary>
