@@ -12,29 +12,7 @@
 
             @foreach (var account in Accounts)
             {
-                <MudItem xs="12" sm="6" md="4" lg="4">
-                    <MudPaper Class="pa-3" Elevation="3">
-                        <div class="d-flex flex-column">
-                            <div class="d-flex mt-1 mb-4">
-                                <div class="flex-grow-1 cuttext">
-                                    <div class="d-flex gap-3">
-                                        <div><GenderCircleComponent account="account"/></div>
-                                        <div class="d-flex flex-column cuttext">
-                                            <h3 class="cuttext">@account.Name</h3>
-                                            <p class="cuttext">@account.ToRegionString()</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div>
-                                    <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Default" Class="pa-0" />
-                                </div>
-                            </div>
-                            <div>
-                                <MudImage Fluid="true" Src="@account.ToAvatarUri(EnumImageSize.s450x600)" />
-                            </div>
-                        </div>
-                    </MudPaper>
-                </MudItem>
+                <OneAccount Account="account" ShowDialogs="ShowDialogs" />
             }
 
         </MudGrid>

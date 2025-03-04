@@ -1,0 +1,70 @@
+﻿<MudItem xs="12" sm="6" md="4" lg="4">
+    <MudPaper Class="pa-3" Elevation="3" Style=@(IsBlockedUser != null ? "background-color:#fff2f2" : null)>
+        <div class="d-flex flex-column">
+            <div class="d-flex mt-1 mb-4">
+                <div class="flex-grow-1 cuttext">
+                    <div class="d-flex gap-3">
+                        <div><GenderCircleComponent account="Account" /></div>
+                        <div class="d-flex flex-column cuttext">
+                            <h3 class="cuttext">@Account.Name</h3>
+                            <p class="cuttext">@Account.ToRegionString()</p>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    @if (CurrentState.Account != null)
+                    {
+                        <MudMenu Dense Icon="@Icons.Material.Filled.MoreVert" Size="Size.Small" AnchorOrigin="Origin.TopLeft" TransformOrigin="Origin.TopRight">
+                            @* Есть ли блокировка у обеих пользователей? *@
+                            @if (IsBlockedUser != null)
+                            {
+                                @* Инициатор текущий пользователь? *@
+                                @if (IsBlockedUser.Sender.Id == CurrentState.Account.Id)
+                                {
+                                    <MudMenuItem Icon="@Icons.Material.Filled.Done" IconColor="Color.Success" OnClick="() => ShowDialogs.BlockAccountDialogAsync(CurrentState.Account, Account)">Разблокировать собеседника</MudMenuItem>
+                                }
+                                else
+                                {
+                                    <MudMenuItem Icon="@Icons.Material.Filled.Block" Disabled>Собеседник Вас заблокировал</MudMenuItem>
+                                }
+                            }
+                            else
+                            {
+                                @* Есть ли дружба между двумя собеседниками? *@
+                                @if (HasFriendship != null)
+                                {
+                                    @* Дружба подтверждена? *@
+                                    if (HasFriendship.IsConfirmed)
+                                    {
+                                        <MudMenuItem Icon="@Icons.Material.Filled.Favorite" IconColor="Color.Success" OnClick="() => ShowDialogs.CancelFriendshipDialogAsync(CurrentState.Account, CurrentState.Account.Id == CurrentState.Account?.Id ? Account : CurrentState.Account)">Вы друзья</MudMenuItem>
+                                    }
+                                    else
+                                    {
+                                        @* Кто инициатор дружбы? *@
+                                        @if (HasFriendship.Sender.Id == CurrentState.Account.Id)
+                                        {
+                                            <MudMenuItem onclick="@(() => ShowDialogs.AbortFriendshipRequestDialogAsync(CurrentState.Account, CurrentState.Account.Id == CurrentState.Account?.Id ? Account : CurrentState.Account))" Icon="@Icons.Material.Filled.FavoriteBorder" IconColor="Color.Warning">Запрос на дружбу отправлен</MudMenuItem>
+                                        }
+                                        else
+                                        {
+                                            <MudMenuItem onclick="@(() => ShowDialogs.AcceptFriendshipRequestDialogAsync(CurrentState.Account, CurrentState.Account.Id == CurrentState.Account?.Id ? Account : CurrentState.Account))" Icon="@Icons.Material.Filled.FavoriteBorder" IconColor="Color.Warning">Принять дружбу</MudMenuItem>
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    <MudMenuItem onclick="@(() => ShowDialogs.SendFriendshipRequestDialogAsync(CurrentState.Account, CurrentState.Account.Id == CurrentState.Account?.Id ? Account : CurrentState.Account))" Icon="@Icons.Material.Filled.FavoriteBorder" IconColor="Color.Success">Добавить в друзья</MudMenuItem>
+                                }
+                                <MudMenuItem Icon="@Icons.Material.Filled.Block" IconColor="Color.Error" OnClick="() => ShowDialogs.BlockAccountDialogAsync(CurrentState.Account, Account)">Заблокировать собеседника</MudMenuItem>
+                            }
+
+                        </MudMenu>
+                    }
+                </div>
+            </div>
+            <div>
+                <MudImage Fluid="true" Src="@Account.ToAvatarUri(EnumImageSize.s450x600)" />
+            </div>
+        </div>
+    </MudPaper>
+</MudItem>
