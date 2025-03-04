@@ -7,3 +7,9 @@
 .IsHidden {
     display: none;
 }
+
+.cuttext {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

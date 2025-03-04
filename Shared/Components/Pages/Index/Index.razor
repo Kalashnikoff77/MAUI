@@ -2,68 +2,42 @@
 
 <PageTitle>Главная страница</PageTitle>
 
-<div style="max-width:300px; height:50px">
-    <MudText Typo="Typo.h6" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">
-        Привет! Как дела? Что ты сейчас делаешь? Как планируешь жить дальше?
-    </MudText>
-</div>
-
-
 @if (Accounts != null)
 {
-    <MudGrid>
-        @foreach (var account in Accounts)
-        {
-        <MudItem xs="12" sm="6" lg="4">
+    <div class="d-flex flex-column pa-6 cuttext" style="min-width:300px">
+        <MudText Align="Align.Left" Typo="Typo.h6" Class="mb-3">Новые участники</MudText>
+        <MudDivider DividerType="DividerType.FullWidth" Light="false" Class="mb-5" />
 
-            <div class="mud-paper mud-elevation-1 mud-card">
-                <div class="d-flex" style="padding:16px; flex-grow:1; flex-shrink:1; flex-basis:auto">
-                    <div class="mud-card-header-avatar">
-                        <GenderCircleComponent account="account" />
-                    </div>
-                    <div class="d-flex flex-column" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis">
-                        <h6 class="mud-typography mud-typography-h6" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">Елена Крым Симферополь Па</h6>
-                        <p class="mud-typography mud-typography-body2" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">Беларусь, Минск и область</p>
-                    </div>
-                    <div class="mud-card-header-actions">
-                        <MudIconButton Icon="@Icons.Material.Filled.Settings" Color="Color.Default" />
-                    </div>
-                </div>
-                <MudImage Fluid="true" Src="@account.ToAvatarUri(EnumImageSize.s250x250)" />
-                <div class="mud-card-content">
-                    <p class="mud-typography mud-typography-body2">Хоккей, футбол</p>
-                </div>
-                <div class="mud-card-actions">
-                    <MudIconButton Icon="@Icons.Material.Filled.Favorite" Color="Color.Default" />
-                </div>
-            </div>
+        <MudGrid Justify="Justify.Center">
 
-@*             <MudCard>
-                <MudCardHeader>
-                    <CardHeaderAvatar>
-                        <GenderCircleComponent account="account" />
-                    </CardHeaderAvatar>
-                    <CardHeaderContent>
-                        <div class="d-flex flex-column" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis">
-                            <MudText Typo="Typo.h6" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">@account.Name</MudText>
-                            <MudText Typo="Typo.body2" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">@account.ToRegionString()</MudText>
+            @foreach (var account in Accounts)
+            {
+                <MudItem xs="12" sm="6" md="4" lg="4">
+                    <MudPaper Class="pa-3" Elevation="3">
+                        <div class="d-flex flex-column">
+                            <div class="d-flex mt-1 mb-4">
+                                <div class="flex-grow-1 cuttext">
+                                    <div class="d-flex gap-3">
+                                        <div><GenderCircleComponent account="account"/></div>
+                                        <div class="d-flex flex-column cuttext">
+                                            <h3 class="cuttext">@account.Name</h3>
+                                            <p class="cuttext">@account.ToRegionString()</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Default" Class="pa-0" />
+                                </div>
+                            </div>
+                            <div>
+                                <MudImage Fluid="true" Src="@account.ToAvatarUri(EnumImageSize.s450x600)" />
+                            </div>
                         </div>
-                    </CardHeaderContent>
-                    <CardHeaderActions>
-                        <MudIconButton Icon="@Icons.Material.Filled.Settings" Color="Color.Default" />
-                    </CardHeaderActions>
-                </MudCardHeader>
-                <MudImage Fluid="true" Src="@account.ToAvatarUri(EnumImageSize.s250x250)" />
-                <MudCardContent>
-                    <MudText Typo="Typo.body2">Хоккей, футбол</MudText>
-                </MudCardContent>
-                <MudCardActions>
-                    <MudIconButton Icon="@Icons.Material.Filled.Favorite" Color="Color.Default" />
-                </MudCardActions>
-            </MudCard>
- *@
-        </MudItem>
-        }
-    </MudGrid>
+                    </MudPaper>
+                </MudItem>
+            }
+
+        </MudGrid>
+</div>
 }
 
