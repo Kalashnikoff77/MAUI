@@ -2,20 +2,18 @@
 
 <PageTitle>Главная страница</PageTitle>
 
-@if (Accounts != null)
-{
-    <div class="d-flex flex-column pa-6 cuttext" style="min-width:300px">
-        <MudText Align="Align.Left" Typo="Typo.h6" Class="mb-3">Новые участники</MudText>
-        <MudDivider DividerType="DividerType.FullWidth" Light="false" Class="mb-5" />
+<div class="d-flex flex-column pa-6 cuttext" style="min-width:300px">
+    <MudText Align="Align.Left" Typo="Typo.h6" Class="mb-3">Добро пожаловать на сайт!</MudText>
+    <MudDivider DividerType="DividerType.FullWidth" Light="false" Class="mb-5" />
 
+    @if (Accounts != null) 
+    {
         <MudGrid Justify="Justify.Center">
-
             @foreach (var account in Accounts)
             {
                 <OneAccount Account="account" ShowDialogs="ShowDialogs" />
             }
-
         </MudGrid>
-</div>
-}
+    }
 
+</div>

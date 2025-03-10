@@ -27,12 +27,12 @@
                         <tr style=@(block != null ? "background-color:#fff2f2" : null)>
                             <td>
                                 <div class="d-flex align-center gap-3">
-                                    <div @onclick="@(() => ShowDialogs.AccountInfoCardDialogAsync(accountsViewDto))" style="cursor:pointer">
+                                    <div @onclick="@(() => ShowDialogs.AccountInfoCardDialogAsync(accountsViewDto))" class="pointer">
                                         <ImageAvatar Account="@accountsViewDto" Class="d-none d-sm-block avatar" Size="EnumImageSize.s64x64" />
                                         <ImageAvatar Account="@accountsViewDto" Class="d-xs-block d-sm-none avatar" Style="width:45px; height:45px" Size="EnumImageSize.s64x64" />
                                     </div>
 
-                                    <div class="d-flex flex-column gap-0" @onclick="@(() => ShowDialogs.MessagesDialogAsync(accountsViewDto))" style="cursor:pointer; width:100%">
+                                    <div class="d-flex flex-column gap-0 pointer" @onclick="@(() => ShowDialogs.MessagesDialogAsync(accountsViewDto))" style="width:100%">
                                         <div style="text-align:end">
                                             <MudMenu Dense Icon="@Icons.Material.Filled.MoreVert" Size="Size.Small" AnchorOrigin="Origin.TopLeft" TransformOrigin="Origin.TopRight">
                                                 @* Есть ли блокировка у обеих пользователей? *@

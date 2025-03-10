@@ -11,7 +11,6 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using MudBlazor;
 using Shared.Components.Dialogs;
-using System.ComponentModel.DataAnnotations;
 using System.Text;
 
 namespace Shared.Components.Pages.Messages
@@ -20,14 +19,14 @@ namespace Shared.Components.Pages.Messages
     {
         [CascadingParameter] public CurrentState CurrentState { get; set; } = null!;
         [CascadingParameter] protected MudDialogInstance MudDialog { get; set; } = null!;
-        [Parameter, Required] public AccountsViewDto Recipient { get; set; } = null!;
+        [Parameter, EditorRequired] public AccountsViewDto Recipient { get; set; } = null!;
 
         [Inject] IRepository<GetMessagesRequestDto, GetMessagesResponseDto> _repoGetMessages { get; set; } = null!;
         [Inject] IRepository<AddMessageRequestDto, AddMessageResponseDto> _repoAddMessage { get; set; } = null!;
         [Inject] IRepository<DeleteMessagesRequestDto, ResponseDtoBase> _repoDeleteMessage { get; set; } = null!;
         [Inject] ShowDialogs _showDialogs { get; set; } = null!;
         [Inject] IJSRuntime _JSRuntime { get; set; } = null!;
-        [Inject] IComponentRenderer<OneMessage> _renderOneMessage { get; set; } = null!;
+        [Inject] IComponentRenderer<OneMessageDialog> _renderOneMessageDialog { get; set; } = null!;
 
         DotNetObjectReference<MessagesDialog> _dotNetReference { get; set; } = null!;
         IJSObjectReference _JSModule { get; set; } = null!;
@@ -96,7 +95,7 @@ namespace Shared.Components.Pages.Messages
                             if (index >= 0)
                             {
                                 messages[index].ReadDate = DateTime.Now;
-                                var html = await _renderOneMessage.RenderAsync(new Dictionary<string, object?> { { "AccountId", CurrentState.Account?.Id }, { "Message", messages[index] } });
+                                var html = await _renderOneMessageDialog.RenderAsync(new Dictionary<string, object?> { { "AccountId", CurrentState.Account?.Id }, { "Message", messages[index] } });
                                 await _JSModule.InvokeVoidAsync("MarkMessageAsRead", messageId, html);
                             }
                         }
@@ -113,7 +112,7 @@ namespace Shared.Components.Pages.Messages
                             if (index >= 0)
                             {
                                 messages[index].ReadDate = DateTime.Now;
-                                var html = await _renderOneMessage.RenderAsync(new Dictionary<string, object?> { { "AccountId", CurrentState.Account?.Id }, { "Message", messages[index] } });
+                                var html = await _renderOneMessageDialog.RenderAsync(new Dictionary<string, object?> { { "AccountId", CurrentState.Account?.Id }, { "Message", messages[index] } });
                                 await _JSModule.InvokeVoidAsync("MarkMessageAsRead", messageId, html);
                             }
                         }
@@ -241,7 +240,7 @@ namespace Shared.Components.Pages.Messages
             var html = new StringBuilder(5000);
 
             foreach (var message in messages)
-                html.Append(await _renderOneMessage.RenderAsync(new Dictionary<string, object?> { { "AccountId", CurrentState.Account?.Id }, { "Message", message } }));
+                html.Append(await _renderOneMessageDialog.RenderAsync(new Dictionary<string, object?> { { "AccountId", CurrentState.Account?.Id }, { "Message", message } }));
 
             return html.ToString();
         }

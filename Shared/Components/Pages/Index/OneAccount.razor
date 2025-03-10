@@ -1,5 +1,5 @@
 ﻿<MudItem xs="12" sm="6" md="4" lg="4">
-    <MudPaper Class="pa-3" Elevation="3" Style=@(IsBlockedUser != null ? "background-color:#fff2f2" : null)>
+    <MudPaper onclick="@(() => ShowDialogs.AccountInfoCardDialogAsync(Account))" Class="pa-3 pointer" Elevation="3" Style=@(IsBlockedUser != null ? "background-color:#fff2f2" : null)>
         <div class="d-flex flex-column">
             <div class="d-flex mt-1 mb-4">
                 <div class="flex-grow-1 cuttext">
@@ -12,7 +12,7 @@
                     </div>
                 </div>
                 <div>
-                    @if (CurrentState.Account != null)
+                    @if (CurrentState.Account != null && CurrentState.Account.Id != Account.Id)
                     {
                         <MudMenu Dense Icon="@Icons.Material.Filled.MoreVert" Size="Size.Small" AnchorOrigin="Origin.TopLeft" TransformOrigin="Origin.TopRight">
                             @* Есть ли блокировка у обеих пользователей? *@
@@ -21,16 +21,19 @@
                                 @* Инициатор текущий пользователь? *@
                                 @if (IsBlockedUser.Sender.Id == CurrentState.Account.Id)
                                 {
-                                    <MudMenuItem Icon="@Icons.Material.Filled.Done" IconColor="Color.Success" OnClick="() => ShowDialogs.BlockAccountDialogAsync(CurrentState.Account, Account)">Разблокировать собеседника</MudMenuItem>
+                                    <MudMenuItem Icon="@Icons.Material.Filled.Done" IconColor="Color.Success" OnClick="() => ShowDialogs.BlockAccountDialogAsync(CurrentState.Account, Account)">Разблокировать пользователя</MudMenuItem>
                                 }
                                 else
                                 {
-                                    <MudMenuItem Icon="@Icons.Material.Filled.Block" Disabled>Собеседник Вас заблокировал</MudMenuItem>
+                                    <MudMenuItem Icon="@Icons.Material.Filled.Block" Disabled>Пользователь Вас заблокировал</MudMenuItem>
                                 }
                             }
                             else
                             {
-                                @* Есть ли дружба между двумя собеседниками? *@
+                                @* Окно сообщений *@
+                                <MudMenuItem Icon="@Icons.Material.Filled.Message" OnClick="@(() => ShowDialogs.MessagesDialogAsync(Account))" IconColor="Color.Primary">Сообщения</MudMenuItem>
+
+                                @* Есть ли дружба между двумя пользователями? *@
                                 @if (HasFriendship != null)
                                 {
                                     @* Дружба подтверждена? *@
@@ -55,7 +58,7 @@
                                 {
                                     <MudMenuItem onclick="@(() => ShowDialogs.SendFriendshipRequestDialogAsync(CurrentState.Account, CurrentState.Account.Id == CurrentState.Account?.Id ? Account : CurrentState.Account))" Icon="@Icons.Material.Filled.FavoriteBorder" IconColor="Color.Success">Добавить в друзья</MudMenuItem>
                                 }
-                                <MudMenuItem Icon="@Icons.Material.Filled.Block" IconColor="Color.Error" OnClick="() => ShowDialogs.BlockAccountDialogAsync(CurrentState.Account, Account)">Заблокировать собеседника</MudMenuItem>
+                                <MudMenuItem Icon="@Icons.Material.Filled.Block" IconColor="Color.Error" OnClick="() => ShowDialogs.BlockAccountDialogAsync(CurrentState.Account, Account)">Заблокировать пользователя</MudMenuItem>
                             }
 
                         </MudMenu>
@@ -63,7 +66,7 @@
                 </div>
             </div>
             <div>
-                <MudImage Fluid="true" Src="@Account.ToAvatarUri(EnumImageSize.s450x600)" />
+                <MudImage Fluid Src="@Account.ToAvatarUri(EnumImageSize.s450x600)" />
             </div>
         </div>
     </MudPaper>

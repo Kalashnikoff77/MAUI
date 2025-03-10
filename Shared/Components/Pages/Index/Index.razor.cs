@@ -14,13 +14,17 @@ namespace Shared.Components.Pages.Index
     {
         [CascadingParameter] public CurrentState CurrentState { get; set; } = null!;
         [Inject] IRepository<GetAccountsRequestDto, GetAccountsResponseDto> _repoGetAccounts { get; set; } = null!;
+
         [Inject] ShowDialogs ShowDialogs { get; set; } = null!;
 
         List<AccountsViewDto> Accounts = null!;
+        List<SchedulesForEventsViewDto> Schedules = null!;
         IDisposable? OnMessagesUpdatedHandler;
 
-        protected override async Task OnInitializedAsync() =>
+        protected override async Task OnInitializedAsync()
+        {
             await GetAccounts();
+        }
 
         protected override void OnAfterRender(bool firstRender)
         {
