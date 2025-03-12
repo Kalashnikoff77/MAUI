@@ -4,11 +4,12 @@
             <MudIcon Color="Data.IsPanel1Valid ? Color.Success : Color.Default" Icon="@Icons.Material.Filled.Settings" class="mr-3" />
             <MudText Color="Data.IsPanel1Valid ? Color.Success : Color.Default"><b>1. ОБЩИЕ ДАННЫЕ</b></MudText>
         </div>
+        <p style="font-size:14px; color:gray; margin-top:5px">Укажите общие данные учётной записи, в т.ч. данные для входа на сайт. Имя и регион проживания будут видны всем, email будет от всех скрыт.</p>
     </TitleContent>
     <ChildContent>
         <MudGrid>
             <MudItem sm="6" xs="12">
-                <MudTextField @bind-Value="Data.AccountRequestDto.Name" Validation="@(new Func<string, Task<string?>>(Data.NameValidator))" HelperText="Пример: Иван да Марья Мск" AdornmentIcon="@Icons.Material.Outlined.Person" AdornmentColor="@Data.NameIconColor" Adornment="Adornment.End" Label="Имя учётной записи" Typo="Typo.body1" Margin="Margin.Normal" Variant="Variant.Text" MaxLength="StaticData.DB_ACCOUNTS_NAME_MAX" />
+                <MudTextField @bind-Value="Data.AccountRequestDto.Name" Validation="@(new Func<string, Task<string?>>(Data.NameValidator))" HelperText="Примеры: Иван да Марья Мск | Алексей | Татьяна" AdornmentIcon="@Icons.Material.Outlined.Person" AdornmentColor="@Data.NameIconColor" Adornment="Adornment.End" Label="Имя учётной записи" Typo="Typo.body1" Margin="Margin.Normal" Variant="Variant.Text" MaxLength="StaticData.DB_ACCOUNTS_NAME_MAX" />
             </MudItem>
             <MudItem sm="6" xs="12">
                 <MudTextField @bind-Value="Data.AccountRequestDto.Email" Validation="@(new Func<string, Task<string?>>(Data.EmailValidator))" HelperText="Пример: email@mail.ru" AdornmentIcon="@Icons.Material.Outlined.Mail" AdornmentColor="@Data.EmailIconColor" Adornment="Adornment.End" Label="Email" Typo="Typo.body1" Margin="Margin.Normal" Variant="Variant.Text" MaxLength="StaticData.DB_ACCOUNTS_EMAIL_MAX" />
