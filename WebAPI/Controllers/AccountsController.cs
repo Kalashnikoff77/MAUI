@@ -13,6 +13,7 @@ using Microsoft.Extensions.Caching.Memory;
 using WebAPI.Exceptions;
 using WebAPI.Extensions;
 using WebAPI.Models;
+using static Dapper.SqlMapper;
 
 namespace WebAPI.Controllers
 {
@@ -25,6 +26,8 @@ namespace WebAPI.Controllers
         [Route("Get"), HttpPost]
         public async Task<GetAccountsResponseDto> GetAsync(GetAccountsRequestDto request)
         {
+            AuthenticateUser();
+
             var response = new GetAccountsResponseDto();
 
             var columns = GetRequiredColumns<AccountsViewEntity>();
@@ -72,6 +75,35 @@ namespace WebAPI.Controllers
                 var result = await _unitOfWork.SqlConnection.QueryAsync<AccountsViewEntity>(sql);
                 response.Accounts = _unitOfWork.Mapper.Map<List<AccountsViewDto>>(result);
             }
+
+            return response;
+        }
+
+
+        [Route("GetFriends"), HttpPost, Authorize]
+        public async Task<GetFriendsForAccountsResponseDto> GetFriendsAsync(GetFriendsForAccountsRequestDto request)
+        {
+            AuthenticateUser();
+
+            var response = new GetFriendsForAccountsResponseDto();
+
+            var columns = GetRequiredColumns<AccountsViewEntity>();
+
+            if (request.IsRelationsIncluded)
+                columns.Add(nameof(AccountsViewEntity.Relations));
+
+            if (request.IsHobbiesIncluded)
+                columns.Add(nameof(AccountsViewEntity.Hobbies));
+
+            if (request.IsPhotosIncluded)
+                columns.Add(nameof(AccountsViewEntity.Photos));
+
+            if (request.IsSchedulesIncluded)
+                columns.Add(nameof(AccountsViewEntity.Schedules));
+
+            var sql = $"SELECT {columns.Aggregate((a, b) => a + ", " + b)} FROM FriendsForAccountsView WHERE Id <> @AccountId";
+            var result = await _unitOfWork.SqlConnection.QueryAsync<FriendsForAccountsViewEntity>(sql, new { _unitOfWork.AccountId });
+            response.Accounts = _unitOfWork.Mapper.Map<List<FriendsForAccountsViewDto>>(result);
 
             return response;
         }

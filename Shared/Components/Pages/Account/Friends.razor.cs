@@ -1,26 +1,25 @@
 ﻿using Data.Dto.Requests;
 using Data.Dto.Responses;
 using Data.Dto.Views;
-using Data.Enums;
 using Data.Models.SignalR;
 using Data.Services;
 using Data.State;
 using Microsoft.AspNetCore.Components;
 using Shared.Components.Dialogs;
 
-namespace Shared.Components.Pages.Index
+namespace Shared.Components.Pages.Account
 {
-    public partial class Index
+    public partial class Friends
     {
         [CascadingParameter] public CurrentState CurrentState { get; set; } = null!;
-        [Inject] IRepository<GetAccountsRequestDto, GetAccountsResponseDto> _repoGetAccounts { get; set; } = null!;
+        [Inject] IRepository<GetFriendsForAccountsRequestDto, GetFriendsForAccountsResponseDto> _repoGetFriends { get; set; } = null!;
 
         [Inject] ShowDialogs ShowDialogs { get; set; } = null!;
 
-        List<AccountsViewDto> Accounts = null!;
+        List<FriendsForAccountsViewDto> Accounts = null!;
         IDisposable? OnMessagesUpdatedHandler;
 
-        protected override async Task OnInitializedAsync() =>
+        protected override async Task OnParametersSetAsync() =>
             await GetAccounts();
 
         protected override void OnAfterRender(bool firstRender)
@@ -37,15 +36,16 @@ namespace Shared.Components.Pages.Index
 
         async Task GetAccounts()
         {
-            var request = new GetAccountsRequestDto
+            if (CurrentState.Account?.Token != null)
             {
-                IsRelationsIncluded = true,
-                IsUsersIncluded = true,
-                Order = EnumOrders.IdDesc,
-                Take = 6
-            };
-            var response = await _repoGetAccounts.HttpPostAsync(request);
-            Accounts = response.Response.Accounts;
+                var request = new GetFriendsForAccountsRequestDto
+                {
+                    IsUsersIncluded = true,
+                    Token = CurrentState.Account?.Token
+                };
+                var response = await _repoGetFriends.HttpPostAsync(request);
+                Accounts = response.Response.Accounts;
+            }
         }
 
         public void Dispose() =>
