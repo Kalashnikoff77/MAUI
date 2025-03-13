@@ -1,0 +1,10 @@
+Установка SSL у MTW.ru:
+1. Генерим сертификат в личном кабинете my.mtw.ru. В процессе (на 3-м шаге) сохраняем в файл certificate.key ключ - -----BEGIN RSA PRIVATE KEY-----
+2. Ждём генерации сертификата и сохраняем его в файл certificate.pem.
+3. Запускам из меню "Пуск" OpenSSL Command Prompt.
+4. Выполняем команду, указав пароль Oleg184977: openssl pkcs12 -inkey certificate.key -in certificate.pem -export -out certificate.pfx
+
+
+
+
+https://learn.microsoft.com/en-us/dotnet/maui/data-cloud/local-web-services?view=net-maui-9.0&viewFallbackFrom=net-maui-7.0&wt.mc_id=lesjackson_dotnetmaui-mvp-video

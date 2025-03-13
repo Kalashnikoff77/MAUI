@@ -1,14 +1,19 @@
 using Data.Services;
+using Data.State;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using MudBlazor.Services;
 using SH.Web.Services;
-using Data.State;
-using Web.Components;
 using Shared.Components.Dialogs;
+using Web.Components;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+builder.WebHost.ConfigureKestrel((context, options) =>
+{
+    options.Listen(System.Net.IPAddress.Any, 8000, options => options.UseHttps(@"C:\Projects\Projects\MAUI\More\certificate.pfx", "Oleg184977"));
+    options.Listen(System.Net.IPAddress.Any, 8001);
+});
+
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
