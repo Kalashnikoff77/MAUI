@@ -1,7 +1,7 @@
 ﻿<MudNavMenu Color="Color.Primary" Bordered="true">
     <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Главная</MudNavLink>
     <MudNavLink Href="/events" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Diversity1">Клубы и мероприятия</MudNavLink>
-    <MudNavLink Href="/private" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.SupervisorAccount">Частные встречи</MudNavLink>
+    @* <MudNavLink Href="/private" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.SupervisorAccount">Частные встречи</MudNavLink> *@
     <MudNavLink Href="/users" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Portrait">Участники</MudNavLink>
     @if (CurrentState.Account == null)
     {
@@ -19,3 +19,6 @@
         <MudNavLink OnClick="async() => { await CurrentState.LogOutAsync(); }" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Logout">Выйти</MudNavLink>
     }
 </MudNavMenu>
+
+<p align="center" style="font-size:12px; color:gray; margin-top:20px">В разработке!</p>
+<p align="center" style="font-size:12px; color:gray">Версия от 14.03.2025</p>
