@@ -1,6 +1,7 @@
 using Data.Services;
 using Data.State;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
+using Microsoft.AspNetCore.DataProtection;
 using MudBlazor.Services;
 using SH.Web.Services;
 using Shared.Components.Dialogs;
@@ -16,6 +17,8 @@ builder.WebHost.ConfigureKestrel((context, options) =>
 
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+//builder.Services.AddDataProtection();
 
 builder.Services.AddScoped(typeof(IRepository<,>), typeof(Repository<,>));
 builder.Services.AddScoped(typeof(IComponentRenderer<>), typeof(ComponentRenderer<>));

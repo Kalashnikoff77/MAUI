@@ -18,8 +18,8 @@ namespace Data.State
         NavigationManager _navigationManager { get; set; } = null!;
         IServiceProvider _serviceProvider { get; set; } = null!;
 
-        public readonly string WebAPIUrl;
-        public readonly string SignalRUrl;
+        //public readonly string WebAPIUrl;
+        //public readonly string SignalRUrl;
         public readonly string WebUrl;
 
         public CurrentState(IServiceProvider serviceProvider, IFormFactor formFactor, IJSProcessor JSProcessor, IJSRuntime JS, IConfiguration config, NavigationManager navigationManager)
@@ -33,14 +33,14 @@ namespace Data.State
 
             if (_formFactor.GetFormFactor() == "Phone")
             {
-                WebAPIUrl = _config.GetRequiredSection("WebAPI:AndroidHost").Value!;
-                SignalRUrl = _config.GetRequiredSection("SignalR:AndroidHost").Value!;
+                //WebAPIUrl = _config.GetRequiredSection("WebAPI:AndroidHost").Value!;
+                //SignalRUrl = _config.GetRequiredSection("SignalR:AndroidHost").Value!;
                 WebUrl = _config.GetRequiredSection("Web:AndroidHost").Value!;
             }
             else
             {
-                WebAPIUrl = _config.GetRequiredSection("WebAPI:WinHost").Value!;
-                SignalRUrl = _config.GetRequiredSection("SignalR:WinHost").Value!;
+                //WebAPIUrl = _config.GetRequiredSection("WebAPI:WinHost").Value!;
+                //SignalRUrl = _config.GetRequiredSection("SignalR:WinHost").Value!;
                 WebUrl = _config.GetRequiredSection("Web:WinHost").Value!;
             }
         }
