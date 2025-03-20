@@ -17,3 +17,17 @@
 .pointer {
     cursor: pointer;
 }
+
+@media (max-width: 600px) {
+    .infoblock {
+        min-width: 300px;
+        padding: 10px;
+    }
+}
+
+@media (min-width: 601px) {
+    .infoblock {
+        min-width: 300px;
+        padding: 20px;
+    }
+}

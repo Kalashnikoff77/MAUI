@@ -16,11 +16,6 @@
 
             @* <MudIconButton Icon="@(DarkLightModeButtonIcon)" Color="Color.Inherit" OnClick="@DarkModeToggle" /> *@
             <ProfileMenu />
-
-            @if (CurrentState.Account != null)
-            {
-                <ImageAvatar Account="CurrentState.Account" Class="avatar s45 ml-3" />
-            }
         </MudAppBar>
 
         <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">

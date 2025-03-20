@@ -1,10 +1,17 @@
 ﻿@if (CurrentState.Account != null)
 {
-    <MudMenu Icon="@Icons.Material.Filled.MoreVert" AnchorOrigin="Origin.TopLeft" TransformOrigin="Origin.TopLeft">
-        <MudMenuItem Href="/profile" Icon="@Icons.Material.Filled.Settings">Настройки профиля</MudMenuItem>
-        <MudMenuItem Href="/friends" Icon="@Icons.Material.Filled.PeopleAlt">Мои друзья</MudMenuItem>
-        <MudDivider />
-        <MudMenuItem Icon="@Icons.Material.Filled.Logout" OnClick="async() => { await CurrentState.LogOutAsync(); }">Выйти</MudMenuItem>
+    <MudMenu AnchorOrigin="Origin.TopLeft" TransformOrigin="Origin.TopLeft">
+        <ActivatorContent>
+            <MudAvatar Style="width:45px; height:45px">
+                <ImageAvatar Account="CurrentState.Account" Size="EnumImageSize.s64x64" Class="avatar s45" />
+            </MudAvatar>
+        </ActivatorContent>
+        <ChildContent>
+            <MudMenuItem Href="/profile" Icon="@Icons.Material.Filled.Settings">Настройки профиля</MudMenuItem>
+            <MudMenuItem Href="/friends" Icon="@Icons.Material.Filled.PeopleAlt">Мои друзья</MudMenuItem>
+            <MudDivider />
+            <MudMenuItem Icon="@Icons.Material.Filled.Logout" OnClick="async() => { await CurrentState.LogOutAsync(); }">Выйти</MudMenuItem>
+        </ChildContent>
     </MudMenu>
 }
 else
