@@ -1,6 +1,9 @@
 using Data.Services;
 using Data.State;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption.ConfigurationModel;
+using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption;
 using MudBlazor.Services;
 using SH.Web.Services;
 using Shared.Components.Dialogs;
@@ -17,7 +20,14 @@ builder.WebHost.ConfigureKestrel((context, options) =>
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-//builder.Services.AddDataProtection();
+builder.Services.AddDataProtection()
+    .SetApplicationName("SwingHouse.Ru")
+    .UseCryptographicAlgorithms(
+        new AuthenticatedEncryptorConfiguration
+        {
+            EncryptionAlgorithm = EncryptionAlgorithm.AES_256_CBC,
+            ValidationAlgorithm = ValidationAlgorithm.HMACSHA256
+        });
 
 builder.Services.AddScoped(typeof(IRepository<,>), typeof(Repository<,>));
 builder.Services.AddScoped(typeof(IComponentRenderer<>), typeof(ComponentRenderer<>));

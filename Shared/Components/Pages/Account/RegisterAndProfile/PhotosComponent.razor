@@ -50,7 +50,7 @@
                         }
                         <div class="d-flex">
                             <MudTextField T="string" Value="@photo.Comment" ValueChanged="@((c) => Data.UpdateCommentPhoto(photo, c))" Label="Описание" Variant="Variant.Text" />
-                            <MudMenu Icon="@Icons.Material.Filled.MoreVert" Size="Size.Small" AnchorOrigin="Origin.BottomLeft" TransformOrigin="Origin.TopCenter" Dense>
+                            <MudMenu Icon="@Icons.Material.Filled.MoreVert" Size="Size.Small" AnchorOrigin="Origin.TopLeft" TransformOrigin="Origin.TopLeft" Dense>
                                 <MudMenuItem Disabled="@photo.IsAvatar" OnClick="@(() => Data.SetAsAvatarPhoto(photo))" Icon="@Icons.Material.Filled.Portrait">Установить как аватар</MudMenuItem>
                                 <MudMenuItem Disabled="@photo.IsAvatar" OnClick="@(() => photo.IsDeleted = true)" IconColor="Color.Error" Icon="@Icons.Material.Outlined.Delete">Удалить</MudMenuItem>
                             </MudMenu>
