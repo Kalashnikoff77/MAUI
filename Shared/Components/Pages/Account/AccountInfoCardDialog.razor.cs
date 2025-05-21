@@ -14,7 +14,7 @@ namespace Shared.Components.Pages.Account
     public partial class AccountInfoCardDialog : IDisposable
     {
         [CascadingParameter] CurrentState CurrentState { get; set; } = null!;
-        [CascadingParameter] MudDialogInstance MudDialog { get; set; } = null!;
+        [CascadingParameter] IMudDialogInstance MudDialog { get; set; } = null!;
         [Inject] ShowDialogs ShowDialogs { get; set; } = null!;
 
         [Parameter, EditorRequired] public AccountsViewDto Account { get; set; } = null!;

@@ -11,7 +11,7 @@ namespace Shared.Components.Pages.Events
     public class ScheduleInfoBase : ComponentBase
     {
         [CascadingParameter] protected CurrentState CurrentState { get; set; } = null!;
-        [CascadingParameter] protected MudDialogInstance MudDialog { get; set; } = null!;
+        [CascadingParameter] protected IMudDialogInstance MudDialog { get; set; } = null!;
 
         protected SchedulesForEventsViewDto ScheduleForEventView { get; set; } = null!;
         protected SchedulesDatesViewDto selectedSchedule { get; set; } = null!;

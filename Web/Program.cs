@@ -11,11 +11,11 @@ using Web.Components;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.WebHost.ConfigureKestrel((context, options) =>
-{
-    options.Listen(System.Net.IPAddress.Any, 7443, options => options.UseHttps(@"C:\Projects\Projects\MAUI\More\certificate.pfx", "Oleg184977"));
-    options.Listen(System.Net.IPAddress.Any, 780);
-});
+//builder.WebHost.ConfigureKestrel((context, options) =>
+//{
+//    options.Listen(System.Net.IPAddress.Any, 7443, options => options.UseHttps(@"C:\Projects\Projects\MAUI\More\certificate.pfx", "Oleg184977"));
+//    options.Listen(System.Net.IPAddress.Any, 780);
+//});
 
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();

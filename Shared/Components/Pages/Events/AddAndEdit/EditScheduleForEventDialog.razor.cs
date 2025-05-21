@@ -12,7 +12,7 @@ namespace Shared.Components.Pages.Events.AddAndEdit
 {
     public partial class EditScheduleForEventDialog
     {
-        [CascadingParameter] MudDialogInstance MudDialog { get; set; } = null!;
+        [CascadingParameter] IMudDialogInstance MudDialog { get; set; } = null!;
         [Parameter, EditorRequired] public SchedulesForEventsViewDto Schedule { get; set; } = null!;
 
         [Inject] IRepository<GetFeaturesRequestDto, GetFeaturesResponseDto> _repoGetFeatures { get; set; } = null!;

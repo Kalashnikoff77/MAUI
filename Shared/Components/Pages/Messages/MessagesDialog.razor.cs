@@ -18,7 +18,7 @@ namespace Shared.Components.Pages.Messages
     public partial class MessagesDialog : IAsyncDisposable
     {
         [CascadingParameter] public CurrentState CurrentState { get; set; } = null!;
-        [CascadingParameter] protected MudDialogInstance MudDialog { get; set; } = null!;
+        [CascadingParameter] protected IMudDialogInstance MudDialog { get; set; } = null!;
         [Parameter, EditorRequired] public AccountsViewDto Recipient { get; set; } = null!;
 
         [Inject] IRepository<GetMessagesRequestDto, GetMessagesResponseDto> _repoGetMessages { get; set; } = null!;

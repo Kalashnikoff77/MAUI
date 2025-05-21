@@ -11,7 +11,7 @@ namespace Shared.Components.Pages.Events
 {
     public partial class RegisterForScheduleDialog
     {
-        [CascadingParameter] MudDialogInstance MudDialog { get; set; } = null!;
+        [CascadingParameter] IMudDialogInstance MudDialog { get; set; } = null!;
         [CascadingParameter] CurrentState CurrentState { get; set; } = null!;
         [Parameter, EditorRequired] public SchedulesForEventsViewDto ScheduleForEventView { get; set; } = null!;
         [Parameter, EditorRequired] public bool IsRegistered { get; set; }

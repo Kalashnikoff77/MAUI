@@ -8,7 +8,7 @@ namespace Shared.Components.Pages.Account.RegisterAndProfile
 {
     public partial class EditUserDialog
     {
-        [CascadingParameter] MudDialogInstance MudDialog { get; set; } = null!;
+        [CascadingParameter] IMudDialogInstance MudDialog { get; set; } = null!;
         [Parameter] public UsersDto User { get; set; } = null!;
 
         Dictionary<short, DialogProperty> dialogProperties { get; set; } = null!;

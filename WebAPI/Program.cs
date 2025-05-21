@@ -9,11 +9,11 @@ using WebAPI.Mapping;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.WebHost.ConfigureKestrel((context, options) =>
-{
-    options.Listen(System.Net.IPAddress.Any, 7011, options => options.UseHttps(@"C:\Projects\Projects\MAUI\More\certificate.pfx", "Oleg184977"));
-    options.Listen(System.Net.IPAddress.Any, 7010);
-});
+//builder.WebHost.ConfigureKestrel((context, options) =>
+//{
+//    options.Listen(System.Net.IPAddress.Any, 7011, options => options.UseHttps(@"C:\Projects\Projects\MAUI\More\certificate.pfx", "Oleg184977"));
+//    options.Listen(System.Net.IPAddress.Any, 7010);
+//});
 
 builder.Services.AddControllers()
     .AddJsonOptions(opt =>
@@ -65,13 +65,8 @@ builder.Services.AddCors(o => o.AddPolicy("CorsPolicy", builder =>
            .AllowAnyMethod()
            .AllowAnyHeader()
            .AllowCredentials()
-           .WithOrigins("https://swinghouse.ru:7000");
+           .WithOrigins("https://localhost:7000");
 }));
-
-//builder.Services.AddDbContext<SwContext>(options =>
-//{
-//    options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
-//});
 
 var app = builder.Build();
 
