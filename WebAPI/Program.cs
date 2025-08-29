@@ -11,7 +11,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 //builder.WebHost.ConfigureKestrel((context, options) =>
 //{
-//    options.Listen(System.Net.IPAddress.Any, 7011, options => options.UseHttps(@"C:\Projects\Projects\MAUI\More\certificate.pfx", "Oleg184977"));
+//    options.Listen(System.Net.IPAddress.Any, 7011, options => options.UseHttps(@"C:\Projects\Projects\MAUI\More\certificate.pfx", "O*******77"));
 //    options.Listen(System.Net.IPAddress.Any, 7010);
 //});
 
